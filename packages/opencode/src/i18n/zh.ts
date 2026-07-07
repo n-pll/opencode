@@ -317,7 +317,7 @@ export const dict: Partial<Record<Keys, string>> = {
   "cli.mcp.logout.intro": "MCP OAuth 登出",
   "cli.mcp.logout.warn.no-credentials": "未存储 MCP OAuth 凭据",
   "cli.mcp.logout.prompt.select-server": "选择要登出的 MCP 服务器",
-  "cli.mcp.logout.hint.tokens-client": "tokens + client",
+  "cli.mcp.logout.hint.tokens-client": "tokens + client 注册信息",
   "cli.mcp.logout.hint.tokens": "tokens",
   "cli.mcp.logout.hint.client-registration": "客户端注册",
   "cli.mcp.logout.error.no-credentials-for": "未找到凭据：{{serverName}}",

@@ -4,6 +4,17 @@
 - The default branch in this repo is `dev`.
 - Local `main` ref may not exist; use `dev` or `origin/dev` for diffs.
 
+## Internationalization (i18n)
+
+User-facing text must not be hardcoded. Add a dictionary key and a Simplified Chinese (`zh`) translation instead.
+
+- **Namespaces**: `core.*` (headless errors/logs, dict in `packages/core/src/i18n`), `cli.*` (CLI command/prompt/error text, dict in `packages/opencode/src/i18n`), `tui.*` (TUI interface + keybind descriptions, dict in `packages/tui/src/i18n`), `ui.*` (shared web/desktop, dict in `packages/ui/src/i18n`). The web/desktop apps already use `ui.*`.
+- **Placeholders**: use `{{param}}` (e.g. `"Model not found: {{providerID}}/{{modelID}}"`), resolved by the core engine's `resolveTemplate`.
+- **Adding a string**: add the key+English to the package's `en.ts`, then the key+Chinese to `zh.ts`. Every `en` key must have a `zh` entry (parity tests in each `test/i18n-parity.test.ts` enforce this).
+- **Consuming**: CLI/core code imports `t` from `@opencode-ai/core/i18n` or `@/i18n`; TUI components call `useLanguage().t(...)` from `context/language`.
+- **Locale resolution**: `OPENCODE_LOCALE` env → `LC_ALL`/`LC_MESSAGES`/`LANG` env → config `locale` field → `en`. The TUI persists the user's choice to the KV store.
+- Technical tokens and brand names (e.g. "API key", "Warp", "tokens") may stay verbatim in `zh` when that is the convention; the parity test allows a small set of these.
+
 ## Branch Names
 
 Use a short branch name of at most three words, separated by hyphens. Do not use slashes or type prefixes such as `feat/` or `fix/`.
