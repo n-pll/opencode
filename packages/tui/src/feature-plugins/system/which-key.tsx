@@ -3,6 +3,9 @@ import { RGBA, TextAttributes, type KeyEvent, type Renderable } from "@opentui/c
 import { useTerminalDimensions } from "@opentui/solid"
 import { createEffect, createMemo, createSignal, For, Show } from "solid-js"
 import { useBindings, useKeymapSelector } from "../../keymap"
+import { resolveCommandDescription } from "../../config/keybind"
+import { useLanguage } from "../../context/language"
+import type { I18nParams } from "@opencode-ai/core/i18n"
 import type { ActiveKey } from "@opentui/keymap"
 import type { TuiPlugin, TuiPluginApi } from "@opencode-ai/plugin/tui"
 import type { BuiltinTuiPlugin } from "../builtins"
@@ -111,10 +114,19 @@ function skin(api: TuiPluginApi): Skin {
   }
 }
 
-function activeKeyLabel(active: ActiveKey<Renderable, KeyEvent>) {
+function activeKeyLabel(
+  active: ActiveKey<Renderable, KeyEvent>,
+  t: (key: string, params?: I18nParams) => string,
+) {
   if (active.continues) return text(active.tokenName) ?? text(active.display) ?? UNKNOWN
+  const command = text(active.commandAttrs?.name)
+  const resolved = command ? resolveCommandDescription(command, t) : undefined
   return (
-    text(active.commandAttrs?.title) ?? text(active.bindingAttrs?.desc) ?? text(active.commandAttrs?.desc) ?? UNKNOWN
+    text(active.commandAttrs?.title) ??
+    resolved ??
+    text(active.bindingAttrs?.desc) ??
+    text(active.commandAttrs?.desc) ??
+    UNKNOWN
   )
 }
 
@@ -123,7 +135,11 @@ function activeKeyGroup(active: ActiveKey<Renderable, KeyEvent>) {
   return text(active.commandAttrs?.category) ?? text(active.bindingAttrs?.group) ?? UNKNOWN
 }
 
-function activeKeyEntry(api: TuiPluginApi, active: ActiveKey<Renderable, KeyEvent>): Entry {
+function activeKeyEntry(
+  api: TuiPluginApi,
+  active: ActiveKey<Renderable, KeyEvent>,
+  t: (key: string, params?: I18nParams) => string,
+): Entry {
   const key = api.keys.formatSequence([
     {
       stroke: active.stroke,
@@ -131,7 +147,7 @@ function activeKeyEntry(api: TuiPluginApi, active: ActiveKey<Renderable, KeyEven
       tokenName: active.tokenName,
     },
   ])
-  const label = activeKeyLabel(active)
+  const label = activeKeyLabel(active, t)
   return {
     type: "entry",
     key,
@@ -191,6 +207,7 @@ function WhichKeyPanel(props: {
   const dimensions = useTerminalDimensions()
   const [offset, setOffset] = createSignal(0)
   const [activeGroup, setActiveGroup] = createSignal<string | undefined>()
+  const { t } = useLanguage()
   const pending = useKeymapSelector((keymap) => keymap.getPendingSequence())
   const active = useKeymapSelector((keymap) => keymap.getActiveKeys({ includeMetadata: true }))
   const pendingActive = createMemo(() => pending().length > 0 && active().length > 0)
@@ -206,7 +223,7 @@ function WhichKeyPanel(props: {
   const columns = createMemo(() =>
     Math.max(1, Math.min(3, Math.floor((contentWidth() + COLUMN_GAP) / (MAX_COLUMN_WIDTH + COLUMN_GAP)) || 1)),
   )
-  const entries = createMemo(() => active().map((item) => activeKeyEntry(props.api, item)))
+  const entries = createMemo(() => active().map((item) => activeKeyEntry(props.api, item, t)))
   const groups = createMemo(() => grouped(entries()))
   const tabsVisible = createMemo(() => !pendingMode() && groups().length > 0)
   const headerVisible = createMemo(() => tabsVisible() || pendingMode())

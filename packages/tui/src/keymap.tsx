@@ -15,7 +15,8 @@ import {
 import { KeymapProvider, useKeymap, useKeymapSelector, useBindings } from "@opentui/keymap/solid"
 import { createMemo, type Accessor } from "solid-js"
 import { useTuiConfig } from "./config"
-import { TuiKeybind } from "./config/keybind"
+import { TuiKeybind, resolveCommandDescription } from "./config/keybind"
+import { useLanguage } from "./context/language"
 
 export const LEADER_TOKEN = "leader"
 export const OPENCODE_BASE_MODE = "base"
@@ -259,6 +260,7 @@ export function useCommandShortcut(command: string): Accessor<string> {
 
 export function useCommandSlashes(): Accessor<readonly CommandSlashEntry[]> {
   const keymap = useOpencodeKeymap()
+  const { t } = useLanguage()
   const entries = useKeymapSelector((keymap: OpenTuiKeymap) =>
     keymap.getCommandEntries({
       visibility: "reachable",
@@ -272,14 +274,16 @@ export function useCommandSlashes(): Accessor<readonly CommandSlashEntry[]> {
       const slashName = entry.command.slashName
       if (typeof slashName !== "string" || !slashName) return []
       const slashAliases = entry.command.slashAliases
+      const resolved = resolveCommandDescription(entry.command.name, t)
       return {
         display: `/${slashName}`,
         description:
-          typeof entry.command.desc === "string"
+          resolved ??
+          (typeof entry.command.desc === "string"
             ? entry.command.desc
             : typeof entry.command.title === "string"
               ? entry.command.title
-              : undefined,
+              : undefined),
         aliases: Array.isArray(slashAliases)
           ? slashAliases.filter((alias): alias is string => typeof alias === "string").map((alias) => `/${alias}`)
           : undefined,
