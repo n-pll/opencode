@@ -50,6 +50,7 @@ import { DialogAgent } from "./component/dialog-agent"
 import { DialogSessionList } from "./component/dialog-session-list"
 import { DialogWorkspaceList } from "./component/dialog-workspace-list"
 import { DialogConsoleOrg } from "./component/dialog-console-org"
+import { DialogLanguage } from "./component/dialog-language"
 import { ThemeProvider, useTheme } from "./context/theme"
 import { Home } from "./routes/home"
 import { Session } from "./routes/session"
@@ -788,6 +789,16 @@ function App(props: { onSnapshot?: () => Promise<string[]>; pluginHost: TuiPlugi
         slashName: "themes",
         run: () => {
           dialog.replace(() => <DialogThemeList />)
+        },
+        category: t("tui.category.system"),
+      },
+      {
+        name: "language.switch",
+        title: t("tui.command.language.switch.title"),
+        slashName: "language",
+        slashAliases: ["lang"],
+        run: () => {
+          dialog.replace(() => <DialogLanguage />)
         },
         category: t("tui.category.system"),
       },
