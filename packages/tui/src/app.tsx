@@ -61,6 +61,7 @@ import { DialogConfirm } from "./ui/dialog-confirm"
 import { ToastProvider, useToast } from "./ui/toast"
 import { isDefaultTitle } from "./util/session"
 import { KVProvider, useKV } from "./context/kv"
+import { LanguageProvider, useLanguage } from "./context/language"
 import * as Model from "./util/model"
 import { ArgsProvider, useArgs, type Args } from "./context/args"
 import open from "open"
@@ -282,6 +283,7 @@ export const run = Effect.fn("Tui.run")(function* (input: TuiInput) {
                           <OpencodeKeymapProvider keymap={keymap}>
                             <ArgsProvider {...input.args}>
                               <KVProvider>
+                                <LanguageProvider>
                                 <ToastProvider>
                                   <RouteProvider
                                     initialRoute={
@@ -337,6 +339,7 @@ export const run = Effect.fn("Tui.run")(function* (input: TuiInput) {
                                     </TuiConfigProvider>
                                   </RouteProvider>
                                 </ToastProvider>
+                                </LanguageProvider>
                               </KVProvider>
                             </ArgsProvider>
                           </OpencodeKeymapProvider>
