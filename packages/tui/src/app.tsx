@@ -873,7 +873,7 @@ function App(props: { onSnapshot?: () => Promise<string[]>; pluginHost: TuiPlugi
           const files = await props.onSnapshot?.()
           toast.show({
             variant: "info",
-            message: t("tui.toast.heap_snapshot_written", { files: files?.join(", ") }),
+            message: t("tui.toast.heap_snapshot_written", { files: files?.join(", ") ?? "" }),
             duration: 5000,
           })
           dialog.clear()
