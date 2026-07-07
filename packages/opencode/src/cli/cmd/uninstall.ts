@@ -8,6 +8,7 @@ import path from "path"
 import os from "os"
 import { Filesystem } from "@/util/filesystem"
 import { Process } from "@/util/process"
+import { t } from "@/i18n"
 
 interface UninstallArgs {
   keepConfig: boolean
@@ -24,30 +25,30 @@ interface RemovalTargets {
 
 export const UninstallCommand = {
   command: "uninstall",
-  describe: "uninstall opencode and remove all related files",
+  describe: t("cli.uninstall.describe"),
   builder: (yargs: Argv) =>
     yargs
       .option("keep-config", {
         alias: "c",
         type: "boolean",
-        describe: "keep configuration files",
+        describe: t("cli.uninstall.option.keep-config"),
         default: false,
       })
       .option("keep-data", {
         alias: "d",
         type: "boolean",
-        describe: "keep session data and snapshots",
+        describe: t("cli.uninstall.option.keep-data"),
         default: false,
       })
       .option("dry-run", {
         type: "boolean",
-        describe: "show what would be removed without removing",
+        describe: t("cli.uninstall.option.dry-run"),
         default: false,
       })
       .option("force", {
         alias: "f",
         type: "boolean",
-        describe: "skip confirmation prompts",
+        describe: t("cli.uninstall.option.force"),
         default: false,
       }),
 
@@ -55,10 +56,10 @@ export const UninstallCommand = {
     UI.empty()
     UI.println(UI.logo("  "))
     UI.empty()
-    prompts.intro("Uninstall OpenCode")
+    prompts.intro(t("cli.uninstall.intro"))
 
     const method = await Installation.method()
-    prompts.log.info(`Installation method: ${method}`)
+    prompts.log.info(t("cli.uninstall.log.install-method", { method }))
 
     const targets = await collectRemovalTargets(args, method)
 
@@ -66,33 +67,33 @@ export const UninstallCommand = {
 
     if (!args.force && !args.dryRun) {
       const confirm = await prompts.confirm({
-        message: "Are you sure you want to uninstall?",
+        message: t("cli.uninstall.prompt.confirm"),
         initialValue: false,
       })
       if (!confirm || prompts.isCancel(confirm)) {
-        prompts.outro("Cancelled")
+        prompts.outro(t("cli.uninstall.outro.cancelled"))
         return
       }
     }
 
     if (args.dryRun) {
-      prompts.log.warn("Dry run - no changes made")
-      prompts.outro("Done")
+      prompts.log.warn(t("cli.uninstall.log.dry-run"))
+      prompts.outro(t("cli.uninstall.outro.done"))
       return
     }
 
     await executeUninstall(method, targets)
 
-    prompts.outro("Done")
+    prompts.outro(t("cli.uninstall.outro.done"))
   },
 }
 
 async function collectRemovalTargets(args: UninstallArgs, method: Installation.Method): Promise<RemovalTargets> {
   const directories: RemovalTargets["directories"] = [
-    { path: Global.Path.data, label: "Data", keep: args.keepData },
-    { path: Global.Path.cache, label: "Cache", keep: false },
-    { path: Global.Path.config, label: "Config", keep: args.keepConfig },
-    { path: Global.Path.state, label: "State", keep: false },
+    { path: Global.Path.data, label: t("cli.uninstall.label.data"), keep: args.keepData },
+    { path: Global.Path.cache, label: t("cli.uninstall.label.cache"), keep: false },
+    { path: Global.Path.config, label: t("cli.uninstall.label.config"), keep: args.keepConfig },
+    { path: Global.Path.state, label: t("cli.uninstall.label.state"), keep: false },
   ]
 
   const shellConfig = method === "curl" ? await getShellConfigFile() : null
@@ -102,7 +103,7 @@ async function collectRemovalTargets(args: UninstallArgs, method: Installation.M
 }
 
 async function showRemovalSummary(targets: RemovalTargets, method: Installation.Method) {
-  prompts.log.message("The following will be removed:")
+  prompts.log.message(t("cli.uninstall.log.removal-summary-header"))
 
   for (const dir of targets.directories) {
     const exists = await fs
@@ -113,18 +114,18 @@ async function showRemovalSummary(targets: RemovalTargets, method: Installation.
 
     const size = await getDirectorySize(dir.path)
     const sizeStr = formatSize(size)
-    const status = dir.keep ? UI.Style.TEXT_DIM + "(keeping)" : ""
+    const status = dir.keep ? UI.Style.TEXT_DIM + t("cli.uninstall.status.keeping") : ""
     const prefix = dir.keep ? "○" : "✓"
 
     prompts.log.info(`  ${prefix} ${dir.label}: ${shortenPath(dir.path)} ${UI.Style.TEXT_DIM}(${sizeStr})${status}`)
   }
 
   if (targets.binary) {
-    prompts.log.info(`  ✓ Binary: ${shortenPath(targets.binary)}`)
+    prompts.log.info(`  ✓ ${t("cli.uninstall.label.binary")}: ${shortenPath(targets.binary)}`)
   }
 
   if (targets.shellConfig) {
-    prompts.log.info(`  ✓ Shell PATH in ${shortenPath(targets.shellConfig)}`)
+    prompts.log.info(`  ✓ ${t("cli.uninstall.label.shell-path", { file: shortenPath(targets.shellConfig) })}`)
   }
 
   if (method !== "curl" && method !== "unknown") {
@@ -137,7 +138,7 @@ async function showRemovalSummary(targets: RemovalTargets, method: Installation.
       choco: "choco uninstall opencode",
       scoop: "scoop uninstall opencode",
     }
-    prompts.log.info(`  ✓ Package: ${cmds[method] || method}`)
+    prompts.log.info(`  ✓ ${t("cli.uninstall.label.package")}: ${cmds[method] || method}`)
   }
 }
 
@@ -147,7 +148,7 @@ async function executeUninstall(method: Installation.Method, targets: RemovalTar
 
   for (const dir of targets.directories) {
     if (dir.keep) {
-      prompts.log.step(`Skipping ${dir.label} (--keep-${dir.label.toLowerCase()})`)
+      prompts.log.step(t("cli.uninstall.log.skipping", { label: dir.label, key: dir.label.toLowerCase() }))
       continue
     }
 
@@ -157,24 +158,24 @@ async function executeUninstall(method: Installation.Method, targets: RemovalTar
       .catch(() => false)
     if (!exists) continue
 
-    spinner.start(`Removing ${dir.label}...`)
+    spinner.start(t("cli.uninstall.spinner.removing", { label: dir.label }))
     const err = await fs.rm(dir.path, { recursive: true, force: true }).catch((e) => e)
     if (err) {
-      spinner.stop(`Failed to remove ${dir.label}`, 1)
+      spinner.stop(t("cli.uninstall.spinner.failed-remove", { label: dir.label }), 1)
       errors.push(`${dir.label}: ${err.message}`)
       continue
     }
-    spinner.stop(`Removed ${dir.label}`)
+    spinner.stop(t("cli.uninstall.spinner.removed", { label: dir.label }))
   }
 
   if (targets.shellConfig) {
-    spinner.start("Cleaning shell config...")
+    spinner.start(t("cli.uninstall.spinner.cleaning-shell"))
     const err = await cleanShellConfig(targets.shellConfig).catch((e) => e)
     if (err) {
-      spinner.stop("Failed to clean shell config", 1)
+      spinner.stop(t("cli.uninstall.spinner.failed-clean-shell"), 1)
       errors.push(`Shell config: ${err.message}`)
     } else {
-      spinner.stop("Cleaned shell config")
+      spinner.stop(t("cli.uninstall.spinner.cleaned-shell"))
     }
   }
 
@@ -191,27 +192,27 @@ async function executeUninstall(method: Installation.Method, targets: RemovalTar
 
     const cmd = cmds[method]
     if (cmd) {
-      spinner.start(`Running ${cmd.join(" ")}...`)
+      spinner.start(t("cli.uninstall.spinner.running-cmd", { cmd: cmd.join(" ") }))
       const result = await Process.run(method === "choco" ? ["choco", "uninstall", "opencode", "-y", "-r"] : cmd, {
         nothrow: true,
       })
       if (result.code !== 0) {
-        spinner.stop(`Package manager uninstall failed: exit code ${result.code}`, 1)
+        spinner.stop(t("cli.uninstall.spinner.pkgmgr-failed", { code: result.code }), 1)
         const text = `${result.stdout.toString("utf8")}\n${result.stderr.toString("utf8")}`
         if (method === "choco" && text.includes("not running from an elevated command shell")) {
-          prompts.log.warn(`You may need to run '${cmd.join(" ")}' from an elevated command shell`)
+          prompts.log.warn(t("cli.uninstall.log.run-elevated", { cmd: cmd.join(" ") }))
         } else {
-          prompts.log.warn(`You may need to run manually: ${cmd.join(" ")}`)
+          prompts.log.warn(t("cli.uninstall.log.run-manually", { cmd: cmd.join(" ") }))
         }
       } else {
-        spinner.stop("Package removed")
+        spinner.stop(t("cli.uninstall.spinner.package-removed"))
       }
     }
   }
 
   if (method === "curl" && targets.binary) {
     UI.empty()
-    prompts.log.message("To finish removing the binary, run:")
+    prompts.log.message(t("cli.uninstall.log.finish-binary-header"))
     prompts.log.info(`  rm "${targets.binary}"`)
 
     const binDir = path.dirname(targets.binary)
@@ -222,14 +223,14 @@ async function executeUninstall(method: Installation.Method, targets: RemovalTar
 
   if (errors.length > 0) {
     UI.empty()
-    prompts.log.warn("Some operations failed:")
+    prompts.log.warn(t("cli.uninstall.log.some-failed"))
     for (const err of errors) {
       prompts.log.error(`  ${err}`)
     }
   }
 
   UI.empty()
-  prompts.log.success("Thank you for using OpenCode!")
+  prompts.log.success(t("cli.uninstall.log.thank-you"))
 }
 
 async function getShellConfigFile(): Promise<string | null> {

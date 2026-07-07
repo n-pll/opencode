@@ -1,5 +1,6 @@
 import { EOL } from "os"
 import { Schema } from "effect"
+import { t } from "@/i18n"
 import { logo as glyphs } from "./logo"
 
 const wordmark = [
@@ -119,10 +120,11 @@ export async function input(prompt: string): Promise<string> {
 }
 
 export function error(message: string) {
-  if (message.startsWith("Error: ")) {
-    message = message.slice("Error: ".length)
+  const prefix = t("cli.ui.error.prefix")
+  if (message.startsWith(prefix)) {
+    message = message.slice(prefix.length)
   }
-  println(Style.TEXT_DANGER_BOLD + "Error: " + Style.TEXT_NORMAL + message)
+  println(Style.TEXT_DANGER_BOLD + prefix + Style.TEXT_NORMAL + message)
 }
 
 export function markdown(text: string): string {

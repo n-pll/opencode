@@ -1,9 +1,10 @@
 import { EOL } from "os"
 import { cmd } from "../cmd"
+import { t } from "@/i18n"
 
 export const ScrapCommand = cmd({
   command: "scrap",
-  describe: "list all known projects",
+  describe: t("cli.debug.scrap.describe"),
   builder: (yargs) => yargs,
   async handler() {
     const { Project } = await import("@/project/project")

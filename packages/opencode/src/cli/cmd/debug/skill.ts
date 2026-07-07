@@ -2,10 +2,11 @@ import { EOL } from "os"
 import { Effect } from "effect"
 import { Skill } from "../../../skill"
 import { effectCmd } from "../../effect-cmd"
+import { t } from "@/i18n"
 
 export const SkillCommand = effectCmd({
   command: "skill",
-  describe: "list all available skills",
+  describe: t("cli.debug.skill.describe"),
   builder: (yargs) => yargs,
   handler: Effect.fn("Cli.debug.skill")(function* () {
     const skill = yield* Skill.Service

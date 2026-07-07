@@ -5,10 +5,11 @@ import { LocationServiceMap, locationServiceMapLayer } from "@opencode-ai/core/l
 import { Location } from "@opencode-ai/core/location"
 import { AbsolutePath } from "@opencode-ai/core/schema"
 import { effectCmd } from "../../effect-cmd"
+import { t } from "@/i18n"
 
 export const V2Command = effectCmd({
   command: "v2",
-  describe: "debug v2 catalog and built-in plugins",
+  describe: t("cli.debug.v2.describe"),
   instance: false,
   handler: () =>
     Effect.gen(function* () {

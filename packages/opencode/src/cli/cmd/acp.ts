@@ -5,13 +5,14 @@ import { ServerAuth } from "@/server/auth"
 import { createOpencodeClient } from "@opencode-ai/sdk/v2"
 import { withNetworkOptions, resolveNetworkOptions } from "../network"
 import { ACPProfile } from "@/acp/profile"
+import { t } from "@/i18n"
 
 export const AcpCommand = effectCmd({
   command: "acp",
-  describe: "start ACP (Agent Client Protocol) server",
+  describe: t("cli.acp.describe"),
   builder: (yargs) => {
     return withNetworkOptions(yargs).option("cwd", {
-      describe: "working directory",
+      describe: t("cli.acp.option.cwd"),
       type: "string",
       default: process.cwd(),
     })

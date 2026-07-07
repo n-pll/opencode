@@ -3,48 +3,49 @@ import { UI } from "@/cli/ui"
 import { errorMessage } from "@opencode-ai/tui/util/error"
 import { validateSession } from "../tui/validate-session"
 import { ServerAuth } from "@/server/auth"
+import { t } from "@/i18n"
 
 export const AttachCommand = cmd({
   command: "attach <url>",
-  describe: "attach to a running opencode server",
+  describe: t("cli.attach.describe"),
   builder: (yargs) =>
     yargs
       .positional("url", {
         type: "string",
-        describe: "http://localhost:4096",
+        describe: t("cli.attach.positional.url"),
         demandOption: true,
       })
       .option("dir", {
         type: "string",
-        description: "directory to run in",
+        description: t("cli.attach.option.dir"),
       })
       .option("continue", {
         alias: ["c"],
-        describe: "continue the last session",
+        describe: t("cli.attach.option.continue"),
         type: "boolean",
       })
       .option("session", {
         alias: ["s"],
         type: "string",
-        describe: "session id to continue",
+        describe: t("cli.attach.option.session"),
       })
       .option("fork", {
         type: "boolean",
-        describe: "fork the session when continuing (use with --continue or --session)",
+        describe: t("cli.attach.option.fork"),
       })
       .option("password", {
         alias: ["p"],
         type: "string",
-        describe: "basic auth password (defaults to OPENCODE_SERVER_PASSWORD)",
+        describe: t("cli.attach.option.password"),
       })
       .option("username", {
         alias: ["u"],
         type: "string",
-        describe: "basic auth username (defaults to OPENCODE_SERVER_USERNAME or 'opencode')",
+        describe: t("cli.attach.option.username"),
       })
       .option("mini", {
         type: "boolean",
-        describe: "start the minimal interactive interface",
+        describe: t("cli.attach.option.mini"),
         default: false,
       })
       .option("replay", {
@@ -53,15 +54,15 @@ export const AttachCommand = cmd({
       })
       .option("no-replay", {
         type: "boolean",
-        describe: "disable mini session history replay on resume and after resize",
+        describe: t("cli.attach.option.no-replay"),
       })
       .option("replay-limit", {
         type: "number",
-        describe: "cap visible mini replay to the newest N messages",
+        describe: t("cli.attach.option.replay-limit"),
       }),
   handler: async (args) => {
     if (args.replay === true) {
-      UI.error("--replay is not supported; replay is enabled by default")
+      UI.error(t("cli.attach.error.replay-unsupported"))
       process.exitCode = 1
       return
     }
@@ -99,14 +100,14 @@ export const AttachCommand = cmd({
       ["--replay-limit", args.replayLimit !== undefined],
     ].find((entry) => entry[1])?.[0]
     if (unsupported) {
-      UI.error(`${unsupported} requires --mini`)
+      UI.error(t("cli.attach.error.option-requires-mini", { option: unsupported }))
       process.exitCode = 1
       return
     }
 
     const { TuiConfig } = await import("@/config/tui")
     if (args.fork && !args.continue && !args.session) {
-      UI.error("--fork requires --continue or --session")
+      UI.error(t("cli.attach.error.fork-requires-continue"))
       process.exitCode = 1
       return
     }

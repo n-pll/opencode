@@ -4,21 +4,22 @@ import { effectCmd, fail } from "../effect-cmd"
 import { Git } from "@/git"
 import { InstanceRef } from "@/effect/instance-ref"
 import { Process } from "@/util/process"
+import { t } from "@/i18n"
 
 export const PrCommand = effectCmd({
   command: "pr <number>",
-  describe: "fetch and checkout a GitHub PR branch, then run opencode",
+  describe: t("cli.pr.describe"),
   builder: (yargs) =>
     yargs.positional("number", {
       type: "number",
-      describe: "PR number to checkout",
+      describe: t("cli.pr.positional.number"),
       demandOption: true,
     }),
   handler: Effect.fn("Cli.pr")(function* (args) {
     const ctx = yield* InstanceRef
-    if (!ctx) return yield* fail("Could not load instance context")
+    if (!ctx) return yield* fail(t("cli.pr.fail.load-instance"))
     if (ctx.project.vcs !== "git") {
-      return yield* fail("Could not find git repository. Please run this command from a git repository.")
+      return yield* fail(t("cli.pr.fail.no-git-repo"))
     }
 
     const git = yield* Git.Service
@@ -26,13 +27,13 @@ export const PrCommand = effectCmd({
 
     const prNumber = args.number
     const localBranchName = `pr/${prNumber}`
-    UI.println(`Fetching and checking out PR #${prNumber}...`)
+    UI.println(t("cli.pr.message.fetching", { prNumber }))
 
     const checkout = yield* Effect.promise(() =>
       Process.run(["gh", "pr", "checkout", `${prNumber}`, "--branch", localBranchName, "--force"], { nothrow: true }),
     )
     if (checkout.code !== 0) {
-      return yield* fail(`Failed to checkout PR #${prNumber}. Make sure you have gh CLI installed and authenticated.`)
+      return yield* fail(t("cli.pr.fail.checkout-failed", { prNumber }))
     }
 
     const prInfoResult = yield* Effect.promise(() =>
@@ -64,7 +65,7 @@ export const PrCommand = effectCmd({
           yield* git.run(["remote", "add", remoteName, `https://github.com/${forkOwner}/${forkName}.git`], {
             cwd: worktree,
           })
-          UI.println(`Added fork remote: ${remoteName}`)
+          UI.println(t("cli.pr.message.added-fork-remote", { remoteName }))
         }
 
         yield* git.run(["branch", `--set-upstream-to=${remoteName}/${prInfo.headRefName}`, localBranchName], {
@@ -76,8 +77,8 @@ export const PrCommand = effectCmd({
         const sessionMatch = prInfo.body.match(/https:\/\/opncd\.ai\/s\/([a-zA-Z0-9_-]+)/)
         if (sessionMatch) {
           const sessionUrl = sessionMatch[0]
-          UI.println(`Found opencode session: ${sessionUrl}`)
-          UI.println(`Importing session...`)
+          UI.println(t("cli.pr.message.found-session", { sessionUrl }))
+          UI.println(t("cli.pr.message.importing"))
 
           const importResult = yield* Effect.promise(() =>
             Process.text(["opencode", "import", sessionUrl], { nothrow: true }),
@@ -86,16 +87,16 @@ export const PrCommand = effectCmd({
             const sessionIdMatch = importResult.text.trim().match(/Imported session: ([a-zA-Z0-9_-]+)/)
             if (sessionIdMatch) {
               sessionId = sessionIdMatch[1]
-              UI.println(`Session imported: ${sessionId}`)
+              UI.println(t("cli.pr.message.session-imported", { sessionId }))
             }
           }
         }
       }
     }
 
-    UI.println(`Successfully checked out PR #${prNumber} as branch '${localBranchName}'`)
+    UI.println(t("cli.pr.message.checked-out", { prNumber, localBranchName }))
     UI.println()
-    UI.println("Starting opencode...")
+    UI.println(t("cli.pr.message.starting"))
     UI.println()
 
     const opencodeArgs = sessionId ? ["-s", sessionId] : []
@@ -110,6 +111,6 @@ export const PrCommand = effectCmd({
     )
     // Match legacy throw semantics — propagate as a defect so the top-level
     // index.ts catch handles it identically (exit 1, "Unexpected error" banner).
-    if (code !== 0) return yield* Effect.die(new Error(`opencode exited with code ${code}`))
+    if (code !== 0) return yield* Effect.die(new Error(t("cli.pr.error.exited", { code })))
   }),
 })

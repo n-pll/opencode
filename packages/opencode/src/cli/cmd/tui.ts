@@ -14,6 +14,7 @@ import { writeHeapSnapshot } from "v8"
 import { ServerAuth } from "@/server/auth"
 import { validateSession } from "../tui/validate-session"
 import { win32InstallCtrlCGuard } from "@opencode-ai/tui/terminal-win32"
+import { t } from "@/i18n"
 
 declare global {
   const OPENCODE_WORKER_PATH: string
@@ -71,43 +72,43 @@ export function resolveThreadDirectory(project?: string, envPWD = process.env.PW
 
 export const TuiThreadCommand = cmd({
   command: "$0 [project]",
-  describe: "start opencode tui",
+  describe: t("cli.tui.describe"),
   builder: (yargs) =>
     withNetworkOptions(yargs)
       .positional("project", {
         type: "string",
-        describe: "path to start opencode in",
+        describe: t("cli.tui.positional.project"),
       })
       .option("model", {
         type: "string",
         alias: ["m"],
-        describe: "model to use in the format of provider/model",
+        describe: t("cli.tui.option.model"),
       })
       .option("continue", {
         alias: ["c"],
-        describe: "continue the last session",
+        describe: t("cli.tui.option.continue"),
         type: "boolean",
       })
       .option("session", {
         alias: ["s"],
         type: "string",
-        describe: "session id to continue",
+        describe: t("cli.tui.option.session"),
       })
       .option("fork", {
         type: "boolean",
-        describe: "fork the session when continuing (use with --continue or --session)",
+        describe: t("cli.tui.option.fork"),
       })
       .option("prompt", {
         type: "string",
-        describe: "prompt to use",
+        describe: t("cli.tui.option.prompt"),
       })
       .option("agent", {
         type: "string",
-        describe: "agent to use",
+        describe: t("cli.tui.option.agent"),
       })
       .option("auto", {
         type: "boolean",
-        describe: "auto-approve permissions that are not explicitly denied (dangerous!)",
+        describe: t("cli.tui.option.auto"),
         default: false,
       })
       .option("yolo", {
@@ -122,7 +123,7 @@ export const TuiThreadCommand = cmd({
       })
       .option("mini", {
         type: "boolean",
-        describe: "start the minimal interactive interface",
+        describe: t("cli.tui.option.mini"),
         default: false,
       })
       .option("replay", {
@@ -131,11 +132,11 @@ export const TuiThreadCommand = cmd({
       })
       .option("no-replay", {
         type: "boolean",
-        describe: "disable mini session history replay on resume and after resize",
+        describe: t("cli.tui.option.no-replay"),
       })
       .option("replay-limit", {
         type: "number",
-        describe: "cap visible mini replay to the newest N messages",
+        describe: t("cli.tui.option.replay-limit"),
       })
       .option("demo", {
         type: "boolean",
@@ -143,7 +144,7 @@ export const TuiThreadCommand = cmd({
       }),
   handler: async (args) => {
     if (args.replay === true) {
-      UI.error("--replay is not supported; replay is enabled by default")
+      UI.error(t("cli.tui.error.replay-unsupported"))
       process.exitCode = 1
       return
     }
@@ -154,7 +155,7 @@ export const TuiThreadCommand = cmd({
         process.argv.some((arg) => arg === option || arg.startsWith(option + "=")),
       )
       if (network) {
-        UI.error(`${network} cannot be used with --mini`)
+        UI.error(t("cli.tui.error.network-no-mini", { network }))
         process.exitCode = 1
         return
       }
@@ -181,7 +182,7 @@ export const TuiThreadCommand = cmd({
       ["--demo", args.demo !== undefined],
     ].find((entry) => entry[1])?.[0]
     if (unsupported) {
-      UI.error(`${unsupported} requires --mini`)
+      UI.error(t("cli.tui.error.option-requires-mini", { option: unsupported }))
       process.exitCode = 1
       return
     }
@@ -190,7 +191,7 @@ export const TuiThreadCommand = cmd({
     try {
       const { TuiConfig } = await import("@/config/tui")
       if (args.fork && !args.continue && !args.session) {
-        UI.error("--fork requires --continue or --session")
+        UI.error(t("cli.tui.error.fork-requires-continue"))
         process.exitCode = 1
         return
       }
@@ -202,7 +203,7 @@ export const TuiThreadCommand = cmd({
       try {
         process.chdir(next)
       } catch {
-        UI.error("Failed to change directory to " + next)
+        UI.error(t("cli.tui.error.chdir-failed", { dir: next }))
         return
       }
       const cwd = Filesystem.resolve(process.cwd())

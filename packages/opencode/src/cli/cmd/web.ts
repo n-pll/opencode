@@ -5,6 +5,7 @@ import { withNetworkOptions, resolveNetworkOptions } from "../network"
 import { Flag } from "@opencode-ai/core/flag/flag"
 import open from "open"
 import { networkInterfaces } from "os"
+import { t } from "@/i18n"
 
 function getNetworkIPs() {
   const nets = networkInterfaces()
@@ -31,14 +32,14 @@ function getNetworkIPs() {
 export const WebCommand = effectCmd({
   command: "web",
   builder: (yargs) => withNetworkOptions(yargs),
-  describe: "start opencode server and open web interface",
+  describe: t("cli.web.describe"),
   // Server loads instances per-request via x-opencode-directory header — no
   // ambient project InstanceContext needed at startup.
   instance: false,
   handler: Effect.fn("Cli.web")(function* (args) {
     const { Server } = yield* Effect.promise(() => import("../../server/server"))
     if (!Flag.OPENCODE_SERVER_PASSWORD) {
-      UI.println(UI.Style.TEXT_WARNING_BOLD + "!  OPENCODE_SERVER_PASSWORD is not set; server is unsecured.")
+      UI.println(UI.Style.TEXT_WARNING_BOLD + t("cli.web.warn.unsecured"))
     }
     const opts = yield* resolveNetworkOptions(args)
     const server = yield* Effect.promise(() => Server.listen(opts))
@@ -49,14 +50,14 @@ export const WebCommand = effectCmd({
     if (opts.hostname === "0.0.0.0") {
       // Show localhost for local access
       const localhostUrl = `http://localhost:${server.port}`
-      UI.println(UI.Style.TEXT_INFO_BOLD + "  Local access:      ", UI.Style.TEXT_NORMAL, localhostUrl)
+      UI.println(UI.Style.TEXT_INFO_BOLD + "  " + t("cli.web.label.local-access").padEnd(18), UI.Style.TEXT_NORMAL, localhostUrl)
 
       // Show network IPs for remote access
       const networkIPs = getNetworkIPs()
       if (networkIPs.length > 0) {
         for (const ip of networkIPs) {
           UI.println(
-            UI.Style.TEXT_INFO_BOLD + "  Network access:    ",
+            UI.Style.TEXT_INFO_BOLD + "  " + t("cli.web.label.network-access").padEnd(18),
             UI.Style.TEXT_NORMAL,
             `http://${ip}:${server.port}`,
           )
@@ -65,7 +66,7 @@ export const WebCommand = effectCmd({
 
       if (opts.mdns) {
         UI.println(
-          UI.Style.TEXT_INFO_BOLD + "  mDNS:              ",
+          UI.Style.TEXT_INFO_BOLD + "  " + t("cli.web.label.mdns").padEnd(18),
           UI.Style.TEXT_NORMAL,
           `${opts.mdnsDomain}:${server.port}`,
         )
@@ -75,7 +76,7 @@ export const WebCommand = effectCmd({
       open(localhostUrl).catch(() => {})
     } else {
       const displayUrl = server.url.toString()
-      UI.println(UI.Style.TEXT_INFO_BOLD + "  Web interface:    ", UI.Style.TEXT_NORMAL, displayUrl)
+      UI.println(UI.Style.TEXT_INFO_BOLD + "  " + t("cli.web.label.web-interface").padEnd(18), UI.Style.TEXT_NORMAL, displayUrl)
       open(displayUrl).catch(() => {})
     }
 

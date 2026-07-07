@@ -4,30 +4,31 @@ import { Ripgrep } from "@opencode-ai/core/ripgrep"
 import { effectCmd } from "../../effect-cmd"
 import { cmd } from "../cmd"
 import { InstanceRef } from "@/effect/instance-ref"
+import { t } from "@/i18n"
 
 export const RipgrepCommand = cmd({
   command: "rg",
-  describe: "ripgrep debugging utilities",
+  describe: t("cli.debug.rg.describe"),
   builder: (yargs) => yargs.command(FilesCommand).command(SearchCommand).demandCommand(),
   async handler() {},
 })
 
 const FilesCommand = effectCmd({
   command: "files",
-  describe: "list files using ripgrep",
+  describe: t("cli.debug.rg.files.describe"),
   builder: (yargs) =>
     yargs
       .option("query", {
         type: "string",
-        description: "Filter files by query",
+        description: t("cli.debug.rg.files.option.query"),
       })
       .option("glob", {
         type: "string",
-        description: "Glob pattern to match files",
+        description: t("cli.debug.rg.files.option.glob"),
       })
       .option("limit", {
         type: "number",
-        description: "Limit number of results",
+        description: t("cli.debug.rg.files.option.limit"),
       }),
   handler: Effect.fn("Cli.debug.rg.files")(function* (args) {
     const ctx = yield* InstanceRef
@@ -46,21 +47,21 @@ const FilesCommand = effectCmd({
 
 const SearchCommand = effectCmd({
   command: "search <pattern>",
-  describe: "search file contents using ripgrep",
+  describe: t("cli.debug.rg.search.describe"),
   builder: (yargs) =>
     yargs
       .positional("pattern", {
         type: "string",
         demandOption: true,
-        description: "Search pattern",
+        description: t("cli.debug.rg.search.positional.pattern"),
       })
       .option("glob", {
         type: "array",
-        description: "File glob patterns",
+        description: t("cli.debug.rg.search.option.glob"),
       })
       .option("limit", {
         type: "number",
-        description: "Limit number of results",
+        description: t("cli.debug.rg.search.option.limit"),
       }),
   handler: Effect.fn("Cli.debug.rg.search")(function* (args) {
     const ctx = yield* InstanceRef

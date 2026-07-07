@@ -13,6 +13,7 @@ import { NotFoundError } from "@/storage/storage"
 import { EOL } from "os"
 import path from "path"
 import { which } from "@opencode-ai/core/util/which"
+import { t } from "@/i18n"
 
 function pagerCmd(): string[] {
   const lessOptions = ["-R", "-S"]
@@ -43,17 +44,17 @@ function pagerCmd(): string[] {
 
 export const SessionCommand = cmd({
   command: "session",
-  describe: "manage sessions",
+  describe: t("cli.session.describe"),
   builder: (yargs: Argv) => yargs.command(SessionListCommand).command(SessionDeleteCommand).demandCommand(),
   async handler() {},
 })
 
 export const SessionDeleteCommand = effectCmd({
   command: "delete <sessionID>",
-  describe: "delete a session",
+  describe: t("cli.session.delete.describe"),
   builder: (yargs) =>
     yargs.positional("sessionID", {
-      describe: "session ID to delete",
+      describe: t("cli.session.delete.positional.sessionID"),
       type: "string",
       demandOption: true,
     }),
@@ -62,23 +63,23 @@ export const SessionDeleteCommand = effectCmd({
     const sessionID = SessionID.make(args.sessionID)
     yield* svc
       .remove(sessionID)
-      .pipe(Effect.catchIf(NotFoundError.isInstance, () => fail(`Session not found: ${args.sessionID}`)))
-    UI.println(UI.Style.TEXT_SUCCESS_BOLD + `Session ${args.sessionID} deleted` + UI.Style.TEXT_NORMAL)
+      .pipe(Effect.catchIf(NotFoundError.isInstance, () => fail(t("cli.session.delete.fail.not-found", { sessionID: args.sessionID }))))
+    UI.println(UI.Style.TEXT_SUCCESS_BOLD + t("cli.session.delete.success", { sessionID: args.sessionID }) + UI.Style.TEXT_NORMAL)
   }),
 })
 
 export const SessionListCommand = effectCmd({
   command: "list",
-  describe: "list sessions",
+  describe: t("cli.session.list.describe"),
   builder: (yargs) =>
     yargs
       .option("max-count", {
         alias: "n",
-        describe: "limit to N most recent sessions",
+        describe: t("cli.session.list.option.max-count"),
         type: "number",
       })
       .option("format", {
-        describe: "output format",
+        describe: t("cli.session.list.option.format"),
         type: "string",
         choices: ["table", "json"],
         default: "table",
@@ -121,7 +122,7 @@ function formatSessionTable(sessions: Session.Info[]): string {
   const maxIdWidth = Math.max(20, ...sessions.map((s) => s.id.length))
   const maxTitleWidth = Math.max(25, ...sessions.map((s) => s.title.length))
 
-  const header = `Session ID${" ".repeat(maxIdWidth - 10)}  Title${" ".repeat(maxTitleWidth - 5)}  Updated`
+  const header = `${t("cli.session.list.header.id")}${" ".repeat(maxIdWidth - 10)}  ${t("cli.session.list.header.title")}${" ".repeat(maxTitleWidth - 5)}  ${t("cli.session.list.header.updated")}`
   lines.push(header)
   lines.push("─".repeat(header.length))
   for (const session of sessions) {

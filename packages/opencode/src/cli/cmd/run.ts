@@ -25,6 +25,7 @@ import { Filesystem } from "@/util/filesystem"
 import { createOpencodeClient, type OpencodeClient, type ToolPart } from "@opencode-ai/sdk/v2"
 import { FormatError, FormatUnknownError } from "../error"
 import { INTERACTIVE_INPUT_ERROR, resolveInteractiveStdin } from "./run/runtime.stdin"
+import { t } from "@/i18n"
 
 type ModelInput = Parameters<OpencodeClient["session"]["prompt"]>[0]["model"]
 
@@ -111,7 +112,7 @@ async function toolError(part: ToolPart) {
     const next = toolInlineInfo(part)
     inline({
       icon: "✗",
-      title: `${next.title} failed`,
+      title: t("cli.run.message.tool-failed", { title: next.title }),
       ...(next.description && { description: next.description }),
     })
     return
@@ -125,7 +126,7 @@ async function toolError(part: ToolPart) {
 
 export const RunCommand = effectCmd({
   command: "run [message..]",
-  describe: "run opencode with a message",
+  describe: t("cli.run.describe"),
   // --attach connects to a remote server (no local instance needed); the
   // default path runs an in-process server and needs the project instance.
   instance: (args) => !args.attach,
@@ -135,87 +136,87 @@ export const RunCommand = effectCmd({
   builder: (yargs: Argv) =>
     yargs
       .positional("message", {
-        describe: "message to send",
+        describe: t("cli.run.positional.message"),
         type: "string",
         array: true,
         default: [],
       })
       .option("command", {
-        describe: "the command to run, use message for args",
+        describe: t("cli.run.option.command"),
         type: "string",
       })
       .option("continue", {
         alias: ["c"],
-        describe: "continue the last session",
+        describe: t("cli.run.option.continue"),
         type: "boolean",
       })
       .option("session", {
         alias: ["s"],
-        describe: "session id to continue",
+        describe: t("cli.run.option.session"),
         type: "string",
       })
       .option("fork", {
-        describe: "fork the session before continuing (requires --continue or --session)",
+        describe: t("cli.run.option.fork"),
         type: "boolean",
       })
       .option("share", {
         type: "boolean",
-        describe: "share the session",
+        describe: t("cli.run.option.share"),
       })
       .option("model", {
         type: "string",
         alias: ["m"],
-        describe: "model to use in the format of provider/model",
+        describe: t("cli.run.option.model"),
       })
       .option("agent", {
         type: "string",
-        describe: "agent to use",
+        describe: t("cli.run.option.agent"),
       })
       .option("format", {
         type: "string",
         choices: ["default", "json"],
         default: "default",
-        describe: "format: default (formatted) or json (raw JSON events)",
+        describe: t("cli.run.option.format"),
       })
       .option("file", {
         alias: ["f"],
         type: "string",
         array: true,
-        describe: "file(s) to attach to message",
+        describe: t("cli.run.option.file"),
       })
       .option("title", {
         type: "string",
-        describe: "title for the session (uses truncated prompt if no value provided)",
+        describe: t("cli.run.option.title"),
       })
       .option("attach", {
         type: "string",
-        describe: "attach to a running opencode server (e.g., http://localhost:4096)",
+        describe: t("cli.run.option.attach"),
       })
       .option("password", {
         alias: ["p"],
         type: "string",
-        describe: "basic auth password (defaults to OPENCODE_SERVER_PASSWORD)",
+        describe: t("cli.run.option.password"),
       })
       .option("username", {
         alias: ["u"],
         type: "string",
-        describe: "basic auth username (defaults to OPENCODE_SERVER_USERNAME or 'opencode')",
+        describe: t("cli.run.option.username"),
       })
       .option("dir", {
         type: "string",
-        describe: "directory to run in, path on remote server if attaching",
+        describe: t("cli.run.option.dir"),
       })
       .option("port", {
         type: "number",
-        describe: "port for the local server (defaults to random port if no value provided)",
+        describe: t("cli.run.option.port"),
       })
       .option("variant", {
         type: "string",
-        describe: "model variant (provider-specific reasoning effort, e.g., high, max, minimal)",
+        describe: t("cli.run.option.variant"),
       })
       .option("thinking", {
         type: "boolean",
-        describe: "show thinking blocks",
+        describe: t("cli.run.option.thinking"),
       })
       .option("mini", {
         type: "boolean",
@@ -226,22 +227,22 @@ export const RunCommand = effectCmd({
         type: "boolean",
         default: true,
         hidden: true,
-        describe: "replay interactive session history on resume and after resize (use --no-replay to disable)",
+        describe: t("cli.run.option.replay"),
       })
       .option("replay-limit", {
         type: "number",
         hidden: true,
-        describe: "cap visible interactive replay to the newest N messages",
+        describe: t("cli.run.option.replay-limit"),
       })
       .option("interactive", {
         alias: ["i"],
         type: "boolean",
-        describe: "run in direct interactive split-footer mode",
+        describe: t("cli.run.option.interactive"),
         default: false,
       })
       .option("auto", {
         type: "boolean",
-        describe: "auto-approve permissions that are not explicitly denied (dangerous!)",
+        describe: t("cli.run.option.auto"),
         default: false,
       })
       .option("yolo", {
@@ -258,7 +259,7 @@ export const RunCommand = effectCmd({
         type: "boolean",
         default: false,
         hidden: true,
-        describe: "enable direct interactive demo slash commands; pass one as the message to run it immediately",
+        describe: t("cli.run.option.demo"),
       }),
   handler: Effect.fn("Cli.run")(function* (args) {
     const { Agent } = yield* Effect.promise(() => import("@/agent/agent"))
@@ -290,34 +291,34 @@ export const RunCommand = effectCmd({
         .join(" ")
 
       if (interactive && args.command) {
-        die("--mini cannot be used with --command")
+        die(t("cli.run.message.mini-no-command"))
       }
 
       if (interactive && args._?.[0] !== "mini") {
-        die("--mini must be used without the run subcommand")
+        die(t("cli.run.message.mini-no-run-subcommand"))
       }
 
       if (args.demo && !interactive) {
-        die("--demo requires --mini")
+        die(t("cli.run.message.demo-requires-mini"))
       }
 
       if (interactive && args.format === "json") {
-        die("--mini cannot be used with --format json")
+        die(t("cli.run.message.mini-no-format-json"))
       }
 
       if (args["replay-limit"] !== undefined && !interactive) {
-        die("--replay-limit requires --mini")
+        die(t("cli.run.message.replay-limit-requires-mini"))
       }
 
       if (
         args["replay-limit"] !== undefined &&
         (!Number.isInteger(args["replay-limit"]) || args["replay-limit"] <= 0)
       ) {
-        die("--replay-limit must be a positive integer")
+        die(t("cli.run.message.replay-limit-positive"))
       }
 
       if (interactive && !process.stdout.isTTY) {
-        die("--mini requires a TTY stdout")
+        die(t("cli.run.message.mini-requires-tty"))
       }
 
       if (interactive) {
@@ -339,7 +340,7 @@ export const RunCommand = effectCmd({
           process.chdir(path.isAbsolute(args.dir) ? args.dir : path.join(root, args.dir))
           return process.cwd()
         } catch {
-          UI.error("Failed to change directory to " + args.dir)
+          UI.error(t("cli.run.message.chdir-failed", { dir: args.dir }))
           process.exit(1)
         }
       })()
@@ -361,14 +362,14 @@ export const RunCommand = effectCmd({
         for (const filePath of list) {
           const resolvedPath = path.resolve(args.attach ? root : (directory ?? root), filePath)
           if (!(await Filesystem.exists(resolvedPath))) {
-            UI.error(`File not found: ${filePath}`)
+            UI.error(t("cli.run.message.file-not-found", { file: filePath }))
             process.exit(1)
           }
 
           const stat = Filesystem.stat(resolvedPath)
           const isDirectory = stat?.isDirectory() ?? false
           if (args.attach && isDirectory) {
-            UI.error(`Cannot attach local directory without a shared filesystem: ${filePath}`)
+            UI.error(t("cli.run.message.cannot-attach-dir", { dir: filePath }))
             process.exit(1)
           }
 
@@ -378,7 +379,7 @@ export const RunCommand = effectCmd({
             try {
               const opened = await handle.stat()
               if (!opened.isFile() || Number(opened.size) > ATTACH_FILE_MAX_BYTES) {
-                UI.error(`Cannot attach local file larger than 10 MiB or a special file: ${filePath}`)
+                UI.error(t("cli.run.message.cannot-attach-large-file", { file: filePath }))
                 process.exit(1)
               }
               if (opened.size === 0) return Buffer.alloc(0)
@@ -418,12 +419,12 @@ export const RunCommand = effectCmd({
       const initialInput = resolveRunInput(rawMessage, piped)
 
       if (message.trim().length === 0 && !args.command && !interactive) {
-        UI.error("You must provide a message or a command")
+        UI.error(t("cli.run.message.message-or-command-required"))
         process.exit(1)
       }
 
       if (args.fork && !args.continue && !args.session) {
-        UI.error("--fork requires --continue or --session")
+        UI.error(t("cli.run.message.fork-requires-continue"))
         process.exit(1)
       }
 
@@ -462,7 +463,7 @@ export const RunCommand = effectCmd({
             .catch(() => undefined)
 
           if (!current?.data) {
-            UI.error("Session not found")
+            UI.error(t("cli.run.message.session-not-found"))
             process.exit(1)
           }
 
@@ -565,7 +566,7 @@ export const RunCommand = effectCmd({
         })
         const id = result.data?.id
         if (!id) {
-          throw new Error("Failed to create session")
+          throw new Error(t("cli.run.message.failed-create-session"))
         }
 
         void share(sdk, id).catch(() => {})
@@ -588,7 +589,7 @@ export const RunCommand = effectCmd({
           return next
         }
 
-        UI.error("Failed to resolve remote directory")
+        UI.error(t("cli.run.message.failed-resolve-remote-dir"))
         process.exit(1)
       }
 
@@ -603,7 +604,7 @@ export const RunCommand = effectCmd({
           UI.println(
             UI.Style.TEXT_WARNING_BOLD + "!",
             UI.Style.TEXT_NORMAL,
-            `agent "${name}" not found. Falling back to default agent`,
+            t("cli.run.message.agent-not-found-fallback", { name }),
           )
           return undefined
         }
@@ -611,7 +612,7 @@ export const RunCommand = effectCmd({
           UI.println(
             UI.Style.TEXT_WARNING_BOLD + "!",
             UI.Style.TEXT_NORMAL,
-            `agent "${name}" is a subagent, not a primary agent. Falling back to default agent`,
+            t("cli.run.message.agent-subagent-fallback", { name }),
           )
           return undefined
         }
@@ -631,7 +632,7 @@ export const RunCommand = effectCmd({
           UI.println(
             UI.Style.TEXT_WARNING_BOLD + "!",
             UI.Style.TEXT_NORMAL,
-            `failed to list agents from ${args.attach}. Falling back to default agent`,
+            t("cli.run.message.failed-list-agents-fallback", { attach: args.attach }),
           )
           return undefined
         }
@@ -641,7 +642,7 @@ export const RunCommand = effectCmd({
           UI.println(
             UI.Style.TEXT_WARNING_BOLD + "!",
             UI.Style.TEXT_NORMAL,
-            `agent "${name}" not found. Falling back to default agent`,
+            t("cli.run.message.agent-not-found-fallback", { name }),
           )
           return undefined
         }
@@ -650,7 +651,7 @@ export const RunCommand = effectCmd({
           UI.println(
             UI.Style.TEXT_WARNING_BOLD + "!",
             UI.Style.TEXT_NORMAL,
-            `agent "${name}" is a subagent, not a primary agent. Falling back to default agent`,
+            t("cli.run.message.agent-subagent-fallback", { name }),
           )
           return undefined
         }
@@ -670,7 +671,7 @@ export const RunCommand = effectCmd({
       async function execute(sdk: OpencodeClient) {
         const sess = await session(sdk)
         if (!sess?.id) {
-          UI.error("Session not found")
+          UI.error(t("cli.run.message.session-not-found"))
           process.exit(1)
         }
         const sessionID = sess.id
@@ -806,7 +807,10 @@ export const RunCommand = effectCmd({
                 UI.println(
                   UI.Style.TEXT_WARNING_BOLD + "!",
                   UI.Style.TEXT_NORMAL +
-                    `permission requested: ${permission.permission} (${permission.patterns.join(", ")}); auto-rejecting`,
+                    t("cli.run.message.permission-requested", {
+                      permission: permission.permission,
+                      patterns: permission.patterns.join(", "),
+                    }),
                 )
                 await client.permission.reply({
                   requestID: permission.id,

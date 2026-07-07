@@ -29,6 +29,7 @@ import { DbCommand } from "./cli/cmd/db"
 import { errorMessage } from "./util/error"
 import { PluginCommand } from "./cli/cmd/plug"
 import { Heap } from "./cli/heap"
+import { t } from "./i18n"
 
 const args = hideBin(process.argv)
 
@@ -46,21 +47,21 @@ const cli = yargs(args)
   .parserConfiguration({ "populate--": true })
   .scriptName("opencode")
   .wrap(100)
-  .help("help", "show help")
+  .help("help", t("cli.global.option.help"))
   .alias("help", "h")
-  .version("version", "show version number", InstallationVersion)
+  .version("version", t("cli.global.option.version"), InstallationVersion)
   .alias("version", "v")
   .option("print-logs", {
-    describe: "print logs to stderr",
+    describe: t("cli.global.option.print-logs"),
     type: "boolean",
   })
   .option("log-level", {
-    describe: "log level",
+    describe: t("cli.global.option.log-level"),
     type: "string",
     choices: ["DEBUG", "INFO", "WARN", "ERROR"],
   })
   .option("pure", {
-    describe: "run without external plugins",
+    describe: t("cli.global.option.pure"),
     type: "boolean",
   })
   .middleware(async (opts) => {
@@ -77,7 +78,7 @@ const cli = yargs(args)
     process.env.OPENCODE_PID = String(process.pid)
   })
   .usage("")
-  .completion("completion", "generate shell completion script")
+  .completion("completion", t("cli.global.option.completion"))
   .command(AcpCommand)
   .command(McpCommand)
   .command(TuiThreadCommand)
@@ -129,7 +130,7 @@ try {
   const formatted = FormatError(e)
   if (formatted) UI.error(formatted)
   if (formatted === undefined) {
-    UI.error("Unexpected error" + EOL)
+    UI.error(t("cli.global.message.unexpected-error") + EOL)
     process.stderr.write(errorMessage(e) + EOL)
   }
   process.exitCode = 1

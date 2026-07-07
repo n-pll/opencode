@@ -34,6 +34,7 @@ import { Process } from "@/util/process"
 import { parseGitHubRemote } from "@/util/repository"
 import { Effect } from "effect"
 import { extractResponseText, formatPromptTooLargeError } from "./github.shared"
+import { t } from "@/i18n"
 
 type GitHubAuthor = {
   login: string
@@ -163,7 +164,7 @@ export const githubInstall = Effect.fn("Cli.github.install")(function* () {
   yield* Effect.promise(async () => {
     {
       UI.empty()
-      prompts.intro("Install GitHub agent")
+      prompts.intro(t("cli.github.install.intro"))
       const app = await getAppInfo()
       await installGitHubApp()
 
@@ -187,7 +188,7 @@ export const githubInstall = Effect.fn("Cli.github.install")(function* () {
             "Configure OIDC in AWS - https://docs.github.com/en/actions/how-tos/security-for-github-actions/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services"
         } else {
           step2 = [
-            `    2. Add the following secrets in org or repo (${app.owner}/${app.repo}) settings`,
+            `    ${t("cli.github.install.next-steps.secrets", { owner: app.owner, repo: app.repo })}`,
             "",
             ...providers[provider].env.map((e) => `       - ${e}`),
           ].join("\n")
@@ -195,14 +196,14 @@ export const githubInstall = Effect.fn("Cli.github.install")(function* () {
 
         prompts.outro(
           [
-            "Next steps:",
+            t("cli.github.install.outro.next-steps"),
             "",
-            `    1. Commit the \`${WORKFLOW_FILE}\` file and push`,
+            t("cli.github.install.next-steps.commit", { file: WORKFLOW_FILE }),
             step2,
             "",
-            "    3. Go to a GitHub issue and comment `/oc summarize` to see the agent in action",
+            t("cli.github.install.next-steps.try-command"),
             "",
-            "   Learn more about the GitHub agent - https://opencode.ai/docs/github/#usage-examples",
+            t("cli.github.install.next-steps.learn-more"),
           ].join("\n"),
         )
       }
@@ -210,7 +211,7 @@ export const githubInstall = Effect.fn("Cli.github.install")(function* () {
       async function getAppInfo() {
         const project = ctx.project
         if (project.vcs !== "git") {
-          prompts.log.error(`Could not find git repository. Please run this command from a git repository.`)
+          prompts.log.error(t("cli.github.install.log.no-git-repo"))
           throw new UI.CancelledError()
         }
 
@@ -220,7 +221,7 @@ export const githubInstall = Effect.fn("Cli.github.install")(function* () {
         )
         const parsed = parseGitHubRemote(info)
         if (!parsed) {
-          prompts.log.error(`Could not find git repository. Please run this command from a git repository.`)
+          prompts.log.error(t("cli.github.install.log.no-git-repo"))
           throw new UI.CancelledError()
         }
         return { owner: parsed.owner, repo: parsed.repo, root: ctx.worktree }
@@ -234,7 +235,7 @@ export const githubInstall = Effect.fn("Cli.github.install")(function* () {
           google: 3,
         }
         let provider = await prompts.select({
-          message: "Select provider",
+          message: t("cli.github.install.prompt.select-provider"),
           maxItems: 8,
           options: pipe(
             providers,
@@ -246,7 +247,7 @@ export const githubInstall = Effect.fn("Cli.github.install")(function* () {
             map((x) => ({
               label: x.name,
               value: x.id,
-              hint: priority[x.id] === 0 ? "recommended" : undefined,
+              hint: priority[x.id] === 0 ? t("cli.github.install.hint.recommended") : undefined,
             })),
           ),
         })
@@ -260,7 +261,7 @@ export const githubInstall = Effect.fn("Cli.github.install")(function* () {
         const providerData = providers[provider]!
 
         const model = await prompts.select({
-          message: "Select model",
+          message: t("cli.github.install.prompt.select-model"),
           maxItems: 8,
           options: pipe(
             providerData.models,
@@ -279,11 +280,11 @@ export const githubInstall = Effect.fn("Cli.github.install")(function* () {
 
       async function installGitHubApp() {
         const s = prompts.spinner()
-        s.start("Installing GitHub app")
+        s.start(t("cli.github.install.spinner.installing-app"))
 
         // Get installation
         const installation = await getInstallation()
-        if (installation) return s.stop("GitHub app already installed")
+        if (installation) return s.stop(t("cli.github.install.spinner.already-installed"))
 
         // Open browser
         const url = "https://github.com/apps/opencode-agent"
@@ -296,12 +297,12 @@ export const githubInstall = Effect.fn("Cli.github.install")(function* () {
 
         exec(command, (error) => {
           if (error) {
-            prompts.log.warn(`Could not open browser. Please visit: ${url}`)
+            prompts.log.warn(t("cli.github.install.warn.could-not-open-browser", { url }))
           }
         })
 
         // Wait for installation
-        s.message("Waiting for GitHub app to be installed")
+        s.message(t("cli.github.install.message.waiting-app"))
         const MAX_RETRIES = 120
         let retries = 0
         do {
@@ -309,9 +310,7 @@ export const githubInstall = Effect.fn("Cli.github.install")(function* () {
           if (installation) break
 
           if (retries > MAX_RETRIES) {
-            s.stop(
-              `Failed to detect GitHub app installation. Make sure to install the app for the \`${app.owner}/${app.repo}\` repository.`,
-            )
+            s.stop(t("cli.github.install.spinner.failed-detect", { owner: app.owner, repo: app.repo }))
             throw new UI.CancelledError()
           }
 
@@ -319,7 +318,7 @@ export const githubInstall = Effect.fn("Cli.github.install")(function* () {
           await sleep(1000)
         } while (true) // oxlint-disable-line no-constant-condition
 
-        s.stop("Installed GitHub app")
+        s.stop(t("cli.github.install.spinner.installed"))
 
         async function getInstallation() {
           return await fetch(`https://api.opencode.ai/get_github_app_installation?owner=${app.owner}&repo=${app.repo}`)
@@ -369,7 +368,7 @@ jobs:
           model: ${provider}/${model}`,
         )
 
-        prompts.log.success(`Added workflow file: "${WORKFLOW_FILE}"`)
+        prompts.log.success(t("cli.github.install.success.workflow-added", { file: WORKFLOW_FILE }))
       }
     }
   })
@@ -390,7 +389,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
 
     const context = isMock ? (JSON.parse(args.event!) as Context) : github.context
     if (!SUPPORTED_EVENTS.includes(context.eventName as (typeof SUPPORTED_EVENTS)[number])) {
-      core.setFailed(`Unsupported event type: ${context.eventName}`)
+      core.setFailed(t("cli.github.run.error.unsupported-event", { eventName: context.eventName }))
       process.exit(1)
     }
 
@@ -472,9 +471,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
       if (useGithubToken) {
         const githubToken = process.env["GITHUB_TOKEN"]
         if (!githubToken) {
-          throw new Error(
-            "GITHUB_TOKEN environment variable is not set. When using use_github_token, you must provide GITHUB_TOKEN.",
-          )
+          throw new Error(t("cli.github.run.error.env-github-token"))
         }
         appToken = githubToken
       } else {
@@ -516,7 +513,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
         await runLocalEffect(sessionShare.share(session.id))
         return session.id.slice(-8)
       })()
-      console.log("opencode session", session.id)
+      console.log(t("cli.github.run.message.session"), session.id)
 
       // Handle event types:
       // REPO_EVENTS (schedule, workflow_dispatch): no issue/PR context, output to logs/PR only
@@ -525,7 +522,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
       if (isRepoEvent) {
         // Repo event - no issue/PR context, output goes to logs
         if (isWorkflowDispatchEvent && actor) {
-          console.log(`Triggered by: ${actor}`)
+          console.log(t("cli.github.run.message.triggered-by", { actor }))
         }
         const branchPrefix = isWorkflowDispatchEvent ? "dispatch" : "schedule"
         const branch = await checkoutNewBranch(branchPrefix)
@@ -534,8 +531,8 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
         const { dirty, uncommittedChanges, switched } = await branchIsDirty(head, branch)
         if (switched) {
           // Agent switched branches (likely created its own branch/PR)
-          console.log("Agent managed its own branch, skipping infrastructure push/PR")
-          console.log("Response:", response)
+          console.log(t("cli.github.run.message.agent-managed-branch"))
+          console.log(t("cli.github.run.message.response", { response }))
         } else if (dirty) {
           const summary = await summarize(response)
           // workflow_dispatch has an actor for co-author attribution, schedule does not
@@ -548,12 +545,12 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
             `${response}\n\nTriggered by ${triggerType}${footer({ image: true })}`,
           )
           if (pr) {
-            console.log(`Created PR #${pr}`)
+            console.log(t("cli.github.run.message.created-pr", { pr }))
           } else {
-            console.log("Skipped PR creation (no new commits)")
+            console.log(t("cli.github.run.message.skipped-pr"))
           }
         } else {
-          console.log("Response:", response)
+          console.log(t("cli.github.run.message.response", { response }))
         }
       } else if (
         ["pull_request", "pull_request_review_comment"].includes(context.eventName) ||
@@ -568,7 +565,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
           const response = await chat(`${userPrompt}\n\n${dataPrompt}`, promptFiles)
           const { dirty, uncommittedChanges, switched } = await branchIsDirty(head, prData.headRefName)
           if (switched) {
-            console.log("Agent managed its own branch, skipping infrastructure push")
+            console.log(t("cli.github.run.message.agent-managed-branch-push"))
           }
           if (dirty && !switched) {
             const summary = await summarize(response)
@@ -586,7 +583,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
           const response = await chat(`${userPrompt}\n\n${dataPrompt}`, promptFiles)
           const { dirty, uncommittedChanges, switched } = await branchIsDirty(head, forkBranch)
           if (switched) {
-            console.log("Agent managed its own branch, skipping infrastructure push")
+            console.log(t("cli.github.run.message.agent-managed-branch-push"))
           }
           if (dirty && !switched) {
             const summary = await summarize(response)
@@ -656,18 +653,18 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
 
     function normalizeModel() {
       const value = process.env["MODEL"]
-      if (!value) throw new Error(`Environment variable "MODEL" is not set`)
+      if (!value) throw new Error(t("cli.github.run.error.env-model"))
 
       const { providerID, modelID } = Provider.parseModel(value)
 
       if (!providerID.length || !modelID.length)
-        throw new Error(`Invalid model ${value}. Model must be in the format "provider/model".`)
+        throw new Error(t("cli.github.run.error.invalid-model", { value }))
       return { providerID, modelID }
     }
 
     function normalizeRunId() {
       const value = process.env["GITHUB_RUN_ID"]
-      if (!value) throw new Error(`Environment variable "GITHUB_RUN_ID" is not set`)
+      if (!value) throw new Error(t("cli.github.run.error.env-run-id"))
       return value
     }
 
@@ -676,7 +673,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
       if (!value) return undefined
       if (value === "true") return true
       if (value === "false") return false
-      throw new Error(`Invalid share value: ${value}. Share must be a boolean.`)
+      throw new Error(t("cli.github.run.error.invalid-share", { value }))
     }
 
     function normalizeUseGithubToken() {
@@ -684,7 +681,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
       if (!value) return false
       if (value === "true") return true
       if (value === "false") return false
-      throw new Error(`Invalid use_github_token value: ${value}. Must be a boolean.`)
+      throw new Error(t("cli.github.run.error.invalid-use-github-token", { value }))
     }
 
     function normalizeOidcBaseUrl(): string {
@@ -728,7 +725,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
       if (isRepoEvent || isIssuesEvent) {
         if (!customPrompt) {
           const eventType = isRepoEvent ? "scheduled and workflow_dispatch" : "issues"
-          throw new Error(`PROMPT input is required for ${eventType} events`)
+          throw new Error(t("cli.github.run.error.prompt-required", { eventType }))
         }
         return { userPrompt: customPrompt, promptFiles: [] }
       }
@@ -760,7 +757,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
           }
           return body
         }
-        throw new Error(`Comments must mention ${mentions.map((m) => "`" + m + "`").join(" or ")}`)
+        throw new Error(t("cli.github.run.error.mentions-required", { mentions: mentions.map((m) => "`" + m + "`").join(" or ") }))
       })()
 
       // Handle images
@@ -889,7 +886,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
     }
 
     async function chat(message: string, files: PromptFiles = []) {
-      console.log("Sending message to opencode...")
+      console.log(t("cli.github.run.message.sending"))
 
       return runLocalEffect(
         Effect.gen(function* () {
@@ -932,7 +929,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
 
           if (result.info.role === "assistant" && result.info.error) {
             const err = result.info.error
-            console.error("Agent error:", err)
+            console.error(t("cli.github.run.error.agent", { error: err }))
             if (err.name === "ContextOverflowError") throw new Error(formatPromptTooLargeError(files))
             const message = "message" in err.data ? err.data.message : ""
             throw new Error(`${err.name}: ${message}`)
@@ -941,7 +938,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
           const text = extractResponseText(result.parts)
           if (text) return text
 
-          console.log("Requesting summary from agent...")
+          console.log(t("cli.github.run.message.requesting-summary"))
           const summary = yield* prompt.prompt({
             sessionID: session.id,
             messageID: MessageID.ascending(),
@@ -962,14 +959,14 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
 
           if (summary.info.role === "assistant" && summary.info.error) {
             const err = summary.info.error
-            console.error("Summary agent error:", err)
+            console.error(t("cli.github.run.error.summary-agent", { error: err }))
             if (err.name === "ContextOverflowError") throw new Error(formatPromptTooLargeError(files))
             const message = "message" in err.data ? err.data.message : ""
             throw new Error(`${err.name}: ${message}`)
           }
 
           const summaryText = extractResponseText(summary.parts)
-          if (!summaryText) throw new Error("Failed to get summary from agent")
+          if (!summaryText) throw new Error(t("cli.github.run.error.failed-get-summary"))
           return summaryText
         }),
       )
@@ -980,10 +977,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
         return await core.getIDToken("opencode-github-action")
       } catch (error) {
         console.error("Failed to get OIDC token:", error instanceof Error ? error.message : error)
-        throw new Error(
-          "Could not fetch an OIDC token. Make sure to add `id-token: write` to your workflow permissions.",
-          { cause: error },
-        )
+        throw new Error(t("cli.github.run.error.failed-oidc"), { cause: error })
       }
     }
 
@@ -1005,7 +999,13 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
 
       if (!response.ok) {
         const responseJson = (await response.json()) as { error?: string }
-        throw new Error(`App token exchange failed: ${response.status} ${response.statusText} - ${responseJson.error}`)
+        throw new Error(
+          t("cli.github.run.error.app-token-exchange", {
+            status: response.status,
+            statusText: response.statusText,
+            error: responseJson.error,
+          }),
+        )
       }
 
       const responseJson = (await response.json()) as { token: string }
@@ -1016,7 +1016,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
       // Do not change git config when running locally
       if (isMock) return
 
-      console.log("Configuring git...")
+      console.log(t("cli.github.run.message.configuring-git"))
       const config = "http.https://github.com/.extraheader"
       // actions/checkout@v6 no longer stores credentials in .git/config,
       // so this may not exist - use nothrow() to handle gracefully
@@ -1040,14 +1040,14 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
     }
 
     async function checkoutNewBranch(type: "issue" | "schedule" | "dispatch") {
-      console.log("Checking out new branch...")
+      console.log(t("cli.github.run.message.checking-out-new"))
       const branch = generateBranchName(type)
       await gitRun(["checkout", "-b", branch])
       return branch
     }
 
     async function checkoutLocalBranch(pr: GitHubPullRequest) {
-      console.log("Checking out local branch...")
+      console.log(t("cli.github.run.message.checking-out-local"))
 
       const branch = pr.headRefName
       const depth = Math.max(pr.commits.totalCount, 20)
@@ -1057,7 +1057,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
     }
 
     async function checkoutForkBranch(pr: GitHubPullRequest) {
-      console.log("Checking out fork branch...")
+      console.log(t("cli.github.run.message.checking-out-fork"))
 
       const remoteBranch = pr.headRefName
       const localBranch = generateBranchName("pr")
@@ -1084,7 +1084,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
     }
 
     async function pushToNewBranch(summary: string, branch: string, commit: boolean, isSchedule: boolean) {
-      console.log("Pushing to new branch...")
+      console.log(t("cli.github.run.message.pushing-new"))
       if (commit) {
         await gitRun(["add", "."])
         if (isSchedule) {
@@ -1097,7 +1097,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
     }
 
     async function pushToLocalBranch(summary: string, commit: boolean) {
-      console.log("Pushing to local branch...")
+      console.log(t("cli.github.run.message.pushing-local"))
       if (commit) {
         await gitRun(["add", "."])
         await commitChanges(summary, actor)
@@ -1106,7 +1106,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
     }
 
     async function pushToForkBranch(summary: string, pr: GitHubPullRequest, commit: boolean) {
-      console.log("Pushing to fork branch...")
+      console.log(t("cli.github.run.message.pushing-fork"))
 
       const remoteBranch = pr.headRefName
 
@@ -1118,12 +1118,12 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
     }
 
     async function branchIsDirty(originalHead: string, expectedBranch: string) {
-      console.log("Checking if branch is dirty...")
+      console.log(t("cli.github.run.message.checking-dirty"))
       // Detect if the agent switched branches during chat (e.g. created
       // its own branch, committed, and possibly pushed/created a PR).
       const current = await gitText(["rev-parse", "--abbrev-ref", "HEAD"])
       if (current !== expectedBranch) {
-        console.log(`Branch changed during chat: expected ${expectedBranch}, now on ${current}`)
+        console.log(t("cli.github.run.message.branch-changed", { expected: expectedBranch, current }))
         return { dirty: true, uncommittedChanges: false, switched: true }
       }
 
@@ -1146,7 +1146,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
     async function hasNewCommits(base: string, head: string) {
       const result = await gitStatus(["rev-list", "--count", `${base}..${head}`])
       if (result.exitCode !== 0) {
-        console.log(`rev-list failed, fetching origin/${base}...`)
+        console.log(t("cli.github.run.message.rev-list-failed", { base }))
         await gitStatus(["fetch", "origin", base, "--depth=1"])
         const retry = await gitStatus(["rev-list", "--count", `origin/${base}..${head}`])
         if (retry.exitCode !== 0) return true // assume dirty if we can't tell
@@ -1157,7 +1157,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
 
     async function assertPermissions() {
       // Only called for non-schedule events, so actor is defined
-      console.log(`Asserting permissions for user ${actor}...`)
+      console.log(t("cli.github.run.message.asserting-perms", { actor }))
 
       let permission
       try {
@@ -1168,18 +1168,18 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
         })
 
         permission = response.data.permission
-        console.log(`  permission: ${permission}`)
+        console.log(t("cli.github.run.message.permission-value", { permission }))
       } catch (error) {
-        console.error(`Failed to check permissions: ${error}`)
-        throw new Error(`Failed to check permissions for user ${actor}: ${error}`, { cause: error })
+        console.error(t("cli.github.run.error.failed-check-perms", { actor, error }))
+        throw new Error(t("cli.github.run.error.failed-check-perms", { actor, error }), { cause: error })
       }
 
-      if (!["admin", "write"].includes(permission)) throw new Error(`User ${actor} does not have write permissions`)
+      if (!["admin", "write"].includes(permission)) throw new Error(t("cli.github.run.error.no-write-perms", { actor }))
     }
 
     async function addReaction(commentType?: "issue" | "pr_review") {
       // Only called for non-schedule events, so triggerCommentId is defined
-      console.log("Adding reaction...")
+      console.log(t("cli.github.run.message.adding-reaction"))
       if (triggerCommentId) {
         if (commentType === "pr_review") {
           return await octoRest.rest.reactions.createForPullRequestReviewComment({
@@ -1206,7 +1206,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
 
     async function removeReaction(commentType?: "issue" | "pr_review") {
       // Only called for non-schedule events, so triggerCommentId is defined
-      console.log("Removing reaction...")
+      console.log(t("cli.github.run.message.removing-reaction"))
       if (triggerCommentId) {
         if (commentType === "pr_review") {
           const reactions = await octoRest.rest.reactions.listForPullRequestReviewComment({
@@ -1265,7 +1265,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
 
     async function createComment(body: string) {
       // Only called for non-schedule events, so issueId is defined
-      console.log("Creating comment...")
+      console.log(t("cli.github.run.message.creating-comment"))
       return await octoRest.rest.issues.createComment({
         owner,
         repo,
@@ -1275,7 +1275,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
     }
 
     async function createPR(base: string, branch: string, title: string, body: string): Promise<number | null> {
-      console.log("Creating pull request...")
+      console.log(t("cli.github.run.message.creating-pr"))
 
       // Check if an open PR already exists for this head→base combination
       // This handles the case where the agent created a PR via gh pr create during its run
@@ -1291,19 +1291,19 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
         )
 
         if (existing.data.length > 0) {
-          console.log(`PR #${existing.data[0].number} already exists for branch ${branch}`)
+          console.log(t("cli.github.run.message.pr-exists", { number: existing.data[0].number, branch }))
           return existing.data[0].number
         }
       } catch (e) {
         // If the check fails, proceed to create - we'll get a clear error if a PR already exists
-        console.log(`Failed to check for existing PR: ${e}`)
+        console.log(t("cli.github.run.message.failed-check-pr", { error: e }))
       }
 
       // Verify there are commits between base and head before creating the PR.
       // In shallow clones, the branch can appear dirty but share the same
       // commit as the base, causing a 422 from GitHub.
       if (!(await hasNewCommits(base, branch))) {
-        console.log(`No commits between ${base} and ${branch}, skipping PR creation`)
+        console.log(t("cli.github.run.message.no-commits", { base, branch }))
         return null
       }
 
@@ -1324,7 +1324,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
         // This can happen when the branch was pushed but has no new commits
         // relative to the base (e.g. shallow clone edge cases).
         if (e instanceof Error && e.message.includes("No commits between")) {
-          console.log(`GitHub rejected PR: ${e.message}`)
+          console.log(t("cli.github.run.message.github-rejected-pr", { message: e.message }))
           return null
         }
         throw e
@@ -1336,7 +1336,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
         return await fn()
       } catch (e) {
         if (retries > 0) {
-          console.log(`Retrying after ${delayMs}ms...`)
+          console.log(t("cli.github.run.message.retrying", { delay: delayMs }))
           await sleep(delayMs)
           return withRetry(fn, retries - 1, delayMs)
         }
@@ -1363,7 +1363,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
     }
 
     async function fetchIssue() {
-      console.log("Fetching prompt data for issue...")
+      console.log(t("cli.github.run.message.fetching-issue"))
       const issueResult = await octoGraph<IssueQueryResponse>(
         `
 query($owner: String!, $repo: String!, $number: Int!) {
@@ -1398,7 +1398,7 @@ query($owner: String!, $repo: String!, $number: Int!) {
       )
 
       const issue = issueResult.repository.issue
-      if (!issue) throw new Error(`Issue #${issueId} not found`)
+      if (!issue) throw new Error(t("cli.github.run.error.issue-not-found", { issueId }))
 
       return issue
     }
@@ -1434,7 +1434,7 @@ query($owner: String!, $repo: String!, $number: Int!) {
     }
 
     async function fetchPR() {
-      console.log("Fetching prompt data for PR...")
+      console.log(t("cli.github.run.message.fetching-pr"))
       const prResult = await octoGraph<PullRequestQueryResponse>(
         `
 query($owner: String!, $repo: String!, $number: Int!) {
@@ -1528,7 +1528,7 @@ query($owner: String!, $repo: String!, $number: Int!) {
       )
 
       const pr = prResult.repository.pullRequest
-      if (!pr) throw new Error(`PR #${issueId} not found`)
+      if (!pr) throw new Error(t("cli.github.run.error.pr-not-found", { issueId }))
 
       return pr
     }

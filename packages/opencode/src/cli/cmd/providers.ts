@@ -17,6 +17,7 @@ import { Process } from "@/util/process"
 import { errorMessage } from "@/util/error"
 import { text } from "node:stream/consumers"
 import { Effect, Option } from "effect"
+import { t } from "@/i18n"
 
 type PluginAuth = NonNullable<Hooks["auth"]>
 
@@ -46,7 +47,7 @@ const handlePluginAuth = Effect.fn("Cli.providers.pluginAuth")(function* (
       if (plugin.auth.methods.length <= 1) return 0
       return yield* promptValue(
         yield* Prompt.select({
-          message: "Login method",
+          message: t("cli.providers.prompt.login-method"),
           options: plugin.auth.methods.map((x, index) => ({
             label: x.label,
             value: index,
@@ -57,7 +58,11 @@ const handlePluginAuth = Effect.fn("Cli.providers.pluginAuth")(function* (
     const match = plugin.auth.methods.findIndex((x) => x.label.toLowerCase() === methodName.toLowerCase())
     if (match === -1) {
       return yield* fail(
-        `Unknown method "${methodName}" for ${provider}. Available: ${plugin.auth.methods.map((x) => x.label).join(", ")}`,
+        t("cli.providers.fail.unknown-method", {
+          methodName,
+          provider,
+          labels: plugin.auth.methods.map((x) => x.label).join(", "),
+        }),
       )
     }
     return match
@@ -96,7 +101,7 @@ const handlePluginAuth = Effect.fn("Cli.providers.pluginAuth")(function* (
     const authorize = yield* cliTry("Failed to authorize: ", () => method.authorize(inputs))
 
     if (authorize.url) {
-      yield* Prompt.log.info("Go to: " + authorize.url)
+      yield* Prompt.log.info(t("cli.providers.log.goto") + " " + authorize.url)
     }
 
     if (authorize.method === "auto") {
@@ -104,10 +109,10 @@ const handlePluginAuth = Effect.fn("Cli.providers.pluginAuth")(function* (
         yield* Prompt.log.info(authorize.instructions)
       }
       const spinner = Prompt.spinner()
-      yield* spinner.start("Waiting for authorization...")
+      yield* spinner.start(t("cli.providers.spinner.waiting-auth"))
       const result = yield* cliTry("Failed to authorize: ", () => authorize.callback())
       if (result.type === "failed") {
-        yield* spinner.stop("Failed to authorize", 1)
+        yield* spinner.stop(t("cli.providers.spinner.failed-authorize"), 1)
       }
       if (result.type === "success") {
         const saveProvider = result.provider ?? provider
@@ -128,19 +133,19 @@ const handlePluginAuth = Effect.fn("Cli.providers.pluginAuth")(function* (
             ...(result.metadata ? { metadata: result.metadata } : {}),
           })
         }
-        yield* spinner.stop("Login successful")
+        yield* spinner.stop(t("cli.providers.spinner.login-successful"))
       }
     }
 
     if (authorize.method === "code") {
       const code = yield* Prompt.text({
-        message: "Paste the authorization code here: ",
-        validate: (x) => (x && x.length > 0 ? undefined : "Required"),
+        message: t("cli.providers.prompt.paste-code"),
+        validate: (x) => (x && x.length > 0 ? undefined : t("cli.providers.validate.required")),
       })
       const authorizationCode = yield* promptValue(code)
       const result = yield* cliTry("Failed to authorize: ", () => authorize.callback(authorizationCode))
       if (result.type === "failed") {
-        yield* Prompt.log.error("Failed to authorize")
+        yield* Prompt.log.error(t("cli.providers.log.failed-authorize-short"))
       }
       if (result.type === "success") {
         const saveProvider = result.provider ?? provider
@@ -161,18 +166,18 @@ const handlePluginAuth = Effect.fn("Cli.providers.pluginAuth")(function* (
             ...(result.metadata ? { metadata: result.metadata } : {}),
           })
         }
-        yield* Prompt.log.success("Login successful")
+        yield* Prompt.log.success(t("cli.providers.log.login-successful"))
       }
     }
 
-    yield* Prompt.outro("Done")
+    yield* Prompt.outro(t("cli.providers.outro.done"))
     return true
   }
 
   if (method.type === "api") {
     const key = yield* Prompt.password({
-      message: "Enter your API key",
-      validate: (x) => (x && x.length > 0 ? undefined : "Required"),
+      message: t("cli.providers.prompt.enter-api-key"),
+      validate: (x) => (x && x.length > 0 ? undefined : t("cli.providers.validate.required")),
     })
     const apiKey = yield* promptValue(key)
 
@@ -184,13 +189,13 @@ const handlePluginAuth = Effect.fn("Cli.providers.pluginAuth")(function* (
         key: apiKey,
         ...metadata,
       })
-      yield* Prompt.outro("Done")
+      yield* Prompt.outro(t("cli.providers.outro.done"))
       return true
     }
 
     const result = yield* cliTry("Failed to authorize: ", () => authorizeApi(inputs))
     if (result.type === "failed") {
-      yield* Prompt.log.error("Failed to authorize")
+      yield* Prompt.log.error(t("cli.providers.log.failed-authorize-short"))
     }
     if (result.type === "success") {
       const saveProvider = result.provider ?? provider
@@ -200,9 +205,9 @@ const handlePluginAuth = Effect.fn("Cli.providers.pluginAuth")(function* (
         key: result.key ?? apiKey,
         ...(Object.keys(merged).length ? { metadata: merged } : {}),
       })
-      yield* Prompt.log.success("Login successful")
+      yield* Prompt.log.success(t("cli.providers.log.login-successful"))
     }
-    yield* Prompt.outro("Done")
+    yield* Prompt.outro(t("cli.providers.outro.done"))
     return true
   }
 
@@ -239,7 +244,7 @@ export function resolvePluginProviders(input: {
 export const ProvidersCommand = cmd({
   command: "providers",
   aliases: ["auth"],
-  describe: "manage AI providers and credentials",
+  describe: t("cli.providers.describe"),
   builder: (yargs) =>
     yargs.command(ProvidersListCommand).command(ProvidersLoginCommand).command(ProvidersLogoutCommand).demandCommand(),
   async handler() {},
@@ -248,7 +253,7 @@ export const ProvidersCommand = cmd({
 export const ProvidersListCommand = effectCmd({
   command: "list",
   aliases: ["ls"],
-  describe: "list providers and credentials",
+  describe: t("cli.providers.list.describe"),
   // Lists global credentials + provider env vars; no project instance needed.
   instance: false,
   handler: Effect.fn("Cli.providers.list")(function* (_args) {
@@ -259,7 +264,7 @@ export const ProvidersListCommand = effectCmd({
     const authPath = path.join(Global.Path.data, "auth.json")
     const homedir = os.homedir()
     const displayPath = authPath.startsWith(homedir) ? authPath.replace(homedir, "~") : authPath
-    yield* Prompt.intro(`Credentials ${UI.Style.TEXT_DIM}${displayPath}`)
+    yield* Prompt.intro(`${t("cli.providers.intro.credentials")} ${UI.Style.TEXT_DIM}${displayPath}`)
     const results = Object.entries(yield* Effect.orDie(authSvc.all()))
     const database = yield* modelsDev.get()
 
@@ -268,7 +273,7 @@ export const ProvidersListCommand = effectCmd({
       yield* Prompt.log.info(`${name} ${UI.Style.TEXT_DIM}${result.type}`)
     }
 
-    yield* Prompt.outro(`${results.length} credentials`)
+    yield* Prompt.outro(t("cli.providers.outro.credentials-count", { count: results.length }))
 
     const activeEnvVars: Array<{ provider: string; envVar: string }> = []
 
@@ -285,43 +290,43 @@ export const ProvidersListCommand = effectCmd({
 
     if (activeEnvVars.length > 0) {
       UI.empty()
-      yield* Prompt.intro("Environment")
+      yield* Prompt.intro(t("cli.providers.intro.environment"))
 
       for (const { provider, envVar } of activeEnvVars) {
         yield* Prompt.log.info(`${provider} ${UI.Style.TEXT_DIM}${envVar}`)
       }
 
-      yield* Prompt.outro(`${activeEnvVars.length} environment variable` + (activeEnvVars.length === 1 ? "" : "s"))
+      yield* Prompt.outro(t("cli.providers.outro.env-var-count", { count: activeEnvVars.length }))
     }
   }),
 })
 
 export const ProvidersLoginCommand = effectCmd({
   command: "login [url]",
-  describe: "log in to a provider",
+  describe: t("cli.providers.login.describe"),
   // URL login skips instance bootstrap, which would load remote config with the stale token and crash before re-auth.
   instance: (args) => !args.url,
   builder: (yargs: Argv) =>
     yargs
       .positional("url", {
-        describe: "opencode auth provider",
+        describe: t("cli.providers.login.positional.url"),
         type: "string",
       })
       .option("provider", {
         alias: ["p"],
-        describe: "provider id or name to log in to (skips provider selection)",
+        describe: t("cli.providers.login.option.provider"),
         type: "string",
       })
       .option("method", {
         alias: ["m"],
-        describe: "login method label (skips method selection)",
+        describe: t("cli.providers.login.option.method"),
         type: "string",
       }),
   handler: Effect.fn("Cli.providers.login")(function* (args) {
     const authSvc = yield* Auth.Service
 
     UI.empty()
-    yield* Prompt.intro("Add credential")
+    yield* Prompt.intro(t("cli.providers.intro.add-credential"))
     if (args.url) {
       const url = args.url.replace(/\/+$/, "")
       const wellknown = (yield* cliTry(`Failed to load auth provider metadata from ${url}: `, () =>
@@ -329,25 +334,25 @@ export const ProvidersLoginCommand = effectCmd({
       )) as {
         auth: { command: string[]; env: string }
       }
-      yield* Prompt.log.info(`Running \`${wellknown.auth.command.join(" ")}\``)
+      yield* Prompt.log.info(t("cli.providers.log.running-command", { command: wellknown.auth.command.join(" ") }))
       const abort = new AbortController()
       const proc = Process.spawn(wellknown.auth.command, { stdout: "pipe", stderr: "inherit", abort: abort.signal })
       if (!proc.stdout) {
-        yield* Prompt.log.error("Failed")
-        yield* Prompt.outro("Done")
+        yield* Prompt.log.error(t("cli.providers.log.failed"))
+        yield* Prompt.outro(t("cli.providers.outro.done"))
         return
       }
       const [exit, token] = yield* cliTry("Failed to run auth provider command: ", () =>
         Promise.all([proc.exited, text(proc.stdout!)]),
       ).pipe(Effect.ensuring(Effect.sync(() => abort.abort())))
       if (exit !== 0) {
-        yield* Prompt.log.error("Failed")
-        yield* Prompt.outro("Done")
+        yield* Prompt.log.error(t("cli.providers.log.failed"))
+        yield* Prompt.outro(t("cli.providers.outro.done"))
         return
       }
       yield* Effect.orDie(authSvc.set(url, { type: "wellknown", key: wellknown.auth.env, token: token.trim() }))
-      yield* Prompt.log.success("Logged into " + url)
-      yield* Prompt.outro("Done")
+      yield* Prompt.log.success(t("cli.providers.log.logged-into", { url }))
+      yield* Prompt.outro(t("cli.providers.outro.done"))
       return
     }
 
@@ -396,15 +401,15 @@ export const ProvidersLoginCommand = effectCmd({
           label: x.name,
           value: x.id,
           hint: {
-            opencode: "recommended",
-            openai: "ChatGPT Plus/Pro or API key",
+            opencode: t("cli.providers.option.opencode-hint"),
+            openai: t("cli.providers.option.openai-hint"),
           }[x.id],
         })),
       ),
       ...pluginProviders.map((x) => ({
         label: x.name,
         value: x.id,
-        hint: "plugin",
+        hint: t("cli.providers.option.plugin-hint"),
       })),
     ]
 
@@ -415,15 +420,15 @@ export const ProvidersLoginCommand = effectCmd({
       const byName = options.find((x) => x.label.toLowerCase() === input.toLowerCase())
       const match = byID ?? byName
       if (!match) {
-        return yield* fail(`Unknown provider "${input}"`)
+        return yield* fail(t("cli.providers.fail.unknown-provider", { input }))
       }
       provider = match.value
     } else {
       provider = yield* promptValue(
         yield* Prompt.autocomplete({
-          message: "Select provider",
+          message: t("cli.providers.prompt.select-provider"),
           maxItems: 8,
-          options: [...options, { value: "other", label: "Other" }],
+          options: [...options, { value: "other", label: t("cli.providers.option.other") }],
         }),
       )
     }
@@ -437,8 +442,8 @@ export const ProvidersLoginCommand = effectCmd({
     if (provider === "other") {
       provider = (yield* promptValue(
         yield* Prompt.text({
-          message: "Enter provider id",
-          validate: (x) => (x && x.match(/^[0-9a-z-]+$/) ? undefined : "a-z, 0-9 and hyphens only"),
+          message: t("cli.providers.prompt.enter-provider-id"),
+          validate: (x) => (x && x.match(/^[0-9a-z-]+$/) ? undefined : t("cli.providers.validate.provider-id")),
         }),
       )).replace(/^@ai-sdk\//, "")
 
@@ -449,51 +454,43 @@ export const ProvidersLoginCommand = effectCmd({
       }
 
       yield* Prompt.log.warn(
-        `This only stores a credential for ${provider} - you will need configure it in opencode.json, check the docs for examples.`,
+        t("cli.providers.log.warn-store-credential", { provider }),
       )
     }
 
     if (provider === "amazon-bedrock") {
-      yield* Prompt.log.info(
-        "Amazon Bedrock authentication priority:\n" +
-          "  1. Bearer token (AWS_BEARER_TOKEN_BEDROCK or /connect)\n" +
-          "  2. AWS credential chain (profile, access keys, IAM roles, EKS IRSA)\n\n" +
-          "Configure via opencode.json options (profile, region, endpoint) or\n" +
-          "AWS environment variables (AWS_PROFILE, AWS_REGION, AWS_ACCESS_KEY_ID, AWS_WEB_IDENTITY_TOKEN_FILE).",
-      )
+      yield* Prompt.log.info(t("cli.providers.log.bedrock"))
     }
 
     if (provider === "opencode") {
-      yield* Prompt.log.info("Create an api key at https://opencode.ai/auth")
+      yield* Prompt.log.info(t("cli.providers.log.opencode-key"))
     }
 
     if (provider === "vercel") {
-      yield* Prompt.log.info("You can create an api key at https://vercel.link/ai-gateway-token")
+      yield* Prompt.log.info(t("cli.providers.log.vercel-key"))
     }
 
     if (["cloudflare", "cloudflare-ai-gateway"].includes(provider)) {
-      yield* Prompt.log.info(
-        "Cloudflare AI Gateway can be configured with CLOUDFLARE_GATEWAY_ID, CLOUDFLARE_ACCOUNT_ID, and CLOUDFLARE_API_TOKEN environment variables. Read more: https://opencode.ai/docs/providers/#cloudflare-ai-gateway",
-      )
+      yield* Prompt.log.info(t("cli.providers.log.cloudflare"))
     }
 
     const key = yield* Prompt.password({
-      message: "Enter your API key",
-      validate: (x) => (x && x.length > 0 ? undefined : "Required"),
+      message: t("cli.providers.prompt.enter-api-key"),
+      validate: (x) => (x && x.length > 0 ? undefined : t("cli.providers.validate.required")),
     })
     const apiKey = yield* promptValue(key)
     yield* Effect.orDie(authSvc.set(provider, { type: "api", key: apiKey }))
 
-    yield* Prompt.outro("Done")
+    yield* Prompt.outro(t("cli.providers.outro.done"))
   }),
 })
 
 export const ProvidersLogoutCommand = effectCmd({
   command: "logout [provider]",
-  describe: "log out from a configured provider",
+  describe: t("cli.providers.logout.describe"),
   builder: (yargs) =>
     yargs.positional("provider", {
-      describe: "provider id or name to log out from",
+      describe: t("cli.providers.logout.positional.provider"),
       type: "string",
     }),
   // Removes a global auth credential; no project instance needed.
@@ -504,9 +501,9 @@ export const ProvidersLogoutCommand = effectCmd({
 
     UI.empty()
     const credentials: Array<[string, Auth.Info]> = Object.entries(yield* Effect.orDie(authSvc.all()))
-    yield* Prompt.intro("Remove credential")
+    yield* Prompt.intro(t("cli.providers.intro.remove-credential"))
     if (credentials.length === 0) {
-      yield* Prompt.log.error("No credentials found")
+      yield* Prompt.log.error(t("cli.providers.log.no-credentials"))
       return
     }
     const database = yield* modelsDev.get()
@@ -522,13 +519,13 @@ export const ProvidersLogoutCommand = effectCmd({
         )?.value
       : yield* promptValue(
           yield* Prompt.autocomplete({
-            message: "Select provider",
+            message: t("cli.providers.prompt.select-provider"),
             maxItems: 8,
             options,
           }),
         )
-    if (!provider) return yield* fail(`Unknown configured provider "${args.provider}"`)
+    if (!provider) return yield* fail(t("cli.providers.fail.unknown-configured-provider", { provider: args.provider }))
     yield* Effect.orDie(authSvc.remove(provider))
-    yield* Prompt.outro("Logout successful")
+    yield* Prompt.outro(t("cli.providers.outro.logout-successful"))
   }),
 })

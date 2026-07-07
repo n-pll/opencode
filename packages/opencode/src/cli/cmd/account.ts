@@ -6,6 +6,7 @@ import { AccountID, OrgID, PollExpired, type PollResult, type AccountError } fro
 import { effectCmd } from "../effect-cmd"
 import * as Prompt from "../effect/prompt"
 import open from "open"
+import { t } from "@/i18n"
 
 const openBrowser = (url: string) => Effect.promise(() => open(url).catch(() => undefined))
 
@@ -41,15 +42,15 @@ const isActiveOrgChoice = (
 const loginEffect = Effect.fn("login")(function* (url: string) {
   const service = yield* Account.Service
 
-  yield* Prompt.intro("Log in")
+  yield* Prompt.intro(t("cli.account.prompt.login-intro"))
   const login = yield* service.login(url)
 
-  yield* Prompt.log.info("Go to: " + login.url)
-  yield* Prompt.log.info("Enter code: " + login.user)
+  yield* Prompt.log.info(t("cli.account.log.goto") + " " + login.url)
+  yield* Prompt.log.info(t("cli.account.log.enter-code") + " " + login.user)
   yield* openBrowser(login.url)
 
   const s = Prompt.spinner()
-  yield* s.start("Waiting for authorization...")
+  yield* s.start(t("cli.account.spinner.waiting-auth"))
 
   const poll = (wait: Duration.Duration): Effect.Effect<PollResult, AccountError> =>
     Effect.gen(function* () {
@@ -68,34 +69,34 @@ const loginEffect = Effect.fn("login")(function* (url: string) {
   yield* Match.valueTags(result, {
     PollSuccess: (r) =>
       Effect.gen(function* () {
-        yield* s.stop("Logged in as " + r.email)
-        yield* Prompt.outro("Done")
+        yield* s.stop(t("cli.account.spinner.logged-in-as", { email: r.email }))
+        yield* Prompt.outro(t("cli.account.outro.done"))
       }),
-    PollExpired: () => s.stop("Device code expired", 1),
-    PollDenied: () => s.stop("Authorization denied", 1),
-    PollError: (r) => s.stop("Error: " + String(r.cause), 1),
-    PollPending: () => s.stop("Unexpected state", 1),
-    PollSlow: () => s.stop("Unexpected state", 1),
+    PollExpired: () => s.stop(t("cli.account.outro.device-code-expired"), 1),
+    PollDenied: () => s.stop(t("cli.account.outro.authorization-denied"), 1),
+    PollError: (r) => s.stop(t("cli.account.outro.error", { message: String(r.cause) }), 1),
+    PollPending: () => s.stop(t("cli.account.outro.unexpected-state"), 1),
+    PollSlow: () => s.stop(t("cli.account.outro.unexpected-state"), 1),
   })
 })
 
 const logoutEffect = Effect.fn("logout")(function* (email?: string) {
   const service = yield* Account.Service
   const accounts = yield* service.list()
-  if (accounts.length === 0) return yield* println("Not logged in")
+  if (accounts.length === 0) return yield* println(t("cli.account.message.not-logged-in"))
 
   if (email) {
     const match = accounts.find((a) => a.email === email)
-    if (!match) return yield* println("Account not found: " + email)
+    if (!match) return yield* println(t("cli.account.message.account-not-found", { email }))
     yield* service.remove(match.id)
-    yield* Prompt.outro("Logged out from " + email)
+    yield* Prompt.outro(t("cli.account.outro.logged-out-from", { email }))
     return
   }
 
   const active = yield* service.active()
   const activeID = Option.map(active, (a) => a.id)
 
-  yield* Prompt.intro("Log out")
+  yield* Prompt.intro(t("cli.account.prompt.logout-intro"))
 
   const opts = accounts.map((a) => {
     const isActive = Option.isSome(activeID) && activeID.value === a.id
@@ -105,11 +106,11 @@ const logoutEffect = Effect.fn("logout")(function* (email?: string) {
     }
   })
 
-  const selected = yield* Prompt.select({ message: "Select account to log out", options: opts })
+  const selected = yield* Prompt.select({ message: t("cli.account.prompt.select-account-logout"), options: opts })
   if (Option.isNone(selected)) return
 
   yield* service.remove(selected.value.id)
-  yield* Prompt.outro("Logged out from " + selected.value.email)
+  yield* Prompt.outro(t("cli.account.outro.logged-out-from", { email: selected.value.email }))
 })
 
 interface OrgChoice {
@@ -122,7 +123,7 @@ const switchEffect = Effect.fn("switch")(function* () {
   const service = yield* Account.Service
 
   const groups = yield* service.orgsByAccount()
-  if (groups.length === 0) return yield* println("Not logged in")
+  if (groups.length === 0) return yield* println(t("cli.account.message.not-logged-in"))
 
   const active = yield* service.active()
 
@@ -135,24 +136,24 @@ const switchEffect = Effect.fn("switch")(function* () {
       }
     }),
   )
-  if (opts.length === 0) return yield* println("No orgs found")
+  if (opts.length === 0) return yield* println(t("cli.account.message.no-orgs-found"))
 
-  yield* Prompt.intro("Switch org")
+  yield* Prompt.intro(t("cli.account.prompt.switch-intro"))
 
-  const selected = yield* Prompt.select<OrgChoice>({ message: "Select org", options: opts })
+  const selected = yield* Prompt.select<OrgChoice>({ message: t("cli.account.prompt.select-org"), options: opts })
   if (Option.isNone(selected)) return
 
   const choice = selected.value
   yield* service.use(choice.accountID, Option.some(choice.orgID))
-  yield* Prompt.outro("Switched to " + choice.label)
+  yield* Prompt.outro(t("cli.account.outro.switched-to", { label: choice.label }))
 })
 
 const orgsEffect = Effect.fn("orgs")(function* () {
   const service = yield* Account.Service
 
   const groups = yield* service.orgsByAccount()
-  if (groups.length === 0) return yield* println("No accounts found")
-  if (!groups.some((group) => group.orgs.length > 0)) return yield* println("No orgs found")
+  if (groups.length === 0) return yield* println(t("cli.account.message.no-accounts-found"))
+  if (!groups.some((group) => group.orgs.length > 0)) return yield* println(t("cli.account.message.no-orgs-found"))
 
   const active = yield* service.active()
 
@@ -171,7 +172,7 @@ const openEffect = Effect.fn("open")(function* () {
 
   const url = active.value.url
   yield* openBrowser(url)
-  yield* Prompt.outro("Opened " + url)
+  yield* Prompt.outro(t("cli.account.outro.opened", { url }))
 })
 
 export const LoginCommand = effectCmd({
@@ -180,7 +181,7 @@ export const LoginCommand = effectCmd({
   instance: false,
   builder: (yargs) =>
     yargs.positional("url", {
-      describe: "server URL",
+      describe: t("cli.login.positional.url"),
       type: "string",
     }),
   handler: Effect.fn("Cli.account.login")(function* (args) {
@@ -195,7 +196,7 @@ export const LogoutCommand = effectCmd({
   instance: false,
   builder: (yargs) =>
     yargs.positional("email", {
-      describe: "account email to log out from",
+      describe: t("cli.logout.positional.email"),
       type: "string",
     }),
   handler: Effect.fn("Cli.account.logout")(function* (args) {
@@ -241,23 +242,23 @@ export const ConsoleCommand = cmd({
     yargs
       .command({
         ...LoginCommand,
-        describe: "log in to console",
+        describe: t("cli.console.login.describe"),
       })
       .command({
         ...LogoutCommand,
-        describe: "log out from console",
+        describe: t("cli.console.logout.describe"),
       })
       .command({
         ...SwitchCommand,
-        describe: "switch active org",
+        describe: t("cli.console.switch.describe"),
       })
       .command({
         ...OrgsCommand,
-        describe: "list orgs",
+        describe: t("cli.console.orgs.describe"),
       })
       .command({
         ...OpenCommand,
-        describe: "open active console account",
+        describe: t("cli.console.open.describe"),
       })
       .demandCommand(),
   async handler() {},

@@ -4,22 +4,23 @@ import { Database } from "@opencode-ai/core/database/database"
 import { Effect } from "effect"
 import { sql } from "drizzle-orm"
 import { effectCmd } from "../effect-cmd"
+import { t } from "@/i18n"
 
 const QueryCommand = effectCmd({
   command: "$0 [query]",
-  describe: "open an interactive sqlite3 shell or run a query",
+  describe: t("cli.db.query.describe"),
   instance: false,
   builder: (yargs: Argv) => {
     return yargs
       .positional("query", {
         type: "string",
-        describe: "SQL query to execute",
+        describe: t("cli.db.query.positional.query"),
       })
       .option("format", {
         type: "string",
         choices: ["json", "tsv"],
         default: "tsv",
-        describe: "Output format",
+        describe: t("cli.db.query.option.format"),
       })
   },
   handler: Effect.fn("Cli.db.query")(function* (args: { query?: string; format: string }) {
@@ -44,7 +45,7 @@ const QueryCommand = effectCmd({
 
 const PathCommand = effectCmd({
   command: "path",
-  describe: "print the database path",
+  describe: t("cli.db.path.describe"),
   instance: false,
   handler: Effect.fn("Cli.db.path")(function* () {
     console.log(Database.path())
@@ -53,7 +54,7 @@ const PathCommand = effectCmd({
 
 export const DbCommand = effectCmd({
   command: "db",
-  describe: "database tools",
+  describe: t("cli.db.describe"),
   instance: false,
   builder: (yargs: Argv) => {
     return yargs.command(QueryCommand).command(PathCommand).demandCommand()

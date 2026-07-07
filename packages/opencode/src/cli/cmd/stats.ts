@@ -6,6 +6,7 @@ import { Database } from "@opencode-ai/core/database/database"
 import { SessionTable } from "@opencode-ai/core/session/sql"
 import { Project } from "@/project/project"
 import { InstanceRef } from "@/effect/instance-ref"
+import { t } from "@/i18n"
 
 interface SessionStats {
   totalSessions: number
@@ -48,22 +49,22 @@ interface SessionStats {
 
 export const StatsCommand = effectCmd({
   command: "stats",
-  describe: "show token usage and cost statistics",
+  describe: t("cli.stats.describe"),
   builder: (yargs) =>
     yargs
       .option("days", {
-        describe: "show stats for the last N days (default: all time)",
+        describe: t("cli.stats.option.days"),
         type: "number",
       })
       .option("tools", {
-        describe: "number of tools to show (default: all)",
+        describe: t("cli.stats.option.tools"),
         type: "number",
       })
       .option("models", {
-        describe: "show model statistics (default: hidden). Pass a number to show top N, otherwise shows all",
+        describe: t("cli.stats.option.models"),
       })
       .option("project", {
-        describe: "filter by project (default: all projects, empty string: current project)",
+        describe: t("cli.stats.option.project"),
         type: "string",
       }),
   handler: Effect.fn("Cli.stats")(function* (args) {
@@ -147,7 +148,7 @@ const aggregateSessionStats = Effect.fn("Cli.stats.aggregate")(function* (
   }
 
   if (filteredSessions.length > 1000) {
-    console.log(`Large dataset detected (${filteredSessions.length} sessions). This may take a while...`)
+    console.log(t("cli.stats.log.large-dataset", { count: filteredSessions.length }))
   }
 
   if (filteredSessions.length === 0) {
@@ -301,30 +302,30 @@ export function displayStats(stats: SessionStats, toolLimit?: number, modelLimit
 
   // Overview section
   console.log("┌────────────────────────────────────────────────────────┐")
-  console.log("│                       OVERVIEW                         │")
+  console.log("│" + t("cli.stats.section.overview").padStart((56 + t("cli.stats.section.overview").length) / 2).padEnd(56) + "│")
   console.log("├────────────────────────────────────────────────────────┤")
-  console.log(renderRow("Sessions", stats.totalSessions.toLocaleString()))
-  console.log(renderRow("Messages", stats.totalMessages.toLocaleString()))
-  console.log(renderRow("Days", stats.days.toString()))
+  console.log(renderRow(t("cli.stats.row.sessions"), stats.totalSessions.toLocaleString()))
+  console.log(renderRow(t("cli.stats.row.messages"), stats.totalMessages.toLocaleString()))
+  console.log(renderRow(t("cli.stats.row.days"), stats.days.toString()))
   console.log("└────────────────────────────────────────────────────────┘")
   console.log()
 
   // Cost & Tokens section
   console.log("┌────────────────────────────────────────────────────────┐")
-  console.log("│                    COST & TOKENS                       │")
+  console.log("│" + t("cli.stats.section.cost-tokens").padStart((56 + t("cli.stats.section.cost-tokens").length) / 2).padEnd(56) + "│")
   console.log("├────────────────────────────────────────────────────────┤")
   const cost = isNaN(stats.totalCost) ? 0 : stats.totalCost
   const costPerDay = isNaN(stats.costPerDay) ? 0 : stats.costPerDay
   const tokensPerSession = isNaN(stats.tokensPerSession) ? 0 : stats.tokensPerSession
-  console.log(renderRow("Total Cost", `$${cost.toFixed(2)}`))
-  console.log(renderRow("Avg Cost/Day", `$${costPerDay.toFixed(2)}`))
-  console.log(renderRow("Avg Tokens/Session", formatNumber(Math.round(tokensPerSession))))
+  console.log(renderRow(t("cli.stats.row.total-cost"), `$${cost.toFixed(2)}`))
+  console.log(renderRow(t("cli.stats.row.avg-cost-day"), `$${costPerDay.toFixed(2)}`))
+  console.log(renderRow(t("cli.stats.row.avg-tokens-session"), formatNumber(Math.round(tokensPerSession))))
   const medianTokensPerSession = isNaN(stats.medianTokensPerSession) ? 0 : stats.medianTokensPerSession
-  console.log(renderRow("Median Tokens/Session", formatNumber(Math.round(medianTokensPerSession))))
-  console.log(renderRow("Input", formatNumber(stats.totalTokens.input)))
-  console.log(renderRow("Output", formatNumber(stats.totalTokens.output)))
-  console.log(renderRow("Cache Read", formatNumber(stats.totalTokens.cache.read)))
-  console.log(renderRow("Cache Write", formatNumber(stats.totalTokens.cache.write)))
+  console.log(renderRow(t("cli.stats.row.median-tokens-session"), formatNumber(Math.round(medianTokensPerSession))))
+  console.log(renderRow(t("cli.stats.row.input"), formatNumber(stats.totalTokens.input)))
+  console.log(renderRow(t("cli.stats.row.output"), formatNumber(stats.totalTokens.output)))
+  console.log(renderRow(t("cli.stats.row.cache-read"), formatNumber(stats.totalTokens.cache.read)))
+  console.log(renderRow(t("cli.stats.row.cache-write"), formatNumber(stats.totalTokens.cache.write)))
   console.log("└────────────────────────────────────────────────────────┘")
   console.log()
 
@@ -334,17 +335,17 @@ export function displayStats(stats: SessionStats, toolLimit?: number, modelLimit
     const modelsToDisplay = modelLimit === Infinity ? sortedModels : sortedModels.slice(0, modelLimit)
 
     console.log("┌────────────────────────────────────────────────────────┐")
-    console.log("│                      MODEL USAGE                       │")
+    console.log("│" + t("cli.stats.section.model-usage").padStart((56 + t("cli.stats.section.model-usage").length) / 2).padEnd(56) + "│")
     console.log("├────────────────────────────────────────────────────────┤")
 
     for (const [model, usage] of modelsToDisplay) {
       console.log(`│ ${model.padEnd(54)} │`)
-      console.log(renderRow("  Messages", usage.messages.toLocaleString()))
-      console.log(renderRow("  Input Tokens", formatNumber(usage.tokens.input)))
-      console.log(renderRow("  Output Tokens", formatNumber(usage.tokens.output)))
-      console.log(renderRow("  Cache Read", formatNumber(usage.tokens.cache.read)))
-      console.log(renderRow("  Cache Write", formatNumber(usage.tokens.cache.write)))
-      console.log(renderRow("  Cost", `$${usage.cost.toFixed(4)}`))
+      console.log(renderRow(t("cli.stats.row.model-messages"), usage.messages.toLocaleString()))
+      console.log(renderRow(t("cli.stats.row.input-tokens"), formatNumber(usage.tokens.input)))
+      console.log(renderRow(t("cli.stats.row.output-tokens"), formatNumber(usage.tokens.output)))
+      console.log(renderRow(t("cli.stats.row.cache-read-model"), formatNumber(usage.tokens.cache.read)))
+      console.log(renderRow(t("cli.stats.row.cache-write-model"), formatNumber(usage.tokens.cache.write)))
+      console.log(renderRow(t("cli.stats.row.cost"), `$${usage.cost.toFixed(4)}`))
       console.log("├────────────────────────────────────────────────────────┤")
     }
     // Remove last separator and add bottom border
@@ -359,7 +360,7 @@ export function displayStats(stats: SessionStats, toolLimit?: number, modelLimit
     const toolsToDisplay = toolLimit ? sortedTools.slice(0, toolLimit) : sortedTools
 
     console.log("┌────────────────────────────────────────────────────────┐")
-    console.log("│                      TOOL USAGE                        │")
+    console.log("│" + t("cli.stats.section.tool-usage").padStart((56 + t("cli.stats.section.tool-usage").length) / 2).padEnd(56) + "│")
     console.log("├────────────────────────────────────────────────────────┤")
 
     const maxCount = Math.max(...toolsToDisplay.map(([, count]) => count))

@@ -3,19 +3,20 @@ import { UI } from "../ui"
 import * as prompts from "@clack/prompts"
 import { Installation } from "../../installation"
 import { InstallationVersion } from "@opencode-ai/core/installation/version"
+import { t } from "@/i18n"
 
 export const UpgradeCommand = {
   command: "upgrade [target]",
-  describe: "upgrade opencode to the latest or a specific version",
+  describe: t("cli.upgrade.describe"),
   builder: (yargs: Argv) => {
     return yargs
       .positional("target", {
-        describe: "version to upgrade to, for ex '0.1.48' or 'v0.1.48'",
+        describe: t("cli.upgrade.positional.target"),
         type: "string",
       })
       .option("method", {
         alias: "m",
-        describe: "installation method to use",
+        describe: t("cli.upgrade.option.method"),
         type: "string",
         choices: ["curl", "npm", "pnpm", "bun", "brew", "choco", "scoop"],
       })
@@ -24,51 +25,51 @@ export const UpgradeCommand = {
     UI.empty()
     UI.println(UI.logo("  "))
     UI.empty()
-    prompts.intro("Upgrade")
+    prompts.intro(t("cli.upgrade.intro"))
     const detectedMethod = await Installation.method()
     const method = (args.method as Installation.Method) ?? detectedMethod
     if (method === "unknown") {
-      prompts.log.error(`opencode is installed to ${process.execPath} and may be managed by a package manager`)
+      prompts.log.error(t("cli.upgrade.log.managed-by-pkgmgr", { execPath: process.execPath }))
       const install = await prompts.select({
-        message: "Install anyways?",
+        message: t("cli.upgrade.prompt.install-anyways"),
         options: [
-          { label: "Yes", value: true },
-          { label: "No", value: false },
+          { label: t("cli.upgrade.option.yes"), value: true },
+          { label: t("cli.upgrade.option.no"), value: false },
         ],
         initialValue: false,
       })
       if (!install) {
-        prompts.outro("Done")
+        prompts.outro(t("cli.upgrade.outro.done"))
         return
       }
     }
-    prompts.log.info("Using method: " + method)
+    prompts.log.info(t("cli.upgrade.log.using-method", { method }))
     const target = args.target ? args.target.replace(/^v/, "") : await Installation.latest()
 
     if (InstallationVersion === target) {
-      prompts.log.warn(`opencode upgrade skipped: ${target} is already installed`)
-      prompts.outro("Done")
+      prompts.log.warn(t("cli.upgrade.log.skipped-already-installed", { target }))
+      prompts.outro(t("cli.upgrade.outro.done"))
       return
     }
 
-    prompts.log.info(`From ${InstallationVersion} → ${target}`)
+    prompts.log.info(t("cli.upgrade.log.from-to", { from: InstallationVersion, to: target }))
     const spinner = prompts.spinner()
-    spinner.start("Upgrading...")
+    spinner.start(t("cli.upgrade.spinner.upgrading"))
     const err = await Installation.upgrade(method, target).catch((err) => err)
     if (err) {
-      spinner.stop("Upgrade failed", 1)
+      spinner.stop(t("cli.upgrade.spinner.upgrade-failed"), 1)
       if (err instanceof Installation.UpgradeFailedError) {
         // necessary because choco only allows install/upgrade in elevated terminals
         if (method === "choco" && err.stderr.includes("not running from an elevated command shell")) {
-          prompts.log.error("Please run the terminal as Administrator and try again")
+          prompts.log.error(t("cli.upgrade.log.run-as-admin"))
         } else {
           prompts.log.error(err.stderr)
         }
       } else if (err instanceof Error) prompts.log.error(err.message)
-      prompts.outro("Done")
+      prompts.outro(t("cli.upgrade.outro.done"))
       return
     }
-    spinner.stop("Upgrade complete")
-    prompts.outro("Done")
+    spinner.stop(t("cli.upgrade.spinner.upgrade-complete"))
+    prompts.outro(t("cli.upgrade.outro.done"))
   },
 }

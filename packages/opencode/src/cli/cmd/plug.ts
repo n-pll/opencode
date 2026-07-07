@@ -11,6 +11,7 @@ import { Process } from "@/util/process"
 import { UI } from "../ui"
 import { effectCmd } from "../effect-cmd"
 import { InstanceRef } from "@/effect/instance-ref"
+import { t } from "@/i18n"
 
 type Spin = {
   start: (msg: string) => void
@@ -74,11 +75,11 @@ export function createPlugTask(input: PlugInput, dep: PlugDeps = defaultPlugDeps
 
   return async (ctx: PlugCtx) => {
     const install = dep.spinner()
-    install.start("Installing plugin package...")
+    install.start(t("cli.plugin.spinner.installing"))
     const target = await installPlugin(mod, dep)
     if (!target.ok) {
-      install.stop("Install failed", 1)
-      dep.log.error(`Could not install "${mod}"`)
+      install.stop(t("cli.plugin.spinner.install-failed"), 1)
+      dep.log.error(t("cli.plugin.error.could-not-install", { module: mod }))
       const hit = cause(target.error) ?? target.error
       if (hit instanceof Process.RunFailedError) {
         const lines = hit.stderr
@@ -90,8 +91,8 @@ export function createPlugTask(input: PlugInput, dep: PlugDeps = defaultPlugDeps
         const detail = errs[0] ?? lines.at(-1)
         if (detail) dep.log.error(detail)
         if (lines.some((line) => line.includes("No version matching"))) {
-          dep.log.info("This package depends on a version that is not available in your npm registry.")
-          dep.log.info("Check npm registry/auth settings and try again.")
+          dep.log.info(t("cli.plugin.info.registry-version"))
+          dep.log.info(t("cli.plugin.info.check-npm"))
         }
       }
       if (!(hit instanceof Process.RunFailedError)) {
@@ -99,29 +100,27 @@ export function createPlugTask(input: PlugInput, dep: PlugDeps = defaultPlugDeps
       }
       return false
     }
-    install.stop("Plugin package ready")
+    install.stop(t("cli.plugin.spinner.package-ready"))
 
     const inspect = dep.spinner()
-    inspect.start("Reading plugin manifest...")
+    inspect.start(t("cli.plugin.spinner.reading-manifest"))
     const manifest = await readPluginManifest(target.target)
     if (!manifest.ok) {
       if (manifest.code === "manifest_read_failed") {
-        inspect.stop("Manifest read failed", 1)
-        dep.log.error(`Installed "${mod}" but failed to read ${manifest.file}`)
+        inspect.stop(t("cli.plugin.spinner.manifest-read-failed"), 1)
+        dep.log.error(t("cli.plugin.error.manifest-read", { module: mod, file: manifest.file }))
         dep.log.error(errorMessage(cause(manifest.error) ?? manifest.error))
         return false
       }
 
       if (manifest.code === "manifest_no_targets") {
-        inspect.stop("No plugin targets found", 1)
-        dep.log.error(`"${mod}" does not expose plugin entrypoints in package.json`)
-        dep.log.info(
-          'Expected one of: exports["./tui"], exports["./server"], package.json main for server, or package.json["oc-themes"] for tui themes.',
-        )
+        inspect.stop(t("cli.plugin.spinner.no-targets"), 1)
+        dep.log.error(t("cli.plugin.error.no-targets", { module: mod }))
+        dep.log.info(t("cli.plugin.info.expected-entries"))
         return false
       }
 
-      inspect.stop("Manifest read failed", 1)
+      inspect.stop(t("cli.plugin.spinner.manifest-read-failed"), 1)
       return false
     }
 
@@ -130,7 +129,7 @@ export function createPlugTask(input: PlugInput, dep: PlugDeps = defaultPlugDeps
     )
 
     const patch = dep.spinner()
-    patch.start("Updating plugin config...")
+    patch.start(t("cli.plugin.spinner.updating-config"))
     const out = await patchPluginConfig(
       {
         spec: mod,
@@ -146,31 +145,37 @@ export function createPlugTask(input: PlugInput, dep: PlugDeps = defaultPlugDeps
     )
     if (!out.ok) {
       if (out.code === "invalid_json") {
-        patch.stop(`Failed updating ${out.kind} config`, 1)
-        dep.log.error(`Invalid JSON in ${out.file} (${out.parse} at line ${out.line}, column ${out.col})`)
-        dep.log.info("Fix the config file and run the command again.")
+        patch.stop(t("cli.plugin.spinner.failed-update-kind", { kind: out.kind }), 1)
+        dep.log.error(
+          t("cli.plugin.error.invalid-json", { file: out.file, parse: out.parse, line: out.line, col: out.col }),
+        )
+        dep.log.info(t("cli.plugin.info.fix-config"))
         return false
       }
 
-      patch.stop("Failed updating plugin config", 1)
+      patch.stop(t("cli.plugin.spinner.failed-update-config"), 1)
       dep.log.error(errorMessage(out.error))
       return false
     }
-    patch.stop("Plugin config updated")
+    patch.stop(t("cli.plugin.spinner.config-updated"))
     for (const item of out.items) {
       if (item.mode === "noop") {
-        dep.log.info(`Already configured in ${item.file}`)
+        dep.log.info(t("cli.plugin.info.already-configured", { file: item.file }))
         continue
       }
       if (item.mode === "replace") {
-        dep.log.info(`Replaced in ${item.file}`)
+        dep.log.info(t("cli.plugin.info.replaced", { file: item.file }))
         continue
       }
-      dep.log.info(`Added to ${item.file}`)
+      dep.log.info(t("cli.plugin.info.added", { file: item.file }))
     }
 
-    dep.log.success(`Installed ${mod}`)
-    dep.log.info(global ? `Scope: global (${out.dir})` : `Scope: local (${out.dir})`)
+    dep.log.success(t("cli.plugin.success.installed", { module: mod }))
+    dep.log.info(
+      global
+        ? t("cli.plugin.info.scope-global", { dir: out.dir })
+        : t("cli.plugin.info.scope-local", { dir: out.dir }),
+    )
     return true
   }
 }
@@ -178,35 +183,35 @@ export function createPlugTask(input: PlugInput, dep: PlugDeps = defaultPlugDeps
 export const PluginCommand = effectCmd({
   command: "plugin <module>",
   aliases: ["plug"],
-  describe: "install plugin and update config",
+  describe: t("cli.plugin.describe"),
   builder: (yargs) =>
     yargs
       .positional("module", {
         type: "string",
-        describe: "npm module name",
+        describe: t("cli.plugin.positional.module"),
       })
       .option("global", {
         alias: ["g"],
         type: "boolean",
         default: false,
-        describe: "install in global config",
+        describe: t("cli.plugin.option.global"),
       })
       .option("force", {
         alias: ["f"],
         type: "boolean",
         default: false,
-        describe: "replace existing plugin version",
+        describe: t("cli.plugin.option.force"),
       }),
   handler: Effect.fn("Cli.plug")(function* (args) {
     const mod = String(args.module ?? "").trim()
     if (!mod) {
-      UI.error("module is required")
+      UI.error(t("cli.plugin.error.module-required"))
       process.exitCode = 1
       return
     }
 
     UI.empty()
-    intro(`Install plugin ${mod}`)
+    intro(t("cli.plugin.intro", { module: mod }))
 
     const run = createPlugTask({
       mod,
@@ -224,7 +229,7 @@ export const PluginCommand = effectCmd({
       }),
     )
 
-    outro("Done")
+    outro(t("cli.plugin.outro.done"))
     if (!ok) process.exitCode = 1
   }),
 })

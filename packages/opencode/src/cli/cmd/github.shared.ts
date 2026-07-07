@@ -1,4 +1,5 @@
 import type { SessionV1 } from "@opencode-ai/core/v1/session"
+import { t } from "@/i18n"
 
 export { parseGitHubRemote } from "@/util/repository"
 
@@ -14,7 +15,7 @@ export function extractResponseText(parts: SessionV1.Part[]): string | null {
   // Non-text parts (tools, reasoning, step-start/step-finish, etc.) - signal summary needed
   if (parts.length > 0) return null
 
-  throw new Error("Failed to parse response: no parts returned")
+  throw new Error(t("cli.github.error.parse-no-parts"))
 }
 
 /**
@@ -24,7 +25,7 @@ export function extractResponseText(parts: SessionV1.Part[]): string | null {
 export function formatPromptTooLargeError(files: { filename: string; content: string }[]): string {
   const fileDetails =
     files.length > 0
-      ? `\n\nFiles in prompt:\n${files.map((f) => `  - ${f.filename} (${((f.content.length * 0.75) / 1024).toFixed(0)} KB)`).join("\n")}`
+      ? `\n\n${t("cli.github.error.prompt-too-large-files")}\n${files.map((f) => `  - ${f.filename} (${((f.content.length * 0.75) / 1024).toFixed(0)} KB)`).join("\n")}`
       : ""
-  return `PROMPT_TOO_LARGE: The prompt exceeds the model's context limit.${fileDetails}`
+  return `${t("cli.github.error.prompt-too-large")}${fileDetails}`
 }

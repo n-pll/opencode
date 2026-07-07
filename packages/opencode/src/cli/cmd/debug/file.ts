@@ -6,6 +6,7 @@ import { Location } from "@opencode-ai/core/location"
 import { AbsolutePath, RelativePath } from "@opencode-ai/core/schema"
 import { effectCmd } from "../../effect-cmd"
 import { cmd } from "../cmd"
+import { t } from "@/i18n"
 
 const filesystem = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
   effect.pipe(
@@ -15,12 +16,12 @@ const filesystem = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
 
 const FileSearchCommand = effectCmd({
   command: "search <query>",
-  describe: "search files by query",
+  describe: t("cli.debug.file.search.describe"),
   builder: (yargs) =>
     yargs.positional("query", {
       type: "string",
       demandOption: true,
-      description: "Search query",
+      description: t("cli.debug.file.search.positional.query"),
     }),
   handler: Effect.fn("Cli.debug.file.search")(function* (args) {
     const results = yield* Effect.orDie(filesystem(FileSystem.Service.use((svc) => svc.find({ query: args.query }))))
@@ -30,12 +31,12 @@ const FileSearchCommand = effectCmd({
 
 const FileReadCommand = effectCmd({
   command: "read <path>",
-  describe: "read file contents as JSON",
+  describe: t("cli.debug.file.read.describe"),
   builder: (yargs) =>
     yargs.positional("path", {
       type: "string",
       demandOption: true,
-      description: "File path to read",
+      description: t("cli.debug.file.read.positional.path"),
     }),
   handler: Effect.fn("Cli.debug.file.read")(function* (args) {
     const file = yield* filesystem(FileSystem.Service.use((svc) => svc.read({ path: RelativePath.make(args.path) })))
@@ -51,12 +52,12 @@ const FileReadCommand = effectCmd({
 
 const FileListCommand = effectCmd({
   command: "list <path>",
-  describe: "list files in a directory",
+  describe: t("cli.debug.file.list.describe"),
   builder: (yargs) =>
     yargs.positional("path", {
       type: "string",
       demandOption: true,
-      description: "File path to list",
+      description: t("cli.debug.file.list.positional.path"),
     }),
   handler: Effect.fn("Cli.debug.file.list")(function* (args) {
     const files = yield* filesystem(FileSystem.Service.use((svc) => svc.list({ path: RelativePath.make(args.path) })))
@@ -66,7 +67,7 @@ const FileListCommand = effectCmd({
 
 export const FileCommand = cmd({
   command: "file",
-  describe: "file system debugging utilities",
+  describe: t("cli.debug.file.describe"),
   builder: (yargs) =>
     yargs.command(FileReadCommand).command(FileListCommand).command(FileSearchCommand).demandCommand(),
   async handler() {},
