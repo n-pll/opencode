@@ -75,11 +75,11 @@ export function CommandPaletteDialog() {
         .map((option) => ({
           ...option,
           value: `suggested:${option.value}`,
-          category: "Suggested",
+          category: t("tui.command_palette.category.suggested"),
         })),
       ...options(),
     ]
   }
 
-  return <DialogSelect ref={(value) => (ref = value)} title="Commands" options={list()} />
+  return <DialogSelect ref={(value) => (ref = value)} title={t("tui.command_palette.title")} options={list()} />
 }

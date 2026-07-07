@@ -4,10 +4,12 @@ import { For } from "solid-js"
 import { useTheme } from "../context/theme"
 import { useDialog } from "../ui/dialog"
 import { useBindings } from "../keymap"
+import { useLanguage } from "../context/language"
 
 export function DialogWorkspaceUnavailable(props: { onRestore?: () => boolean | void | Promise<boolean | void> }) {
   const dialog = useDialog()
   const { theme } = useTheme()
+  const { t } = useLanguage()
   const [store, setStore] = createStore({
     active: "restore" as "cancel" | "restore",
   })
@@ -25,9 +27,9 @@ export function DialogWorkspaceUnavailable(props: { onRestore?: () => boolean | 
 
   useBindings(() => ({
     bindings: [
-      { key: "return", desc: "Confirm workspace option", group: "Dialog", cmd: () => void confirm() },
-      { key: "left", desc: "Cancel workspace restore", group: "Dialog", cmd: () => setStore("active", "cancel") },
-      { key: "right", desc: "Restore workspace", group: "Dialog", cmd: () => setStore("active", "restore") },
+      { key: "return", desc: t("tui.dialog.workspace_unavailable.binding.confirm"), group: "Dialog", cmd: () => void confirm() },
+      { key: "left", desc: t("tui.dialog.workspace_unavailable.binding.cancel"), group: "Dialog", cmd: () => setStore("active", "cancel") },
+      { key: "right", desc: t("tui.dialog.workspace_unavailable.binding.restore"), group: "Dialog", cmd: () => setStore("active", "restore") },
     ],
   }))
 
@@ -35,17 +37,17 @@ export function DialogWorkspaceUnavailable(props: { onRestore?: () => boolean | 
     <box paddingLeft={2} paddingRight={2} gap={1}>
       <box flexDirection="row" justifyContent="space-between">
         <text attributes={TextAttributes.BOLD} fg={theme.text}>
-          Workspace Unavailable
+          {t("tui.dialog.workspace_unavailable.title")}
         </text>
         <text fg={theme.textMuted} onMouseUp={() => dialog.clear()}>
           esc
         </text>
       </box>
       <text fg={theme.textMuted} wrapMode="word">
-        This session is attached to a workspace that is no longer available.
+        {t("tui.dialog.workspace_unavailable.message1")}
       </text>
       <text fg={theme.textMuted} wrapMode="word">
-        Would you like to restore this session into a new workspace?
+        {t("tui.dialog.workspace_unavailable.message2")}
       </text>
       <box flexDirection="row" justifyContent="flex-end" paddingBottom={1} gap={1}>
         <For each={options}>
@@ -59,7 +61,11 @@ export function DialogWorkspaceUnavailable(props: { onRestore?: () => boolean | 
                 void confirm()
               }}
             >
-              <text fg={item === store.active ? theme.selectedListItemText : theme.textMuted}>{item}</text>
+              <text fg={item === store.active ? theme.selectedListItemText : theme.textMuted}>
+                {item === "cancel"
+                  ? t("tui.dialog.workspace_unavailable.option.cancel")
+                  : t("tui.dialog.workspace_unavailable.option.restore")}
+              </text>
             </box>
           )}
         </For>

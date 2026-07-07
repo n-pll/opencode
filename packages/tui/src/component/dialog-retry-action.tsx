@@ -6,6 +6,7 @@ import { useDialog, type DialogContext } from "../ui/dialog"
 import { Link } from "../ui/link"
 import { BgPulse } from "./bg-pulse"
 import { useBindings } from "../keymap"
+import { useLanguage } from "../context/language"
 
 const GO_URL = "https://opencode.ai/go"
 const PAD_X = 3
@@ -43,30 +44,31 @@ export function DialogRetryAction(props: DialogRetryActionProps) {
   const showGoTreatment = () => props.link === GO_URL
   const textBg = () => (showGoTreatment() ? panelOverlay(theme.backgroundPanel) : undefined)
   const [selected, setSelected] = createSignal<"dismiss" | "action">("action")
+  const { t } = useLanguage()
 
   useBindings(() => ({
     bindings: [
       {
         key: "left",
-        desc: "Previous retry option",
+        desc: t("tui.dialog.retry_action.binding.previous_option"),
         group: "Dialog",
         cmd: () => setSelected((value) => (value === "action" ? "dismiss" : "action")),
       },
       {
         key: "right",
-        desc: "Next retry option",
+        desc: t("tui.dialog.retry_action.binding.next_option"),
         group: "Dialog",
         cmd: () => setSelected((value) => (value === "action" ? "dismiss" : "action")),
       },
       {
         key: "tab",
-        desc: "Next retry option",
+        desc: t("tui.dialog.retry_action.binding.next_option"),
         group: "Dialog",
         cmd: () => setSelected((value) => (value === "action" ? "dismiss" : "action")),
       },
       {
         key: "return",
-        desc: "Confirm retry option",
+        desc: t("tui.dialog.retry_action.binding.confirm_option"),
         group: "Dialog",
         cmd: () => {
           if (selected() === "action") runAction(props, dialog)
@@ -123,7 +125,7 @@ export function DialogRetryAction(props: DialogRetryActionProps) {
               bg={selected() === "dismiss" ? undefined : textBg()}
               attributes={selected() === "dismiss" ? TextAttributes.BOLD : undefined}
             >
-              don't show again
+              {t("tui.dialog.retry_action.button.dont_show_again")}
             </text>
           </box>
           <box

@@ -15,6 +15,7 @@ import { isConsoleManagedProvider } from "../util/provider-origin"
 import { useConnected } from "./use-connected"
 import { useBindings } from "../keymap"
 import { useClipboard } from "../context/clipboard"
+import { useLanguage } from "../context/language"
 
 const PROVIDER_PRIORITY: Record<string, number> = {
   opencode: 0,
@@ -45,6 +46,7 @@ type ProviderOption =
     })
 
 export function providerOptions(list: { id: string; name: string }[]): ProviderOption[] {
+  const { t } = useLanguage()
   return [
     ...pipe(
       list,
@@ -59,20 +61,20 @@ export function providerOptions(list: { id: string; name: string }[]): ProviderO
         value: provider.id,
         providerID: provider.id,
         description: {
-          opencode: "(Recommended)",
-          anthropic: "(API key)",
-          openai: "(ChatGPT Plus/Pro or API key)",
-          "opencode-go": "Low cost subscription for everyone",
+          opencode: t("tui.dialog.provider.desc.recommended"),
+          anthropic: t("tui.dialog.provider.desc.anthropic_apikey"),
+          openai: t("tui.dialog.provider.desc.openai"),
+          "opencode-go": t("tui.dialog.provider.desc.opencode_go"),
         }[provider.id],
-        category: provider.id in PROVIDER_PRIORITY ? "Popular" : "Providers",
+        category: provider.id in PROVIDER_PRIORITY ? t("tui.dialog.provider.category.popular") : t("tui.dialog.provider.category.providers"),
       })),
     ),
     {
       type: "custom",
-      title: "Other",
+      title: t("tui.dialog.provider.other.title"),
       value: CUSTOM_PROVIDER_OPTION_VALUE,
-      description: "Custom provider",
-      category: "Providers",
+      description: t("tui.dialog.provider.other.desc"),
+      category: t("tui.dialog.provider.category.providers"),
     },
   ]
 }
@@ -90,13 +92,14 @@ export function createDialogProviderOptions() {
   const toast = useToast()
   const { theme } = useTheme()
   const onboarded = useConnected()
+  const { t } = useLanguage()
 
   async function promptCustomProviderID(): Promise<string | undefined> {
-    const value = await DialogPrompt.show(dialog, "Other", {
-      placeholder: "Provider id",
+    const value = await DialogPrompt.show(dialog, t("tui.dialog.provider.other.title"), {
+      placeholder: t("tui.dialog.provider.other.placeholder"),
       description: () => (
         <text fg={theme.textMuted}>
-          This only stores a credential. Configure the provider in opencode.json to use it.
+          {t("tui.dialog.provider.other.description")}
         </text>
       ),
     })
@@ -107,8 +110,7 @@ export function createDialogProviderOptions() {
 
     toast.show({
       variant: "error",
-      message:
-        "Provider ids must start with a lowercase letter or number and only use lowercase letters, numbers, hyphens, and underscores",
+      message: t("tui.dialog.provider.custom.error"),
     })
     return promptCustomProviderID()
   }
@@ -126,7 +128,7 @@ export function createDialogProviderOptions() {
             async onSelect() {
               const providerID = await promptCustomProviderID()
               if (!providerID) return
-              return dialog.replace(() => <ApiMethod providerID={providerID} title="API key" custom />)
+              return dialog.replace(() => <ApiMethod providerID={providerID} title={t("tui.dialog.provider.method.api_key")} custom />)
             },
           }
         }
@@ -148,7 +150,7 @@ export function createDialogProviderOptions() {
             const methods = sync.data.provider_auth[providerID] ?? [
               {
                 type: "api",
-                label: "API key",
+                label: t("tui.dialog.provider.method.api_key"),
               },
             ]
             let index: number | null = 0
@@ -157,7 +159,7 @@ export function createDialogProviderOptions() {
                 dialog.replace(
                   () => (
                     <DialogSelect
-                      title="Select auth method"
+                      title={t("tui.dialog.provider.select_auth_method.title")}
                       options={methods.map((x, index) => ({
                         title: x.label,
                         value: index,
@@ -227,7 +229,8 @@ export function createDialogProviderOptions() {
 
 export function DialogProvider() {
   const options = createDialogProviderOptions()
-  return <DialogSelect title="Connect a provider" options={options()} />
+  const { t } = useLanguage()
+  return <DialogSelect title={t("tui.dialog.provider.title.connect")} options={options()} />
 }
 
 interface AutoMethodProps {
@@ -243,19 +246,20 @@ function AutoMethod(props: AutoMethodProps) {
   const sync = useSync()
   const toast = useToast()
   const clipboard = useClipboard()
+  const { t } = useLanguage()
 
   useBindings(() => ({
     bindings: [
       {
         key: "c",
-        desc: "Copy provider code",
+        desc: t("tui.dialog.provider.auto.binding.copy_provider_code"),
         group: "Dialog",
         cmd: () => {
           const code =
             props.authorization.instructions.match(/[A-Z0-9]{4}-[A-Z0-9]{4,5}/)?.[0] ?? props.authorization.url
           clipboard
             .write?.(code)
-            .then(() => toast.show({ message: "Copied to clipboard", variant: "info" }))
+            .then(() => toast.show({ message: t("tui.dialog.provider.auto.copied"), variant: "info" }))
             .catch(toast.error)
         },
       },
@@ -272,7 +276,7 @@ function AutoMethod(props: AutoMethodProps) {
         variant: "error",
         message:
           "name" in result.error && result.error.name === "ProviderAuthOauthCallbackFailed"
-            ? "OAuth authorization failed. Try /connect again."
+            ? t("tui.dialog.provider.auto.oauth_failed")
             : JSON.stringify(result.error),
       })
       dialog.clear()
@@ -297,9 +301,9 @@ function AutoMethod(props: AutoMethodProps) {
         <Link href={props.authorization.url} fg={theme.primary} />
         <text fg={theme.textMuted}>{props.authorization.instructions}</text>
       </box>
-      <text fg={theme.textMuted}>Waiting for authorization...</text>
+      <text fg={theme.textMuted}>{t("tui.dialog.provider.auto.waiting")}</text>
       <text fg={theme.text}>
-        c <span style={{ fg: theme.textMuted }}>copy</span>
+        c <span style={{ fg: theme.textMuted }}>{t("tui.dialog.provider.auto.copy_hint")}</span>
       </text>
     </box>
   )
@@ -317,11 +321,12 @@ function CodeMethod(props: CodeMethodProps) {
   const sync = useSync()
   const dialog = useDialog()
   const [error, setError] = createSignal(false)
+  const { t } = useLanguage()
 
   return (
     <DialogPrompt
       title={props.title}
-      placeholder="Authorization code"
+      placeholder={t("tui.dialog.provider.code.placeholder")}
       onConfirm={async (value) => {
         const { error } = await sdk.client.provider.oauth.callback({
           providerID: props.providerID,
@@ -341,7 +346,7 @@ function CodeMethod(props: CodeMethodProps) {
           <text fg={theme.textMuted}>{props.authorization.instructions}</text>
           <Link href={props.authorization.url} fg={theme.primary} />
           <Show when={error()}>
-            <text fg={theme.error}>Invalid code</text>
+            <text fg={theme.error}>{t("tui.dialog.provider.code.invalid")}</text>
           </Show>
         </box>
       )}
@@ -361,32 +366,31 @@ function ApiMethod(props: ApiMethodProps) {
   const sync = useSync()
   const toast = useToast()
   const { theme } = useTheme()
+  const { t } = useLanguage()
 
   return (
     <DialogPrompt
       title={props.title}
-      placeholder="API key"
+      placeholder={t("tui.dialog.provider.api.placeholder")}
       description={() =>
         ({
           opencode: (
             <box gap={1}>
               <text fg={theme.textMuted}>
-                OpenCode Zen gives you access to all the best coding models at the cheapest prices with a single API
-                key.
+                {t("tui.dialog.provider.api.opencode.desc")}
               </text>
               <text fg={theme.text}>
-                Go to <span style={{ fg: theme.primary }}>https://opencode.ai/zen</span> to get a key
+                {t("tui.dialog.provider.api.opencode.url")}
               </text>
             </box>
           ),
           "opencode-go": (
             <box gap={1}>
               <text fg={theme.textMuted}>
-                OpenCode Go is a $10 per month subscription that provides reliable access to popular open coding models
-                with generous usage limits.
+                {t("tui.dialog.provider.api.opencode_go.desc")}
               </text>
               <text fg={theme.text}>
-                Go to <span style={{ fg: theme.primary }}>https://opencode.ai/go</span> and enable OpenCode Go
+                {t("tui.dialog.provider.api.opencode_go.url")}
               </text>
             </box>
           ),
@@ -407,7 +411,7 @@ function ApiMethod(props: ApiMethodProps) {
         if (props.custom && !sync.data.provider_next.all.some((provider) => provider.id === props.providerID)) {
           toast.show({
             variant: "info",
-            message: `Saved credential for ${props.providerID}. Configure it in opencode.json to use it.`,
+            message: t("tui.dialog.provider.api.custom_saved", { providerID: props.providerID }),
           })
           dialog.clear()
           return

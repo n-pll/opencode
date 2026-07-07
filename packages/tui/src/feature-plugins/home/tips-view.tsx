@@ -2,6 +2,7 @@ import type { TuiPluginApi } from "@opencode-ai/plugin/tui"
 import { createMemo, For, type Accessor } from "solid-js"
 import { DEFAULT_THEMES, useTheme } from "../../context/theme"
 import { useCommandShortcut } from "../../keymap"
+import { useLanguage } from "../../context/language"
 
 const themeCount = Object.keys(DEFAULT_THEMES).length
 
@@ -96,6 +97,8 @@ function configShortcut(api: TuiPluginApi, command: string): TipShortcut {
 
 export function Tips(props: { api: TuiPluginApi; connected?: boolean }) {
   const theme = useTheme().theme
+  const { t } = useLanguage()
+  const noModelsTip = () => t("tui.tips.no_models")
   const tipOffset = Math.random()
   const shortcuts: Shortcuts = {
     agentCycle: useCommandShortcut("agent.cycle"),
@@ -133,13 +136,13 @@ export function Tips(props: { api: TuiPluginApi; connected?: boolean }) {
     themeList: useCommandShortcut("theme.switch"),
   }
   const tip = createMemo(() => {
-    if (props.connected === false) return NO_MODELS_TIP
+    if (props.connected === false) return noModelsTip()
     const tips = [...TIPS, process.platform !== "win32" ? TERMINAL_SUSPEND_TIP : INPUT_UNDO_TIP].flatMap((item) => {
       const value = typeof item === "string" ? item : item(shortcuts)
       return value ? [value] : []
     })
-    return tips[Math.floor(tipOffset * tips.length)] ?? NO_MODELS_TIP
-  }, NO_MODELS_TIP)
+    return tips[Math.floor(tipOffset * tips.length)] ?? noModelsTip()
+  }, noModelsTip())
   // Solid can expose a memo's initial value while a pure computation is pending.
   const parts = createMemo(() => {
     const value = tip()
@@ -150,7 +153,7 @@ export function Tips(props: { api: TuiPluginApi; connected?: boolean }) {
   return (
     <box flexDirection="row" maxWidth="100%">
       <text flexShrink={0} style={{ fg: theme.warning }}>
-        ● Tip{" "}
+        {t("tui.tips.prefix")}{" "}
       </text>
       <text flexShrink={1} wrapMode="word">
         <For each={parts()}>

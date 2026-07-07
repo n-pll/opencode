@@ -8,6 +8,7 @@ import { useTheme } from "../context/theme"
 import { useTuiConfig } from "../config"
 import { useDialog, type DialogContext } from "../ui/dialog"
 import { getScrollAcceleration } from "../util/scroll"
+import { useLanguage } from "../context/language"
 
 const options = ["no", "yes"] as const
 
@@ -33,7 +34,10 @@ export function DialogWorkspaceFileChanges(props: {
   const dialog = useDialog()
   const { theme } = useTheme()
   const tuiConfig = useTuiConfig()
+  const { t } = useLanguage()
   const scrollAcceleration = createMemo(() => getScrollAcceleration(tuiConfig))
+  const optionLabel = (value: WorkspaceFileChangesChoice) =>
+    value === "yes" ? t("tui.dialog.workspace_file_changes.option.yes") : t("tui.dialog.workspace_file_changes.option.no")
   const [store, setStore] = createStore({ active: "yes" as WorkspaceFileChangesChoice })
   const height = createMemo(() => Math.min(props.files.length, 8))
   const fileNameWidth = createMemo(() => 48 - Math.max(Math.max(7, ...props.files.map(changeCountWidth)) - 7, 0))
@@ -69,7 +73,7 @@ export function DialogWorkspaceFileChanges(props: {
     <box gap={1}>
       <box flexDirection="row" justifyContent="space-between" paddingLeft={2} paddingRight={2}>
         <text attributes={TextAttributes.BOLD} fg={theme.text}>
-          {props.title ?? "File Changes Found"}
+          {props.title ?? t("tui.dialog.workspace_file_changes.title.default")}
         </text>
         <text fg={theme.textMuted} onMouseUp={() => dialog.clear()}>
           esc
@@ -77,7 +81,7 @@ export function DialogWorkspaceFileChanges(props: {
       </box>
       <box paddingLeft={2} paddingRight={2}>
         <text fg={theme.textMuted} wrapMode="word">
-          {props.message ?? "Do you want to move these changes with the session?"}
+          {props.message ?? t("tui.dialog.workspace_file_changes.message.default")}
         </text>
       </box>
       <scrollbox
@@ -121,7 +125,7 @@ export function DialogWorkspaceFileChanges(props: {
                 dialog.clear()
               }}
             >
-              <text fg={item === store.active ? theme.selectedListItemText : theme.textMuted}>{item}</text>
+              <text fg={item === store.active ? theme.selectedListItemText : theme.textMuted}>{optionLabel(item)}</text>
             </box>
           )}
         </For>
