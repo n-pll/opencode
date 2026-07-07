@@ -37,7 +37,7 @@ export const { use: useLanguage, provider: LanguageProvider } = createSimpleCont
   name: "Language",
   init: () => {
     const kv = useKV()
-    const stored = kv.get<string>(KV_KEY)
+    const stored = kv.get(KV_KEY) as string | undefined
     const initial = normalize(stored)
 
     const [locale, setLocaleSignal] = createSignal<TuiLocale>(initial)

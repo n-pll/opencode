@@ -16,7 +16,7 @@ export type { Dictionary, I18nParams }
 
 export type CoreI18nKey = keyof typeof en
 
-const dictionaries: Record<string, Dictionary> = { en, zh }
+const dictionaries: Record<string, Dictionary> = { en, zh: zh as Dictionary }
 
 /**
  * Headless translator bound to the core dictionary namespace.

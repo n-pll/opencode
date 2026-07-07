@@ -4,7 +4,7 @@ import { dict as zh } from "./zh"
 
 export type CliI18nKey = keyof typeof en
 
-const dictionaries: Record<string, Dictionary> = { en, zh }
+const dictionaries: Record<string, Dictionary> = { en, zh: zh as Dictionary }
 
 /**
  * Headless translator bound to the cli.* dictionary namespace. Resolves the
@@ -15,6 +15,3 @@ const locale = resolveLocale()
 const active = dictionaries[locale] ?? {}
 export const t = (key: CliI18nKey, params?: I18nParams) => translate(en, active, key, params)
 export const cliLocale = locale
-
-export * from "./en"
-export * from "./zh"
