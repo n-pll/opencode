@@ -1,8 +1,13 @@
 import { NamedError } from "@opencode-ai/core/util/error"
+import { coreTranslator, resolveLocale } from "@opencode-ai/core/i18n"
 import { errorFormat } from "@/util/error"
 import { isRecord } from "@/util/record"
 
 type ConfigIssue = { message: string; path: string[] }
+
+// Resolve the locale once at module load from env/config. The CLI surface is
+// short-lived (one process run), so a boot-time snapshot matches its lifecycle.
+const t = coreTranslator(resolveLocale())
 
 function isTaggedError(error: unknown, tag: string): error is Record<string, unknown> {
   return isRecord(error) && error._tag === tag
@@ -47,7 +52,7 @@ export function FormatError(input: unknown): string | undefined {
   // MCPFailed: { name: string }
   if (NamedError.hasName(input, "MCPFailed")) {
     const data = isRecord(input) && isRecord(input.data) ? stringField(input.data, "name") : undefined
-    return `MCP server "${data}" failed. Note, opencode does not support MCP authentication yet.`
+    return t("core.error.mcpFailed", { name: data ?? "" })
   }
 
   // AccountServiceError, AccountTransportError: TaggedErrorClass
@@ -62,30 +67,39 @@ export function FormatError(input: unknown): string | undefined {
       ? providerModelNotFound.suggestions.filter((x) => typeof x === "string")
       : []
     return [
-      `Model not found: ${stringField(providerModelNotFound, "providerID")}/${stringField(providerModelNotFound, "modelID")}`,
-      ...(suggestions.length ? ["Did you mean: " + suggestions.join(", ")] : []),
-      `Try: \`opencode models\` to list available models`,
-      `Or check your config (opencode.json) provider/model names`,
+      t("core.error.modelNotFound", {
+        providerID: stringField(providerModelNotFound, "providerID") ?? "",
+        modelID: stringField(providerModelNotFound, "modelID") ?? "",
+      }),
+      ...(suggestions.length ? [t("core.error.modelNotFound.suggest", { suggestions: suggestions.join(", ") })] : []),
+      t("core.error.modelNotFound.tryModels"),
+      t("core.error.modelNotFound.checkConfig"),
     ].join("\n")
   }
 
   // ProviderInitError: { providerID: string }
   const providerInit = configData(input, "ProviderInitError")
   if (providerInit) {
-    return `Failed to initialize provider "${stringField(providerInit, "providerID")}". Check credentials and configuration.`
+    return t("core.error.providerInit", { providerID: stringField(providerInit, "providerID") ?? "" })
   }
 
   // ConfigJsonError: { path: string, message?: string }
   const configJson = configData(input, "ConfigJsonError")
   if (configJson) {
     const message = stringField(configJson, "message")
-    return `Config file at ${stringField(configJson, "path")} is not valid JSON(C)` + (message ? `: ${message}` : "")
+    return message
+      ? t("core.error.configJson.withMessage", { path: stringField(configJson, "path") ?? "", message })
+      : t("core.error.configJson", { path: stringField(configJson, "path") ?? "" })
   }
 
   // ConfigDirectoryTypoError: { dir: string, path: string, suggestion: string }
   const configDirectoryTypo = configData(input, "ConfigDirectoryTypoError")
   if (configDirectoryTypo) {
-    return `Directory "${stringField(configDirectoryTypo, "dir")}" in ${stringField(configDirectoryTypo, "path")} is not valid. Rename the directory to "${stringField(configDirectoryTypo, "suggestion")}" or remove it. This is a common typo.`
+    return t("core.error.configDirectoryTypo", {
+      dir: stringField(configDirectoryTypo, "dir") ?? "",
+      path: stringField(configDirectoryTypo, "path") ?? "",
+      suggestion: stringField(configDirectoryTypo, "suggestion") ?? "",
+    })
   }
 
   // ConfigFrontmatterError: { message: string }
@@ -100,9 +114,11 @@ export function FormatError(input: unknown): string | undefined {
     const url = stringField(remoteAuth, "url")
     const remote = stringField(remoteAuth, "remote")
     return [
-      `Failed to load remote config${remote ? ` from ${remote}` : ""}: the server returned a login page instead of JSON.`,
-      `Authentication is missing or has expired (the endpoint is likely behind an SSO or identity-aware proxy).`,
-      ...(url ? [`Run \`opencode auth login ${url}\` to re-authenticate.`] : []),
+      remote
+        ? t("core.error.remoteAuth.failedFrom", { remote })
+        : t("core.error.remoteAuth.failed"),
+      t("core.error.remoteAuth.explanation"),
+      ...(url ? [t("core.error.remoteAuth.relogin", { url })] : []),
     ].join("\n")
   }
 
@@ -112,8 +128,15 @@ export function FormatError(input: unknown): string | undefined {
     const path = stringField(configInvalid, "path")
     const message = stringField(configInvalid, "message")
     const issues = configIssues(configInvalid)
+    const atPath = path && path !== "config"
     return [
-      `Configuration is invalid${path && path !== "config" ? ` at ${path}` : ""}` + (message ? `: ${message}` : ""),
+      message
+        ? atPath
+          ? t("core.error.configInvalid.atWithMessage", { path, message })
+          : t("core.error.configInvalid.withMessage", { message })
+        : atPath
+          ? t("core.error.configInvalid.at", { path })
+          : t("core.error.configInvalid"),
       ...issues.map((issue) => "↳ " + issue.message + " " + issue.path.join(".")),
     ].join("\n")
   }

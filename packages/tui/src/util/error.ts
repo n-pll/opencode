@@ -1,6 +1,12 @@
+import { coreTranslator, resolveLocale } from "@opencode-ai/core/i18n"
 import { isRecord } from "./record"
 
 type ConfigIssue = { message: string; path: string[] }
+
+// Resolve once at module load; the TUI reads its locale from the Language context
+// for in-app text, but these error renderers run outside SolidJS (e.g. on exit),
+// so a boot-time snapshot from env/config is the stable choice here.
+const t = coreTranslator(resolveLocale())
 
 export function cliErrorMessage(input: unknown): string | undefined {
   if (input instanceof Error && isRecord(input.cause) && "body" in input.cause) {
@@ -22,26 +28,31 @@ export function cliErrorMessage(input: unknown): string | undefined {
       ? model.suggestions.filter((item): item is string => typeof item === "string")
       : []
     return [
-      `Model not found: ${field(model, "providerID")}/${field(model, "modelID")}`,
-      ...(suggestions.length ? ["Did you mean: " + suggestions.join(", ")] : []),
-      "Try: `opencode models` to list available models",
-      "Or check your config (opencode.json) provider/model names",
+      t("core.error.modelNotFound", { providerID: field(model, "providerID") ?? "", modelID: field(model, "modelID") ?? "" }),
+      ...(suggestions.length ? [t("core.error.modelNotFound.suggest", { suggestions: suggestions.join(", ") })] : []),
+      t("core.error.modelNotFound.tryModels"),
+      t("core.error.modelNotFound.checkConfig"),
     ].join("\n")
   }
 
   const provider = configData(input, "ProviderInitError")
-  if (provider)
-    return `Failed to initialize provider "${field(provider, "providerID")}". Check credentials and configuration.`
+  if (provider) return t("core.error.providerInit", { providerID: field(provider, "providerID") ?? "" })
 
   const json = configData(input, "ConfigJsonError")
   if (json) {
     const message = field(json, "message")
-    return `Config file at ${field(json, "path")} is not valid JSON(C)` + (message ? `: ${message}` : "")
+    return message
+      ? t("core.error.configJson.withMessage", { path: field(json, "path") ?? "", message })
+      : t("core.error.configJson", { path: field(json, "path") ?? "" })
   }
 
   const directory = configData(input, "ConfigDirectoryTypoError")
   if (directory) {
-    return `Directory "${field(directory, "dir")}" in ${field(directory, "path")} is not valid. Rename the directory to "${field(directory, "suggestion")}" or remove it. This is a common typo.`
+    return t("core.error.configDirectoryTypo", {
+      dir: field(directory, "dir") ?? "",
+      path: field(directory, "path") ?? "",
+      suggestion: field(directory, "suggestion") ?? "",
+    })
   }
 
   const frontmatter = configData(input, "ConfigFrontmatterError")
@@ -61,8 +72,15 @@ export function cliErrorMessage(input: unknown): string | undefined {
           )
         })
       : []
+    const atPath = path && path !== "config"
     return [
-      `Configuration is invalid${path && path !== "config" ? ` at ${path}` : ""}` + (message ? `: ${message}` : ""),
+      message
+        ? atPath
+          ? t("core.error.configInvalid.atWithMessage", { path, message })
+          : t("core.error.configInvalid.withMessage", { message })
+        : atPath
+          ? t("core.error.configInvalid.at", { path })
+          : t("core.error.configInvalid"),
       ...issues.map((issue) => "↳ " + issue.message + " " + issue.path.join(".")),
     ].join("\n")
   }
@@ -70,7 +88,7 @@ export function cliErrorMessage(input: unknown): string | undefined {
   if (tagged(input, "UICancelledError") || named(input, "UICancelledError")) return ""
   if (isRecord(input) && named(input, "MCPFailed")) {
     const name = isRecord(input.data) ? field(input.data, "name") : undefined
-    return `MCP server "${name}" failed. Note, opencode does not support MCP authentication yet.`
+    return t("core.error.mcpFailed", { name: name ?? "" })
   }
   return undefined
 }
@@ -111,11 +129,13 @@ export function errorFormat(error: unknown): string {
         const ctor = error.constructor?.name
         const prefix = ctor && ctor !== "Object" ? ctor : "Error"
         const names = Object.getOwnPropertyNames(error)
-        return names.length === 0 ? `${prefix} (no message)` : `${prefix} { ${names.join(", ")} }`
+        return names.length === 0
+          ? t("core.error.noMessage", { prefix })
+          : t("core.error.objectShape", { prefix, names: names.join(", ") })
       }
       return json
     } catch {
-      return "Unexpected error (unserializable)"
+      return t("core.error.unserializable")
     }
   }
 
@@ -141,7 +161,7 @@ export function errorMessage(error: unknown): string {
 
   const formatted = errorFormat(error)
   if (formatted) return formatted
-  return "unknown error"
+  return t("core.error.unknown")
 }
 
 export function errorData(error: unknown) {
