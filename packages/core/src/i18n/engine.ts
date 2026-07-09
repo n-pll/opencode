@@ -1,3 +1,7 @@
+import path from "node:path"
+import { readFileSync } from "node:fs"
+import { Global } from "../global"
+
 export type I18nParams = Record<string, string | number | boolean>
 
 export type Dictionary = Record<string, string>
@@ -66,3 +70,32 @@ export function envLocale() {
 
 /** Locales the headless engine ships dictionaries for. */
 export const SUPPORTED_LOCALES: readonly string[] = ["en", "zh"]
+
+/**
+ * Synchronously peek the `locale` field from opencode.json/config.json without
+ * loading the full Effect config layer. Used at boot time (before the config
+ * Service resolves) so early `describe`/`t()` strings honor the configured
+ * locale. Returns undefined when no candidate file has a locale field.
+ */
+export function peekConfigLocale(): string | undefined {
+  const candidates = [
+    process.env["OPENCODE_CONFIG"],
+    path.join(process.cwd(), "opencode.jsonc"),
+    path.join(process.cwd(), "opencode.json"),
+    path.join(process.cwd(), "config.json"),
+    path.join(Global.Path.config, "opencode.jsonc"),
+    path.join(Global.Path.config, "opencode.json"),
+    path.join(Global.Path.config, "config.json"),
+  ]
+  for (const file of candidates) {
+    if (!file) continue
+    try {
+      const text = readFileSync(file, "utf8")
+      const match = text.match(/"locale"\s*:\s*"([^"]+)"/)
+      if (match) return match[1]
+    } catch {
+      // file missing or unreadable — try next candidate
+    }
+  }
+  return undefined
+}

@@ -1,13 +1,15 @@
 import { NamedError } from "@opencode-ai/core/util/error"
-import { coreTranslator, resolveLocale } from "@opencode-ai/core/i18n"
+import { coreTranslator } from "@opencode-ai/core/i18n"
+import { cliLocale } from "@/i18n"
 import { errorFormat } from "@/util/error"
 import { isRecord } from "@/util/record"
 
 type ConfigIssue = { message: string; path: string[] }
 
-// Resolve the locale once at module load from env/config. The CLI surface is
-// short-lived (one process run), so a boot-time snapshot matches its lifecycle.
-const t = coreTranslator(resolveLocale())
+// Reuse the CLI i18n locale snapshot (resolved once at @/i18n module load from
+// OPENCODE_LOCALE/LANG/config peek) so error rendering stays in sync with the
+// rest of the CLI surface.
+const t = coreTranslator(cliLocale)
 
 function isTaggedError(error: unknown, tag: string): error is Record<string, unknown> {
   return isRecord(error) && error._tag === tag

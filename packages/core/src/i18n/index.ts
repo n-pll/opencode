@@ -4,6 +4,7 @@ import {
   SUPPORTED_LOCALES,
   envLocale,
   normalizeLocale,
+  peekConfigLocale,
   resolveLocale,
   resolveTemplate,
   translate,
@@ -11,7 +12,7 @@ import {
   type I18nParams,
 } from "./engine"
 
-export { resolveTemplate, resolveLocale, normalizeLocale, envLocale, translate, SUPPORTED_LOCALES }
+export { resolveTemplate, resolveLocale, normalizeLocale, envLocale, peekConfigLocale, translate, SUPPORTED_LOCALES }
 export type { Dictionary, I18nParams }
 
 export type CoreI18nKey = keyof typeof en

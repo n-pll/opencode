@@ -1,4 +1,4 @@
-import { resolveLocale, translate, type Dictionary, type I18nParams } from "@opencode-ai/core/i18n"
+import { peekConfigLocale, resolveLocale, translate, type Dictionary, type I18nParams } from "@opencode-ai/core/i18n"
 import { dict as en } from "./en"
 import { dict as zh } from "./zh"
 
@@ -8,10 +8,10 @@ const dictionaries: Record<string, Dictionary> = { en, zh: zh as Dictionary }
 
 /**
  * Headless translator bound to the cli.* dictionary namespace. Resolves the
- * locale once at module load from OPENCODE_LOCALE/LANG/config, matching the
- * one-shot lifecycle of a CLI process.
+ * locale once at module load from OPENCODE_LOCALE/LANG/opencode.json, matching
+ * the one-shot lifecycle of a CLI process.
  */
-const locale = resolveLocale()
+const locale = resolveLocale({ configLocale: peekConfigLocale() })
 const active = dictionaries[locale] ?? {}
 export const t = (key: CliI18nKey, params?: I18nParams) => translate(en, active, key, params)
 export const cliLocale = locale

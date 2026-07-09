@@ -1,7 +1,7 @@
 import { createMemo, createSignal } from "solid-js"
 import { createSimpleContext } from "./helper"
 import { useKV } from "./kv"
-import { resolveLocale, resolveTemplate, translate, type Dictionary, type I18nParams } from "@opencode-ai/core/i18n"
+import { peekConfigLocale, resolveLocale, resolveTemplate, translate, type Dictionary, type I18nParams } from "@opencode-ai/core/i18n"
 import { dict as tuiEn } from "../i18n/en"
 import { dict as tuiZh } from "../i18n/zh"
 import { dict as uiEn } from "@opencode-ai/ui/i18n/en"
@@ -24,13 +24,13 @@ const LABELS: Record<TuiLocale, string> = {
 
 const KV_KEY = "language"
 
-function detectLocale(): TuiLocale {
-  const resolved = resolveLocale()
+function detectLocale(configLocale?: string): TuiLocale {
+  const resolved = resolveLocale({ configLocale })
   return resolved === "zh" || resolved === "zht" ? "zh" : "en"
 }
 
-function normalize(value: string | undefined): TuiLocale {
-  return LOCALES.includes(value as TuiLocale) ? (value as TuiLocale) : detectLocale()
+function normalize(value: string | undefined, configLocale?: string): TuiLocale {
+  return LOCALES.includes(value as TuiLocale) ? (value as TuiLocale) : detectLocale(configLocale)
 }
 
 export const { use: useLanguage, provider: LanguageProvider } = createSimpleContext({
@@ -38,7 +38,8 @@ export const { use: useLanguage, provider: LanguageProvider } = createSimpleCont
   init: () => {
     const kv = useKV()
     const stored = kv.get(KV_KEY) as string | undefined
-    const initial = normalize(stored)
+    // Priority: explicit KV choice > opencode.json locale field > env detection.
+    const initial = normalize(stored, peekConfigLocale())
 
     const [locale, setLocaleSignal] = createSignal<TuiLocale>(initial)
 
