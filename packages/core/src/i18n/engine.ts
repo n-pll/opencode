@@ -37,10 +37,17 @@ export function translate(en: Dictionary, locale: Dictionary, key: string, param
  */
 export function resolveLocale(options?: { envLocale?: string; configLocale?: string; fallback?: string }) {
   const fallback = options?.fallback ?? "en"
-  const env = options?.envLocale ?? envLocale()
-  if (env) return normalizeLocale(env)
+  // OPENCODE_LOCALE is an explicit override and wins over everything.
+  const explicit = options?.envLocale !== undefined ? options.envLocale : process.env["OPENCODE_LOCALE"]
+  if (explicit) return normalizeLocale(explicit)
+  // The opencode.json locale field is an explicit user choice, so it wins over
+  // the generic LANG/LC_* environment (which is often a system default like
+  // "C.UTF-8" that carries no real language intent).
   const config = options?.configLocale
   if (config) return normalizeLocale(config)
+  // Fall back to LANG/LC_* only when neither override nor config set a locale.
+  const lang = options?.envLocale !== undefined ? undefined : langEnv()
+  if (lang) return normalizeLocale(lang)
   return fallback
 }
 
@@ -61,11 +68,19 @@ export function normalizeLocale(value: string): string {
 }
 
 /**
- * Process-level env access isolated for testability. Reads happen at call time
- * (not module load) so tests and the CLI can set these at runtime.
+ * The explicit OPENCODE_LOCALE override, if set. Read at call time (not module
+ * load) so tests and the CLI can set it at runtime.
  */
 export function envLocale() {
-  return process.env["OPENCODE_LOCALE"] ?? process.env["LC_ALL"] ?? process.env["LC_MESSAGES"] ?? process.env["LANG"]
+  return process.env["OPENCODE_LOCALE"]
+}
+
+/**
+ * The generic POSIX locale environment (LC_ALL/LC_MESSAGES/LANG). These are
+ * system defaults and rank below an explicit opencode.json locale field.
+ */
+function langEnv() {
+  return process.env["LC_ALL"] ?? process.env["LC_MESSAGES"] ?? process.env["LANG"]
 }
 
 /** Locales the headless engine ships dictionaries for. */
