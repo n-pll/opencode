@@ -605,6 +605,13 @@ export const dict: Partial<Record<Keys, string>> = {
   "cli.acp.describe": "启动 ACP（Agent Client Protocol）服务器",
   "cli.acp.option.cwd": "工作目录",
 
+  // network.ts — 共享网络选项
+  "cli.network.option.port": "监听端口",
+  "cli.network.option.hostname": "监听主机名",
+  "cli.network.option.mdns": "启用 mDNS 服务发现（默认主机名为 0.0.0.0）",
+  "cli.network.option.mdns-domain": "mDNS 服务的自定义域名（默认：opencode.local）",
+  "cli.network.option.cors": "允许 CORS 的额外域名",
+
   // cmd/debug/*
   "cli.debug.describe": "调试和故障排查工具",
   "cli.debug.wait.describe": "无限等待（用于调试）",

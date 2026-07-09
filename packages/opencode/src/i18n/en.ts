@@ -601,6 +601,13 @@ export const dict: Record<string, string> = {
   "cli.acp.describe": "start ACP (Agent Client Protocol) server",
   "cli.acp.option.cwd": "working directory",
 
+  // network.ts — shared network options (port/hostname/mdns/mdns-domain/cors)
+  "cli.network.option.port": "port to listen on",
+  "cli.network.option.hostname": "hostname to listen on",
+  "cli.network.option.mdns": "enable mDNS service discovery (defaults hostname to 0.0.0.0)",
+  "cli.network.option.mdns-domain": "custom domain name for mDNS service (default: opencode.local)",
+  "cli.network.option.cors": "additional domains to allow for CORS",
+
   // cmd/debug/*
   "cli.debug.describe": "debugging and troubleshooting tools",
   "cli.debug.wait.describe": "wait indefinitely (for debugging)",
