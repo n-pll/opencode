@@ -1,3 +1,4 @@
+import "./boot/locale"
 import yargs from "yargs"
 import { hideBin } from "yargs/helpers"
 import { RunCommand } from "./cli/cmd/run"
@@ -64,6 +65,12 @@ const cli = yargs(args)
     describe: t("cli.global.option.pure"),
     type: "boolean",
   })
+  .option("locale", {
+    describe: t("cli.global.option.locale"),
+    type: "string",
+    choices: ["en", "zh"],
+  })
+  .alias("locale", "L")
   .middleware(async (opts) => {
     if (opts.printLogs) process.env.OPENCODE_PRINT_LOGS = "1"
     if (opts.logLevel) process.env.OPENCODE_LOG_LEVEL = opts.logLevel

@@ -5,6 +5,7 @@ export const dict: Record<string, string> = {
   "cli.global.option.print-logs": "print logs to stderr",
   "cli.global.option.log-level": "log level",
   "cli.global.option.pure": "run without external plugins",
+  "cli.global.option.locale": "set the interface language (en, zh)",
   "cli.global.option.completion": "generate shell completion script",
   "cli.global.message.unexpected-error": "Unexpected error",
 

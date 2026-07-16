@@ -9,6 +9,7 @@ export const dict: Partial<Record<Keys, string>> = {
   "cli.global.option.print-logs": "将日志输出到 stderr",
   "cli.global.option.log-level": "日志级别",
   "cli.global.option.pure": "运行时不加载外部插件",
+  "cli.global.option.locale": "设置界面语言 (en, zh)",
   "cli.global.option.completion": "生成 shell 补全脚本",
   "cli.global.message.unexpected-error": "意外错误",
 
