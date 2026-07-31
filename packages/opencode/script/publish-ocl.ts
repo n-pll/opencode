@@ -70,9 +70,19 @@ await $`mkdir -p ${publishDir}/bin`
 // Copy the binary
 await $`cp ${binaryPath} ${publishDir}/bin/${BIN_NAME}${process.platform === "win32" ? ".exe" : ""}`
 
-// postinstall shim (tells users to run it if --ignore-scripts)
-await Bun.file(`${publishDir}/bin/${BIN_NAME}.cmd`).write(
-  `@echo off\r\n"%~dp0${BIN_NAME}.exe" %*\r\n`,
+// Create a Node.js wrapper script (npm requires .js for bin entries)
+const isWin = process.platform === "win32"
+const ext = isWin ? ".exe" : ""
+await Bun.file(`${publishDir}/bin/${BIN_NAME}.js`).write(
+  [
+    `#!/usr/bin/env node`,
+    `const { spawn } = require("child_process")`,
+    `const path = require("path")`,
+    `const bin = path.join(__dirname, "${BIN_NAME}${ext}")`,
+    `const child = spawn(bin, process.argv.slice(2), { stdio: "inherit" })`,
+    `child.on("exit", (code) => process.exit(code ?? 1))`,
+    ``,
+  ].join("\n"),
 )
 
 // package.json for the npm package
@@ -84,7 +94,7 @@ await Bun.file(`${publishDir}/package.json`).write(
       description: "Custom build of opencode with i18n support (ocl fork).",
       license: pkg.license ?? "MIT",
       bin: {
-        [BIN_NAME]: `./bin/${BIN_NAME}${process.platform === "win32" ? ".exe" : ""}`,
+        [BIN_NAME]: `bin/${BIN_NAME}.js`,
       },
       os: [platformPkg.os],
       cpu: [platformPkg.cpu],
@@ -98,9 +108,11 @@ await Bun.file(`${publishDir}/package.json`).write(
 // Copy LICENSE
 await Bun.file(`${publishDir}/LICENSE`).write(await Bun.file("../../LICENSE").text())
 
-// Step 4: Publish
+// Step 4: Publish (prerelease versions need --tag; pass --otp if 2FA enabled)
 console.log(`Publishing to npm as ${NPM_NAME}@${version}...`)
-await $`npm publish ${publishDir} --access public`
+const otp = process.env.NPM_OTP
+const otpFlag = otp ? ["--otp", otp] : []
+await $`npm publish ${publishDir} --access public --tag latest ${otpFlag}`
 
 console.log(`\nDone! Published ${NPM_NAME}@${version}`)
 console.log(`Install with: npm install -g ${NPM_NAME}`)
