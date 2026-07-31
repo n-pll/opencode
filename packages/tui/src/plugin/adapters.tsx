@@ -36,6 +36,7 @@ type Input = {
   renderer: TuiPluginApi["renderer"]
   attention: TuiPluginApi["attention"]
   Slot: TuiPluginApi["ui"]["Slot"]
+  locale: () => string
 }
 
 function routeNavigate(route: ReturnType<typeof useRoute>, name: string, params?: Record<string, unknown>) {
@@ -351,5 +352,6 @@ export function createTuiApiAdapters(input: Input): Omit<TuiPluginApi, "lifecycl
         return input.theme.ready
       },
     },
+    locale: input.locale,
   }
 }

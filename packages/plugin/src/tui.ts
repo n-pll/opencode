@@ -623,6 +623,8 @@ export type TuiPluginApi = {
     install: (spec: string, options?: TuiPluginInstallOptions) => Promise<TuiPluginInstallResult>
   }
   lifecycle: TuiLifecycle
+  /** Active display locale code (e.g. "en", "zh"), reactive in the TUI. */
+  readonly locale: () => string
 }
 
 export type TuiPlugin = (api: TuiPluginApi, options: PluginOptions | undefined, meta: TuiPluginMeta) => Promise<void>

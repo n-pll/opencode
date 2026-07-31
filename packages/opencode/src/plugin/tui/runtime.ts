@@ -629,6 +629,7 @@ function pluginApi(runtime: RuntimeState, plugin: PluginEntry, scope: PluginScop
     event,
     renderer: api.renderer,
     slots,
+    locale: api.locale,
     plugins: {
       list() {
         return listPluginStatus(runtime)

@@ -12,6 +12,7 @@ import { ServerAuth } from "@/server/auth"
 import { CodexAuthPlugin } from "./openai/codex"
 import { Session } from "@/session/session"
 import { NamedError } from "@opencode-ai/core/util/error"
+import { resolveLocale } from "@opencode-ai/core/i18n"
 import { CopilotAuthPlugin } from "./github-copilot/copilot"
 import { ModalPlugin } from "./modal/modal"
 import { gitlabAuthPlugin as GitlabAuthPlugin } from "opencode-gitlab-auth"
@@ -163,6 +164,7 @@ const layer = Layer.effect(
           },
           // @ts-expect-error
           $: typeof Bun === "undefined" ? undefined : Bun.$,
+          locale: resolveLocale({ configLocale: cfg.locale }),
         }
 
         for (const plugin of flags.disableDefaultPlugins ? [] : internalPlugins(flags)) {

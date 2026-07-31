@@ -19,6 +19,19 @@ import pkg from "../package.json"
 const singleFlag = process.argv.includes("--single")
 const baselineFlag = process.argv.includes("--baseline")
 const skipInstall = process.argv.includes("--skip-install")
+
+// Custom version: pin to the official opencode-ai release on npm, suffixed with
+// an -ocl.<timestamp> build tag so the binary is identifiable as a custom build
+// while tracking its upstream base (e.g. 1.17.18-ocl.202607100813).
+const oclVersion = await (async () => {
+  const base = process.env.OPENCODE_VERSION
+  if (base && !base.startsWith("0.0.0-")) return base
+  const res = await fetch("https://registry.npmjs.org/opencode-ai/latest")
+  if (!res.ok) throw new Error(`failed to fetch official version: ${res.status}`)
+  const official = ((await res.json()) as { version: string }).version
+  const ts = new Date().toISOString().slice(0, 16).replace(/[-:T]/g, "")
+  return `${official}-ocl.${ts}`
+})()
 const sourcemapsFlag = process.argv.includes("--sourcemaps")
 const plugin = createSolidTransformPlugin()
 const skipEmbedWebUi = process.argv.includes("--skip-embed-web-ui")
@@ -175,8 +188,8 @@ for (const item of targets) {
       autoloadTsconfig: true,
       autoloadPackageJson: true,
       target: name.replace(pkg.name, "bun") as any,
-      outfile: `dist/${name}/bin/opencode`,
-      execArgv: [`--user-agent=opencode/${Script.version}`, "--use-system-ca", "--"],
+      outfile: `dist/${name}/bin/ocl`,
+      execArgv: [`--user-agent=ocl/${oclVersion}`, "--use-system-ca", "--"],
       windows: {},
     },
     files: {
@@ -191,11 +204,14 @@ for (const item of targets) {
     ],
     define: {
       FFF_LIBC: JSON.stringify(item.abi === "musl" ? "musl" : "gnu"),
-      OPENCODE_VERSION: `'${Script.version}'`,
+      OPENCODE_VERSION: `'${oclVersion}'`,
       OPENCODE_MODELS_DEV: generated.modelsData,
       OTUI_TREE_SITTER_WORKER_PATH: bunfsRoot + treeSitterWorkerPath,
       OPENCODE_WORKER_PATH: workerPath,
-      OPENCODE_CHANNEL: `'${Script.channel}'`,
+      // Force channel to "latest" so the custom build shares the official
+      // database (opencode.db) instead of a split opencode-<branch>.db, and so
+      // behavior matches the official release (no dev-mode side effects).
+      OPENCODE_CHANNEL: `'latest'`,
       OPENCODE_LIBC: item.os === "linux" ? `'${item.abi ?? "glibc"}'` : "",
       ...(item.os === "linux" ? { "process.env.OPENTUI_LIBC": JSON.stringify(item.abi ?? "glibc") } : {}),
     },
@@ -203,7 +219,7 @@ for (const item of targets) {
 
   // Smoke test: only run if binary is for current platform
   if (item.os === process.platform && item.arch === process.arch && !item.abi) {
-    const binaryPath = `dist/${name}/bin/opencode`
+    const binaryPath = `dist/${name}/bin/ocl`
     console.log(`Running smoke test: ${binaryPath} --version`)
     try {
       const versionOutput = await $`${binaryPath} --version`.text()
@@ -219,7 +235,7 @@ for (const item of targets) {
     JSON.stringify(
       {
         name,
-        version: Script.version,
+        version: oclVersion,
         preferUnplugged: true,
         os: [item.os],
         cpu: [item.arch],
@@ -229,7 +245,7 @@ for (const item of targets) {
       2,
     ),
   )
-  binaries[name] = Script.version
+  binaries[name] = oclVersion
 }
 
 if (Script.release) {
@@ -240,7 +256,7 @@ if (Script.release) {
       await $`zip -r ../../${key}.zip *`.cwd(`dist/${key}/bin`)
     }
   }
-  await $`gh release upload v${Script.version} ./dist/*.zip ./dist/*.tar.gz --clobber --repo ${process.env.GH_REPO}`
+  await $`gh release upload v${oclVersion} ./dist/*.zip ./dist/*.tar.gz --clobber --repo ${process.env.GH_REPO}`
 }
 
 export { binaries }

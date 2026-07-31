@@ -388,7 +388,7 @@ function App(props: { onSnapshot?: () => Promise<string[]>; pluginHost: TuiPlugi
   const pluginRuntime = usePluginRuntime()
   const attention = createTuiAttention({ renderer, config: tuiConfig, kv })
   const clipboard = useClipboard()
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
 
   const api = createTuiApi(
     createTuiApiAdapters({
@@ -407,6 +407,7 @@ function App(props: { onSnapshot?: () => Promise<string[]>; pluginHost: TuiPlugi
       renderer,
       attention,
       Slot: pluginRuntime.Slot,
+      locale,
     }),
   )
   const [ready, setReady] = createSignal(false)

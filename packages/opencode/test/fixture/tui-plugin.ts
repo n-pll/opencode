@@ -351,5 +351,6 @@ export function createTuiPluginApi(opts: Opts = {}): HostPluginApi {
         return opts.theme?.ready ?? true
       },
     },
+    locale: () => "en",
   }
 }

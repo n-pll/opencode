@@ -40,6 +40,10 @@ foreach ($p in $nativePkgs) {
 }
 
 # 2. Build a single binary for the current platform, skipping the cross-platform install.
+#    Use a local models.dev snapshot when present (script/models-dev.json) so the
+#    build does not depend on a live network fetch of models.dev/api.json.
+$modelsCache = Join-Path $pkgDir "script\models-dev.json"
+if (Test-Path $modelsCache) { $env:MODELS_DEV_API_JSON = $modelsCache }
 & bun run --cwd $pkgDir build --single --skip-install
 if ($LASTEXITCODE -ne 0) { throw "build failed" }
 
@@ -49,8 +53,17 @@ if (-not $binary) { throw "build produced no ocl binary under dist/*/bin" }
 
 # 4. Deploy to the npm global bin dir (already on PATH), replacing stale shims.
 $npmRoot = (npm config get prefix).Trim()
+$dest = Join-Path $npmRoot $binary.Name
 Remove-Item (Join-Path $npmRoot "ocl"), (Join-Path $npmRoot "ocl.cmd"), (Join-Path $npmRoot "ocl.ps1") -ErrorAction SilentlyContinue
-Copy-Item $binary.FullName (Join-Path $npmRoot $binary.Name) -Force
+
+# Check for a running ocl that would lock the deployed binary. Do NOT kill it
+# automatically — surface the conflict so the user can close it deliberately.
+$running = Get-Process ocl -ErrorAction SilentlyContinue
+if ($running) {
+  $ids = ($running | ForEach-Object { $_.Id }) -join ", "
+  throw "ocl.exe is in use (PID $ids). Close the running ocl (e.g. its TUI window) and re-run this script."
+}
+Copy-Item $binary.FullName $dest -Force
 
 Write-Host ""
 Write-Host "Deployed $($binary.FullName) -> $(Join-Path $npmRoot $binary.Name)"

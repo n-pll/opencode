@@ -63,6 +63,8 @@ export type PluginInput = {
   }
   serverUrl: URL
   $: BunShell
+  /** Active display locale code (e.g. "en", "zh"), resolved at boot. */
+  readonly locale: string
 }
 
 export type PluginOptions = Record<string, unknown>

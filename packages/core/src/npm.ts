@@ -69,6 +69,17 @@ interface ArboristTree {
   edgesOut: Map<string, { to?: ArboristNode }>
 }
 
+function isFloatingSpec(pkg: string) {
+  try {
+    const parsed = npa(pkg)
+    if (parsed.type === "tag") return true
+    if (parsed.type === "range") return true
+    return false
+  } catch {
+    return false
+  }
+}
+
 const layer = Layer.effect(
   Service,
   Effect.gen(function* () {
@@ -112,6 +123,21 @@ const layer = Layer.effect(
         }),
       )
 
+    const REFRESH_COOLDOWN_MS = 24 * 60 * 60 * 1000
+    const REFRESH_STAMP = ".last-refresh"
+
+    const needsRefresh = (dir: string) =>
+      Effect.gen(function* () {
+        const stamp = path.join(dir, REFRESH_STAMP)
+        if (!(yield* afs.existsSafe(stamp))) return true
+        const raw = yield* fs.readFileString(stamp).pipe(Effect.orElseSucceed(() => "0"))
+        const ts = Number.parseInt(raw.trim(), 10)
+        return Number.isNaN(ts) || Date.now() - ts > REFRESH_COOLDOWN_MS
+      })
+
+    const touchRefresh = (dir: string) =>
+      fs.writeFileString(path.join(dir, REFRESH_STAMP), String(Date.now())).pipe(Effect.orElseSucceed(() => {}))
+
     const add = Effect.fn("Npm.add")(function* (pkg: string) {
       const dir = directory(pkg)
       const name = (() => {
@@ -123,10 +149,14 @@ const layer = Layer.effect(
       })()
 
       if (yield* afs.existsSafe(path.join(dir, "node_modules", name))) {
-        return resolveEntryPoint(name, path.join(dir, "node_modules", name))
+        if (!isFloatingSpec(pkg) || !(yield* needsRefresh(dir))) {
+          return resolveEntryPoint(name, path.join(dir, "node_modules", name))
+        }
+        yield* fs.remove(path.join(dir, "package-lock.json")).pipe(Effect.orElseSucceed(() => {}))
       }
 
       const tree = yield* reify({ dir, add: [pkg] })
+      yield* touchRefresh(dir)
       const first = tree.edgesOut.values().next().value?.to
       if (!first) {
         const result = resolveEntryPoint(name, path.join(dir, "node_modules", name))
