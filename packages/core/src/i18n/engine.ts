@@ -2,7 +2,7 @@ import path from "node:path"
 import { readFileSync } from "node:fs"
 import { Global } from "../global"
 
-export type I18nParams = Record<string, string | number | boolean>
+export type I18nParams = Record<string, string | number | boolean | undefined | null | unknown>
 
 export type Dictionary = Record<string, string>
 
