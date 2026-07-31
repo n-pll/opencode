@@ -7,13 +7,13 @@ export type CliI18nKey = keyof typeof en
 const dictionaries: Record<string, Dictionary> = { en, zh: zh as Dictionary }
 
 /**
- * Resolve --locale/-L from argv inline, before resolveLocale reads the env.
+ * Resolve --locale/-l from argv inline, before resolveLocale reads the env.
  * bun compile does not preserve ESM import order, so we cannot rely on a
  * separate boot module; this scan runs in the same module that consumes it.
  */
 for (let i = 2; i < process.argv.length; i++) {
   const arg = process.argv[i]
-  if (arg === "--locale" || arg === "-L") {
+  if (arg === "--locale" || arg === "-l") {
     const value = process.argv[i + 1]
     if (value && !value.startsWith("-")) process.env.OPENCODE_LOCALE = value
     break

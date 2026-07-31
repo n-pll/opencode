@@ -70,7 +70,7 @@ const cli = yargs(args)
     type: "string",
     choices: ["en", "zh"],
   })
-  .alias("locale", "L")
+  .alias("locale", "l")
   .middleware(async (opts) => {
     if (opts.printLogs) process.env.OPENCODE_PRINT_LOGS = "1"
     if (opts.logLevel) process.env.OPENCODE_LOG_LEVEL = opts.logLevel
