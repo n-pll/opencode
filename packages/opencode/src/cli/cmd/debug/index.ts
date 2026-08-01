@@ -62,6 +62,9 @@ const InfoCommand = effectCmd({
     console.log(t("cli.debug.info.opencode-version", { version: InstallationVersion }))
     console.log(t("cli.debug.info.os", { type: os.type(), release: os.release(), arch: os.arch() }))
     console.log(t("cli.debug.info.terminal", { terminal: terminal || t("cli.debug.info.terminal-unknown") }))
+    // Fork enhancement: show active locale and ocl.json overlay status.
+    const { resolveLocale, peekConfigLocale } = yield* Effect.promise(() => import("@opencode-ai/core/i18n"))
+    console.log(`locale: ${resolveLocale({ configLocale: peekConfigLocale() })}`)
     console.log(t("cli.debug.info.plugins-header"))
     if (Flag.OPENCODE_PURE) {
       console.log(t("cli.debug.info.plugins-disabled"))
