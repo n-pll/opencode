@@ -50,7 +50,15 @@ if (await published(NPM_NAME, version)) {
 
 // Step 1: Build the binary for the current platform
 console.log("Building binary...")
-await $`bun run build --single --skip-install`
+// Use local models.dev cache if available (avoids network fetch)
+const modelsCache = path.join(dir, "script/models-dev.json")
+const cacheExists = await Bun.file(modelsCache).exists()
+if (cacheExists) {
+  console.log("Using local models-dev.json cache")
+  await $`MODELS_DEV_API_JSON=${modelsCache} bun run build --single --skip-install`
+} else {
+  await $`bun run build --single --skip-install`
+}
 
 // Step 2: Find the built binary
 const distDirs = Array.from(new Bun.Glob("dist/*/bin/ocl*").scanSync({ cwd: dir }))
@@ -96,8 +104,8 @@ await Bun.file(`${publishDir}/package.json`).write(
       bin: {
         [BIN_NAME]: `bin/${BIN_NAME}.js`,
       },
-      os: [platformPkg.os],
-      cpu: [platformPkg.cpu],
+      os: Array.isArray(platformPkg.os) ? platformPkg.os : [platformPkg.os],
+      cpu: Array.isArray(platformPkg.cpu) ? platformPkg.cpu : [platformPkg.cpu],
       preferUnplugged: true,
     },
     null,
@@ -108,12 +116,31 @@ await Bun.file(`${publishDir}/package.json`).write(
 // Copy LICENSE
 await Bun.file(`${publishDir}/LICENSE`).write(await Bun.file("../../LICENSE").text())
 
-// Step 4: Publish (prerelease versions need --tag; pass --otp if 2FA enabled)
+// Step 4: Publish to official npm registry (not mirror)
 console.log(`Publishing to npm as ${NPM_NAME}@${version}...`)
 const otp = process.env.NPM_OTP
 const otpFlag = otp ? ["--otp", otp] : []
-await $`npm publish ${publishDir} --access public --tag latest ${otpFlag}`
+await $`npm publish ${publishDir} --access public --tag latest --registry https://registry.npmjs.org/ ${otpFlag}`
 
-console.log(`\nDone! Published ${NPM_NAME}@${version}`)
-console.log(`Install with: npm install -g ${NPM_NAME}`)
-console.log(`Version: ${BIN_NAME} --version`)
+console.log(`\nPublished ${NPM_NAME}@${version}`)
+
+// Step 5: Verify installation
+console.log("\n=== 安装验证 ===")
+const NPM_REGISTRY = process.env.VERIFY_REGISTRY || "https://registry.npmmirror.com"
+console.log(`[1/2] 从 ${NPM_REGISTRY} 安装验证...`)
+await $`npm install -g ${NPM_NAME} --registry ${NPM_REGISTRY} --force`.env({
+  ...process.env,
+  HTTPS_PROXY: "",
+  HTTP_PROXY: "",
+  ALL_PROXY: "",
+})
+
+console.log("[2/2] 运行验证...")
+const v = await $`${BIN_NAME} --version`.text().catch(() => "FAILED")
+console.log(`  ${BIN_NAME} --version: ${v.trim()}`)
+if (v.includes("ocl")) {
+  console.log(`✅ 发布成功！${NPM_NAME}@${version}`)
+  console.log(`   安装: npm install -g ${NPM_NAME}`)
+} else {
+  console.log(`⚠️  发布完成但安装验证失败，请手动检查`)
+}
