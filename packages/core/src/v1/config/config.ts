@@ -87,10 +87,6 @@ export const Info = Schema.Struct({
   username: Schema.optional(Schema.String).annotate({
     description: "Custom username to display in conversations instead of system username",
   }),
-  locale: Schema.optional(Schema.String).annotate({
-    description:
-      "Display language locale code (e.g. 'en', 'zh', 'zht'). Overrides the LANG/OPENCODE_LOCALE environment variable for user-facing text.",
-  }),
   mode: Schema.optional(
     Schema.StructWithRest(
       Schema.Struct({ build: Schema.optional(ConfigAgentV1.Info), plan: Schema.optional(ConfigAgentV1.Info) }),
