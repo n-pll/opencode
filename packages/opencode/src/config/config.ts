@@ -258,21 +258,10 @@ const layer = Layer.effect(
       result = mergeConfig(result, yield* loadFile(path.join(Global.Path.config, "config.json"), env))
       result = mergeConfig(result, yield* loadFile(path.join(Global.Path.config, "opencode.json"), env))
       result = mergeConfig(result, yield* loadFile(path.join(Global.Path.config, "opencode.jsonc"), env))
-      // Fork overlay: ocl.json carries fork-specific fields (locale, etc.)
-      // that are not in the official opencode schema. Load it leniently
-      // (no schema validation) so it doesn't break strict decode.
-      const oclPath = path.join(Global.Path.config, "ocl.json")
-      if (existsSync(oclPath)) {
-        try {
-          const oclText = yield* readConfigFile(oclPath)
-          if (oclText) {
-            const oclData = ConfigParse.jsonc(oclText, oclPath) as Partial<Info>
-            result = mergeConfig(result, oclData as Info)
-          }
-        } catch {
-          // ocl.json parse error — ignore, it's an optional overlay
-        }
-      }
+      // Fork enhancement: ocl.json overlays on top of the standard config
+      // files, carrying fork-only fields (e.g. locale). Loaded identically to
+      // the other files — pure addition, no change to existing behavior.
+      result = mergeConfig(result, yield* loadFile(path.join(Global.Path.config, "ocl.json"), env))
 
       const legacy = path.join(Global.Path.config, "config")
       if (existsSync(legacy)) {

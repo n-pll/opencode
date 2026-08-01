@@ -93,20 +93,16 @@ export const SUPPORTED_LOCALES: readonly string[] = ["en", "zh"]
  * locale. Returns undefined when no candidate file has a locale field.
  */
 export function peekConfigLocale(): string | undefined {
-  // Fork-specific config (ocl.json) is checked first so locale lives in a
-  // separate file that won't break official opencode's strict schema check
-  // on opencode.json. Falls back to OPENCODE_CONFIG / opencode.json for
-  // backward compatibility.
   const candidates = [
     process.env["OPENCODE_CONFIG"],
-    path.join(process.cwd(), "ocl.json"),
-    path.join(Global.Path.config, "ocl.json"),
     path.join(process.cwd(), "opencode.jsonc"),
     path.join(process.cwd(), "opencode.json"),
     path.join(process.cwd(), "config.json"),
+    path.join(process.cwd(), "ocl.json"),
     path.join(Global.Path.config, "opencode.jsonc"),
     path.join(Global.Path.config, "opencode.json"),
     path.join(Global.Path.config, "config.json"),
+    path.join(Global.Path.config, "ocl.json"),
   ]
   for (const file of candidates) {
     if (!file) continue
