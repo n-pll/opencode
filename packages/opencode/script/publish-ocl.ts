@@ -12,7 +12,7 @@
  *   bun run script/publish-ocl.ts    # build + publish
  *
  * Users install with:
- *   npm install -g ocl-ai            # installs ocl command globally
+ *   npm install -g @npll/ocl          # installs ocl command globally
  */
 import { $ } from "bun"
 import pkg from "../package.json"
@@ -22,7 +22,7 @@ import path from "path"
 const dir = fileURLToPath(new URL("..", import.meta.url))
 process.chdir(dir)
 
-const NPM_NAME = "ocl-ai"
+const NPM_NAME = "@npll/ocl"
 const BIN_NAME = "ocl"
 
 // Version: official latest + -ocl.<timestamp> suffix (same logic as build.ts)
