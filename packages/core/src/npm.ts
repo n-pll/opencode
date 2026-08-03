@@ -155,6 +155,40 @@ const layer = Layer.effect(
         yield* fs.remove(path.join(dir, "package-lock.json")).pipe(Effect.orElseSucceed(() => {}))
       }
 
+      // Sync the cache package.json so reify sees the correct dependency.
+      // Without this, a plugin spec change (e.g. package rename) leaves stale
+      // entries in package.json, and Arborist's incremental reify never removes
+      // the old package or installs the new one.
+      const pkgJsonPath = path.join(dir, "package.json")
+      let pkgJson: Record<string, unknown> = {}
+      try {
+        pkgJson = (yield* afs.readJson(pkgJsonPath).pipe(Effect.orElseSucceed(() => ({ })))) as Record<string, unknown>
+      } catch {
+        // no existing package.json — fresh install
+      }
+      const deps = (pkgJson.dependencies ?? {}) as Record<string, string>
+      // Remove any dependency whose name differs from the current spec's name
+      // but shares this cache slot (e.g. oh-my-opencode → oh-my-openagent).
+      let changed = false
+      for (const key of Object.keys(deps)) {
+        if (key !== name) {
+          delete deps[key]
+          changed = true
+        }
+      }
+      // Always set the current spec so version bumps propagate.
+      if (deps[name] !== pkg) {
+        deps[name] = pkg.includes("@") && !pkg.startsWith("@") ? pkg.split("@").slice(1).join("@") || "latest" : pkg.replace(`${name}@`, "")
+        // Store the resolved range, not the raw spec with the name prefix.
+        const parsed = (() => { try { return npa(pkg) } catch { return null } })()
+        deps[name] = parsed?.fetchSpec && parsed.fetchSpec !== "" ? parsed.fetchSpec : "latest"
+        changed = true
+      }
+      if (changed || Object.keys(pkgJson).length === 0) {
+        pkgJson.dependencies = deps
+        yield* fs.writeFileString(pkgJsonPath, JSON.stringify(pkgJson, null, 2)).pipe(Effect.orElseSucceed(() => {}))
+      }
+
       const tree = yield* reify({ dir, add: [pkg] })
       yield* touchRefresh(dir)
       const first = tree.edgesOut.values().next().value?.to
