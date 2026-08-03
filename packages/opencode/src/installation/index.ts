@@ -225,9 +225,11 @@ const layer: Layer.Layer<Service, never, HttpClient.HttpClient | AppProcess.Serv
         }
 
         if (detectedMethod === "npm" || detectedMethod === "bun" || detectedMethod === "pnpm") {
+          // Fork enhancement: check @npll/ocl (fork package) instead of
+          // opencode-ai (official) so update notifications match this fork.
           const response = yield* httpOk.execute(
             HttpClientRequest.get(
-              `${yield* NpmConfig.registry(process.cwd())}/opencode-ai/${InstallationChannel}`,
+              `${yield* NpmConfig.registry(process.cwd())}/@npll%2focl/${InstallationChannel}`,
             ).pipe(HttpClientRequest.acceptJson),
           )
           const data = yield* HttpClientResponse.schemaBodyJson(NpmPackage)(response)
