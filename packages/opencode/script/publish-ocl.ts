@@ -43,6 +43,11 @@ async function published(name: string, version: string) {
 const version = await resolveVersion()
 console.log(`Publishing ${NPM_NAME}@${version}`)
 
+// In GitHub Actions, surface the version to later workflow steps (release).
+if (process.env.GITHUB_ENV) {
+  await Bun.write(process.env.GITHUB_ENV, `VERSION=${version}\n`)
+}
+
 if (await published(NPM_NAME, version)) {
   console.log(`Already published ${NPM_NAME}@${version}`)
   process.exit(0)
