@@ -1,0 +1,81 @@
+# Fork 发布 workflow（由 release-pipeline 技能 05-gen-release-files.sh 渲染，勿手改）
+# 自包含内联: 同步/构建/编译/版本/发布/建 release 全在本文件, 不依赖仓库内任何脚本。
+# 同步策略: 无条件接受上游 (-X theirs), 只重放 PKG_OVERRIDES 字段。
+# 渲染器占位符见 05-gen-release-files.sh: FORK_REPO / UPSTREAM_REPO /
+# UPSTREAM_BRANCH / RELEASE_BRANCH / VERSION_SUFFIX / RUNNER / BUN_VERSION /
+# NODE_VERSION / INSTALL_CMD / BUILD_CMD / COMPILE_BLOCK / PUBLISH_ARGS / REGISTRY / PKG_OVERRIDES
+name: publish-ocl
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "完整版本号覆盖 (如 4.19.4-ocl.202608070216)。留空自动生成。"
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: i18n
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.12"
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install dependencies
+        shell: bash
+        run: bun install --ignore-scripts
+
+      # 同步上游。无条件接受上游版本 (-X theirs): 冲突一律采用上游, fork 私有改动若被
+      # 覆盖, 由本地发版流程 (阶段 2) 分析上游代码后决定召回并重新提交到发版分支;
+      # 本步骤只机械重放 fork 基础设施字段 (PKG_OVERRIDES, 如 name/bin)。
+      # 注意: windows runner 默认 shell 是 PowerShell, 多行 bash 必须显式 shell: bash。
+      - name: Sync with upstream
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote add upstream https://github.com/anomalyco/opencode.git || true
+          git fetch upstream dev
+          git merge -X theirs upstream/dev --no-edit
+          # JSON 经环境变量传给 node (Git Bash 下内嵌双引号字符串会坏)
+          PKG_OVERRIDES='{}' node -e "
+            const fs = require('fs')
+            const cur = JSON.parse(fs.readFileSync('package.json'))
+            Object.assign(cur, JSON.parse(process.env.PKG_OVERRIDES))
+            fs.writeFileSync('package.json', JSON.stringify(cur, null, 2))
+          "
+          git add package.json
+          git diff --cached --quiet || git commit -m "chore(ocl): re-apply fork package overrides"
+          echo "Synced with upstream dev"
+
+      - name: Build
+        shell: bash
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd packages/opencode && bun run script/publish-ocl.ts
+
+
+      # gh release create 必须显式 -R: 不带 -R 时 gh 从 git remote 解析仓库, 经过上游
+      # sync 步骤后可能解析到上游仓库导致 403。步骤不要加 '|| true' —— 会吞掉错误。
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          gh release create -R n-pll/opencode "v${{ env.VERSION }}" --title "v${{ env.VERSION }}" --notes "Auto release ${{ env.VERSION }}"
