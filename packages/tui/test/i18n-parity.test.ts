@@ -8,7 +8,12 @@ import { dict as zh } from "../src/i18n/zh"
 // across locales; the test asserts they remain a small, reviewed set.
 const stripped = (value: string) => value.replace(/{{[^}]+}}/g, "")
 const isUrl = (value: string) => /^https?:\/\//i.test(value.trim())
-const isTranslatable = (value: string) => /[a-z]/i.test(stripped(value)) && !isUrl(value)
+// SVG path data and code identifiers are not translatable prose; exclude them
+// from the verbatim check so technical values kept as-is don't count.
+const isTranslatable = (value: string) =>
+  /[a-z]/i.test(stripped(value)) &&
+  !isUrl(value) &&
+  !/^M\d|^\d[\d ,-]*$|^from\w*\(/.test(stripped(value))
 
 // Aligns with the upstream translate-app findDrift placeholder check: the
 // sorted multiset of {{tokens}} must match exactly, so a translation can never

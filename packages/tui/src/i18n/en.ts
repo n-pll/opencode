@@ -821,4 +821,8 @@ export const dict: Record<string, string> = {
   "tui.local.model-is-not-valid": "Model {{providerID}}/{{modelID}} is not valid",
   "tui.local.agent-s-configured-model-is-not-valid": "Agent {{name}}'s configured model {{providerID}}/{{modelID}} is not valid",
   "tui.runtime.is-missing": "{{name}} is missing",
+  "tui.index.circular-color-reference": "Circular color reference: {{p0}}",
+  "tui.plugins.installed": "Installed {{mod}} ({{p0}}: {{dir}})",
+  "tui.keybind.unrecognized-keybind": "Unrecognized keybind{{p0}}: {{p1}}",
+  "tui.autocomplete.": " {{p0}}",
 }

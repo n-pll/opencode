@@ -288,7 +288,7 @@ function count(n: number, label: string): string {
 
 function runGlob(p: ToolProps<typeof GlobTool>): ToolInline {
   const root = p.input.path ?? ""
-  const title = `Glob "${p.input.pattern ?? ""}"`
+  const title = t("cli.tool.glob.2", { p0: p.input.pattern ?? "" })
   const suffix = root ? `in ${toolPath(root)}` : ""
   const matches = p.metadata.count
   const description = matches === undefined ? suffix : `${suffix}${suffix ? " · " : ""}${count(matches, "match")}`
@@ -301,7 +301,7 @@ function runGlob(p: ToolProps<typeof GlobTool>): ToolInline {
 
 function runGrep(p: ToolProps<typeof GrepTool>): ToolInline {
   const root = p.input.path ?? ""
-  const title = `Grep "${p.input.pattern ?? ""}"`
+  const title = t("cli.tool.grep.2", { p0: p.input.pattern ?? "" })
   const suffix = root ? `in ${toolPath(root)}` : ""
   const matches = p.metadata.matches
   const description = matches === undefined ? suffix : `${suffix}${suffix ? " · " : ""}${count(matches, "match")}`
@@ -397,7 +397,7 @@ function runTodo(p: ToolProps<typeof TodoWriteTool>): ToolInline {
 function runSkill(p: ToolProps<typeof SkillTool>): ToolInline {
   return {
     icon: "→",
-    title: `Skill "${p.input.name ?? ""}"`,
+    title: t("cli.tool.skill", { p0: p.input.name ?? "" }),
   }
 }
 
@@ -412,7 +412,7 @@ function runPatch(p: ToolProps<typeof ApplyPatchTool>): ToolInline {
 
   return {
     icon: "%",
-    title: `Patch ${files} file${files === 1 ? "" : "s"}`,
+    title: t("cli.tool.patch-file", { files: files, p0: files === 1 ? "" : "s" }),
   }
 }
 
@@ -420,7 +420,7 @@ function runQuestion(p: ToolProps<typeof QuestionTool>): ToolInline {
   const total = list(p.frame.input.questions).length
   return {
     icon: "→",
-    title: `Asked ${total} question${total === 1 ? "" : "s"}`,
+    title: t("cli.tool.asked-question", { total: total, p0: total === 1 ? "" : "s" }),
   }
 }
 

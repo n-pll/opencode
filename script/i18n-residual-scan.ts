@@ -110,6 +110,14 @@ export function collectFindings(): Finding[] {
         if (!m[groupIdx]) return
         const value = m[groupIdx]
         if (isSkippable(value)) return
+        // Nested templates (${...} containing backticks) truncate the capture
+        // (unbalanced braces); they stay English — hoisting them into t()
+        // params is not worth it for error-detail snippets.
+        if (quote === "`") {
+          const opens = (value.match(/\$\{/g) || []).length
+          const closes = (value.match(/\}/g) || []).length
+          if (opens !== closes) return
+        }
         if (isConsoleLine(code, m.index)) return
         if (seen.has(m.index)) return
         seen.add(m.index)

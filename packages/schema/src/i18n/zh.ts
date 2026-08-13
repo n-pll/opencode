@@ -25,7 +25,7 @@ export const dict: Partial<Record<Keys, string>> = {
   // tui-event.ts
   "schema.tui_event.duration": "持续时间（毫秒）",
   "schema.tui_event.session_select.sessionID": "要导航到的会话 ID",
-  "schema.event.duplicate-latest-event-definition-for": "",
-  "schema.event.duplicate-durable-event-definition-for": "",
-  "schema.workspace_id.id-does-not-start-with-wrk": "",
+  "schema.event.duplicate-latest-event-definition-for": "{{type}} 的 latest 事件定义重复",
+  "schema.event.duplicate-durable-event-definition-for": "{{key}} 的持久事件定义重复",
+  "schema.workspace_id.id-does-not-start-with-wrk": "ID {{id}} 不以 wrk 开头",
 }

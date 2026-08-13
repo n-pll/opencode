@@ -251,4 +251,8 @@ export const dict: Record<string, string> = {
   "core.layer_node.cannot-check-non-unbound-layer-node": "Cannot check non-unbound layer node: {{name}}",
   "core.service_use.service-method-not-found": "Service method not found: {{key}}",
   "core.path.path-is-not-absolute": "Path is not absolute: {{input}}",
+  "core.event.replay-owner-mismatch-for-aggregate-expected-got": "Replay owner mismatch for aggregate {{aggregateID}}: expected {{ownerID}}, got {{p0}}",
+  "core.event.sequence-mismatch-for-aggregate-expected-got": "Sequence mismatch for aggregate {{aggregateID}}: expected {{p0}}, got {{seq}}",
+  "core.session.new-session": "New session - {{p0}}",
+  "core.websearch.search-the-web-using-the-session-s-local-web-search-provider": "Search the web using the session's local web search provider. Use this for current information beyond knowledge cutoff.\r\n\r\nThis is a provider-independent local tool backed by Exa or Parallel. Provider-hosted web search tools are separate and execute at the model provider.\r\n\r\nOptional controls support result count, live crawling ('fallback' or 'preferred'), search type ('auto', 'fast', or 'deep'), and maximum context characters.\r\n\r\nThe current year is {{p0}}. Use this year when searching for recent information or current events.",
 }

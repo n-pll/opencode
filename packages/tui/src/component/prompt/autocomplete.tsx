@@ -428,7 +428,7 @@ export function Autocomplete(props: {
       .map(
         (reference): AutocompleteOption => ({
           display: "@" + reference.name,
-          description: ` ${reference.source.type === "git" ? reference.source.repository : reference.source.path}`,
+          description: t("tui.autocomplete.", { p0: reference.source.type === "git" ? reference.source.repository : reference.source.path }),
           onSelect: () => {
             insertPart(reference.name, {
               type: "file",

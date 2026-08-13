@@ -251,7 +251,7 @@ export function resolveTheme(theme: ThemeJson, mode: "dark" | "light") {
       if (c.startsWith("#")) return RGBA.fromHex(c)
 
       if (chain.includes(c)) {
-        throw new Error(`Circular color reference: ${[...chain, c].join(" -> ")}`)
+        throw new Error(t("tui.index.circular-color-reference", { p0: [...chain, c].join(" -> ") }))
       }
 
       const next = defs[c] ?? theme.theme[c as ThemeColor]

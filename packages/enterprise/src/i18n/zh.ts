@@ -15,8 +15,9 @@ export const dict: Partial<Record<Keys, string>> = {
   "enterprise.api.share_removed": "分享已移除",
   "enterprise.error.session_data_missing_schema": "SessionDataMissingError 未暴露 schema",
   "enterprise.error.missing_shareID": "缺少 shareID",
-  "enterprise.storage.failed-to-read": "",
-  "enterprise.storage.failed-to-write": "",
-  "enterprise.storage.failed-to-remove": "",
-  "enterprise.storage.failed-to-list": "",
+  "enterprise.storage.failed-to-read": "读取 {{path}} 失败：{{status}}",
+  "enterprise.storage.failed-to-write": "写入 {{path}} 失败：{{status}}",
+  "enterprise.storage.failed-to-remove": "移除 {{path}} 失败：{{status}}",
+  "enterprise.storage.failed-to-list": "列出 {{prefix}} 失败：{{status}}",
+  "enterprise._shareID_.session-not-found": "会话 {{p0}} 不存在",
 }

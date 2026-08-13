@@ -33,7 +33,7 @@ export const QuestionTool = Tool.define<typeof Parameters, Metadata, Question.Se
             .join(", ")
 
           return {
-            title: `Asked ${params.questions.length} question${params.questions.length > 1 ? "s" : ""}`,
+            title: t("cli.question.asked-question", { length: params.questions.length, p0: params.questions.length > 1 ? "s" : "" }),
             output: `User has answered your questions: ${formatted}. You can now continue with the user's answers in mind.`,
             metadata: {
               answers,

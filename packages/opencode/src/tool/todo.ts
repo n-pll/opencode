@@ -35,7 +35,7 @@ export const TodoWriteTool = Tool.define<typeof Parameters, Metadata, Todo.Servi
           })
 
           return {
-            title: `${params.todos.filter((x) => x.status !== "completed").length} todos`,
+            title: t("cli.todo.todos", { p0: params.todos.filter((x) => x.status !== "completed").length }),
             output: JSON.stringify(params.todos, null, 2),
             metadata: {
               todos: params.todos,

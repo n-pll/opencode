@@ -157,7 +157,7 @@ export default function () {
       <Show when={data()}>
         {(data) => {
           const match = createMemo(() => Binary.search(data().session, data().sessionID, (s) => s.id))
-          if (!match().found) throw new Error(`Session ${data().sessionID} not found`)
+          if (!match().found) throw new Error(t("enterprise._shareID_.session-not-found", { p0: data().sessionID }))
           const info = createMemo(() => data().session[match().index])
           const ogImage = createMemo(() => {
             const models = new Set<string>()

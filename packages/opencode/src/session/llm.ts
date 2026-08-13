@@ -126,12 +126,12 @@ const live: Layer.Layer<
         workflowModel.sessionID = input.sessionID
         workflowModel.systemPrompt = prepared.system.join("\n")
         workflowModel.toolExecutor = async (toolName, argsJson, _requestID) => {
-          const t = prepared.tools[toolName]
-          if (!t || !t.execute) {
-            return { result: "", error: `Unknown tool: ${toolName}` }
+          const tool = prepared.tools[toolName]
+          if (!tool || !tool.execute) {
+            return { result: "", error: t("cli.llm.unknown-tool", { toolName }) }
           }
           try {
-            const result = await t.execute!(JSON.parse(argsJson), {
+            const result = await tool.execute!(JSON.parse(argsJson), {
               toolCallId: _requestID,
               messages: input.messages,
               abortSignal: input.abort,

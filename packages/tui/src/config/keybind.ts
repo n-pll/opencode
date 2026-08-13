@@ -491,7 +491,7 @@ export function defaultValue(name: KeybindName) {
 
 export function parse(keybinds: KeybindOverrides): Keybinds {
   const invalid = unknownKeys(keybinds)
-  if (invalid.length) throw new Error(`Unrecognized keybind${invalid.length === 1 ? "" : "s"}: ${invalid.join(", ")}`)
+  if (invalid.length) throw new Error(t("tui.keybind.unrecognized-keybind", { p0: invalid.length === 1 ? "" : "s", p1: invalid.join(", ") }))
   return Object.fromEntries(
     Object.entries(Definitions).map(([name, item]) => [
       name,

@@ -297,7 +297,7 @@ export function resolveTheme(theme: ThemeJson, pick: "dark" | "light"): TuiTheme
     }
 
     if (chain.includes(value)) {
-      throw new Error(`Circular color reference: ${[...chain, value].join(" -> ")}`)
+      throw new Error(t("cli.theme.circular-color-reference", { p0: [...chain, value].join(" -> ") }))
     }
 
     const next = defs[value] ?? theme.theme[value as ThemeColor]

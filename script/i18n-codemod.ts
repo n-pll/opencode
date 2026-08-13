@@ -48,7 +48,7 @@ function relImport(file: string): string {
 const slug = (text: string) =>
   text.replace(/\$\{[^}]*\}/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60)
 
-/** Extract {name: expr} params from a template literal. Returns null when any expr is too complex. */
+/** Extract {name: expr} params from a template literal. Returns null only for truncated nested templates. */
 function extractParams(template: string): Record<string, string> | null {
   // Nested templates (backtick inside ${...}) truncate the capture; treat the
   // unmatched-brace result as needing manual hoisting.
@@ -63,10 +63,8 @@ function extractParams(template: string): Record<string, string> | null {
     if (/^[A-Za-z_$][\w$]*$/.test(raw)) name = raw
     else if (/^[A-Za-z_$][\w$]*(\.[\w$]+)+$/.test(raw)) name = raw.split(".").at(-1)!
     else if (/^[A-Za-z_$][\w$]*\[[^\]]*\]$/.test(raw)) name = raw.split("[")[0]
-    else if (/^[A-Za-z_$][\w$.]*\([^)]*\)$/.test(raw)) name = `p${pIndex++}`
-    else if (/^[^`"']*\?[^`"']*:[^`"']*$/.test(raw)) name = `p${pIndex++}`
-    else return null // nested template / quoted ternary — needs manual hoisting
-    if (params[name]) name = `${name}${pIndex++}`
+    else name = `p${pIndex++}` // any other expression passes through verbatim as a value
+    if (params[name] !== undefined) name = `${name}${pIndex++}`
     params[name] = raw
   }
   return params
@@ -212,6 +210,11 @@ async function main() {
       const params = e.quote === "`" ? extractParams(e.value) : {}
       const enValue = e.quote === "`" ? templateValue(e.value, params) : e.value
       if (enValue === undefined) {
+        // Nested templates stay English (see scan); only genuinely complex
+        // expressions get reported for manual hoisting.
+        const opens = (e.value.match(/\$\{/g) || []).length
+        const closes = (e.value.match(/\}/g) || []).length
+        if (opens !== closes) continue
         manual.push(`${file}:${e.line}: ${e.value.slice(0, 60)}`)
         continue
       }

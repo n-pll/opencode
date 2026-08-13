@@ -264,7 +264,7 @@ export function readPackageThemes(spec: string, pkg: PluginPackage) {
 
 export function readPluginId(id: unknown, spec: string) {
   if (id === undefined) return
-  if (typeof id !== "string") throw new TypeError(`Plugin ${spec} has invalid id type ${typeof id}`)
+  if (typeof id !== "string") throw new TypeError(t("cli.shared.plugin-has-invalid-id-type", { spec: spec, p0: typeof id }))
   const value = id.trim()
   if (!value) throw new TypeError(t("cli.shared.plugin-has-an-empty-id", { spec: spec }))
   return value

@@ -96,7 +96,7 @@ function Install(props: { api: TuiPluginApi }) {
 
             props.api.ui.toast({
               variant: "success",
-              message: `Installed ${mod} (${global() ? "global" : "local"}: ${out.dir})`,
+              message: t("tui.plugins.installed", { mod: mod, p0: global() ? "global" : "local", dir: out.dir }),
             })
             if (!out.tui) {
               props.api.ui.toast({

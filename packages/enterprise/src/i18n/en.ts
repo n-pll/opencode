@@ -15,4 +15,5 @@ export const dict: Record<string, string> = {
   "enterprise.storage.failed-to-write": "Failed to write {{path}}: {{status}}",
   "enterprise.storage.failed-to-remove": "Failed to remove {{path}}: {{status}}",
   "enterprise.storage.failed-to-list": "Failed to list {{prefix}}: {{status}}",
+  "enterprise._shareID_.session-not-found": "Session {{p0}} not found",
 }

@@ -256,7 +256,7 @@ export const layerWith = (options?: LayerOptions) =>
                             yield* Effect.die(
                               new InvalidDurableEventError({
                                 type: event.type,
-                                message: `Replay owner mismatch for aggregate ${aggregateID}: expected ${row.ownerID}, got ${input.ownerID ?? "none"}`,
+                                message: t("core.event.replay-owner-mismatch-for-aggregate-expected-got", { aggregateID: aggregateID, ownerID: row.ownerID, p0: input.ownerID ?? "none" }),
                               }),
                             )
                           }
@@ -297,7 +297,7 @@ export const layerWith = (options?: LayerOptions) =>
                             yield* Effect.die(
                               new InvalidDurableEventError({
                                 type: event.type,
-                                message: `Sequence mismatch for aggregate ${aggregateID}: expected ${latest + 1}, got ${seq}`,
+                                message: t("core.event.sequence-mismatch-for-aggregate-expected-got", { aggregateID: aggregateID, p0: latest + 1, seq: seq }),
                               }),
                             )
                           }
