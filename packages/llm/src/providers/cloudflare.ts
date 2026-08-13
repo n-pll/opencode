@@ -4,6 +4,7 @@ import { Auth } from "../route/auth"
 import { AuthOptions, type AtLeastOne, type ProviderAuthOption } from "../route/auth-options"
 import type { RouteDefaultsInput } from "../route/client"
 import { ProviderID, type ModelID } from "../schema"
+import { t } from "../i18n"
 
 export const aiGatewayID = ProviderID.make("cloudflare-ai-gateway")
 export const workersAIID = ProviderID.make("cloudflare-workers-ai")
@@ -35,7 +36,7 @@ export type WorkersAIOptions = WorkersAIURL & RouteDefaultsInput & ProviderAuthO
 
 export const aiGatewayBaseURL = (input: GatewayURL) => {
   if (input.baseURL) return input.baseURL
-  if (!input.accountId) throw new Error("CloudflareAIGateway.configure requires accountId unless baseURL is supplied")
+  if (!input.accountId) throw new Error(t("llm.error.cloudflareaigateway_configure_requires_accountid_u"))
   return `https://gateway.ai.cloudflare.com/v1/${encodeURIComponent(input.accountId)}/${encodeURIComponent(input.gatewayId?.trim() || "default")}/compat`
 }
 
@@ -52,7 +53,7 @@ const aiGatewayAuth = (input: AIGatewayOptions) => {
 
 export const workersAIBaseURL = (input: WorkersAIURL) => {
   if (input.baseURL) return input.baseURL
-  if (!input.accountId) throw new Error("CloudflareWorkersAI.configure requires accountId unless baseURL is supplied")
+  if (!input.accountId) throw new Error(t("llm.error.cloudflareworkersai_configure_requires_accountid_u"))
   return `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(input.accountId)}/ai/v1`
 }
 

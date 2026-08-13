@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { SessionID, MessageID } from "./schema"
 import { SessionV1 } from "@opencode-ai/core/v1/session"
 import { ProviderV2 } from "@opencode-ai/core/provider"
@@ -628,7 +629,7 @@ export function fromError(
     case (e as SystemError)?.code === "ECONNRESET":
       return new APIError(
         {
-          message: "Connection reset by server",
+          message: t("cli.message_v2.connection-reset-by-server"),
           isRetryable: true,
           metadata: {
             code: (e as SystemError).code ?? "",
@@ -644,7 +645,7 @@ export function fromError(
       }
       return new APIError(
         {
-          message: "Response decompression failed",
+          message: t("cli.message_v2.response-decompression-failed"),
           isRetryable: true,
           metadata: {
             code: (e as FetchDecompressionError).code,

@@ -1,5 +1,6 @@
 import { Schema } from "effect"
 import { HttpApiEndpoint, HttpApiGroup, OpenApi } from "effect/unstable/httpapi"
+import { t } from "../i18n"
 
 export const HealthGroup = HttpApiGroup.make("server.health").add(
   HttpApiEndpoint.get("health.get", "/api/health", {
@@ -7,8 +8,8 @@ export const HealthGroup = HttpApiGroup.make("server.health").add(
   }).annotateMerge(
     OpenApi.annotations({
       identifier: "v2.health.get",
-      summary: "Check server health",
-      description: "Check whether the API server is ready to accept requests.",
+      summary: t("protocol.health.health_get.summary"),
+      description: t("protocol.health.health_get.description"),
     }),
   ),
 )

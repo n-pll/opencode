@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { PermissionV1 } from "@opencode-ai/core/v1/permission"
 import type { Auth } from "@/auth"
 import { SessionV1 } from "@opencode-ai/core/v1/session"
@@ -163,7 +164,7 @@ export const prepare = Effect.fn("LLMRequestPrep.prepare")(function* (input: Pre
   ) {
     // Copilot needs a tools field when replaying prior tool calls, even if no tools are currently enabled.
     tools["_noop"] = aiTool({
-      description: "Do not call this tool. It exists only for API compatibility and must never be invoked.",
+      description: t("cli.request.do-not-call-this-tool-it-exists-only-for-api-compatibility-a"),
       inputSchema: jsonSchema({
         type: "object",
         properties: {

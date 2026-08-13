@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { Schema } from "effect"
 import * as path from "path"
 import { Effect } from "effect"
@@ -18,7 +19,7 @@ import * as Bom from "@/util/bom"
 const MAX_PROJECT_DIAGNOSTICS_FILES = 5
 
 export const Parameters = Schema.Struct({
-  content: Schema.String.annotate({ description: "The content to write to the file" }),
+  content: Schema.String.annotate({ description: t("cli.write.the-content-to-write-to-the-file") }),
   filePath: Schema.String.annotate({
     description: "The absolute path to the file to write (must be absolute, not relative)",
   }),

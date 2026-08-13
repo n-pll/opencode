@@ -1,3 +1,5 @@
+import { t } from "../../i18n/t"
+import { useLanguage } from "../../context/language"
 import type { TuiPlugin, TuiPluginApi, TuiPluginStatus } from "@opencode-ai/plugin/tui"
 import type { BuiltinTuiPlugin } from "../builtins"
 import { useTerminalDimensions } from "@opentui/solid"
@@ -36,6 +38,7 @@ function meta(item: TuiPluginStatus, width: number) {
 }
 
 function Install(props: { api: TuiPluginApi }) {
+  const { t } = useLanguage()
   const [global, setGlobal] = createSignal(false)
   const [busy, setBusy] = createSignal(false)
 
@@ -46,7 +49,7 @@ function Install(props: { api: TuiPluginApi }) {
 
   return (
     <props.api.ui.DialogPrompt
-      title="Install plugin"
+      title={t("tui.plugins.install-plugin")}
       placeholder="npm package name"
       busy={busy()}
       busyText="Installing plugin..."
@@ -67,7 +70,7 @@ function Install(props: { api: TuiPluginApi }) {
         if (!mod) {
           props.api.ui.toast({
             variant: "error",
-            message: "Plugin package name is required",
+            message: t("tui.plugins.plugin-package-name-is-required"),
           })
           return
         }
@@ -84,7 +87,7 @@ function Install(props: { api: TuiPluginApi }) {
               if (out.missing) {
                 props.api.ui.toast({
                   variant: "info",
-                  message: "Check npm registry/auth settings and try again.",
+                  message: t("tui.plugins.check-npm-registry-auth-settings-and-try-again"),
                 })
               }
               show(props.api)
@@ -98,7 +101,7 @@ function Install(props: { api: TuiPluginApi }) {
             if (!out.tui) {
               props.api.ui.toast({
                 variant: "info",
-                message: "Package has no TUI target to load in this app.",
+                message: t("tui.plugins.package-has-no-tui-target-to-load-in-this-app"),
               })
               show(props.api)
               return
@@ -249,7 +252,7 @@ const tui: TuiPlugin = async (api) => {
       },
       {
         name: "plugins.install",
-        title: "Install plugin",
+        title: t("tui.plugins.install-plugin"),
         category: "System",
         namespace: "palette",
         run() {

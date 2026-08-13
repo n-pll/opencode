@@ -7,6 +7,7 @@ import { Authorization } from "../middleware/authorization"
 import { InstanceContextMiddleware } from "../middleware/instance-context"
 import { WorkspaceRoutingMiddleware, WorkspaceRoutingQuery } from "../middleware/workspace-routing"
 import { described } from "./metadata"
+import { t } from "@/i18n"
 
 const root = "/permission"
 const ReplyPayload = Schema.Struct({
@@ -24,8 +25,8 @@ export const PermissionApi = HttpApi.make("permission")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "permission.list",
-            summary: "List pending permissions",
-            description: "Get all pending permission requests across all sessions.",
+            summary: t("instance.permission.permission_list.summary"),
+            description: t("instance.permission.permission_list.description"),
           }),
         ),
         HttpApiEndpoint.post("reply", `${root}/:requestID/reply`, {
@@ -37,15 +38,15 @@ export const PermissionApi = HttpApi.make("permission")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "permission.reply",
-            summary: "Respond to permission request",
-            description: "Approve or deny a permission request from the AI assistant.",
+            summary: t("instance.permission.permission_reply.summary"),
+            description: t("instance.permission.permission_reply.description"),
           }),
         ),
       )
       .annotateMerge(
         OpenApi.annotations({
           title: "permission",
-          description: "Experimental HttpApi permission routes.",
+          description: t("instance.permission.permission_0.description"),
         }),
       )
       .middleware(InstanceContextMiddleware)
@@ -56,6 +57,6 @@ export const PermissionApi = HttpApi.make("permission")
     OpenApi.annotations({
       title: "opencode experimental HttpApi",
       version: "0.0.1",
-      description: "Experimental HttpApi surface for selected instance routes.",
+      description: t("instance.config.config_1.description"),
     }),
   )

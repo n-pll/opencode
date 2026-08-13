@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { listAdapters } from "@/control-plane/adapters"
 import { Workspace } from "@/control-plane/workspace"
 import * as InstanceState from "@/effect/instance-state"
@@ -37,7 +38,7 @@ export const workspaceHandlers = HttpApiBuilder.group(InstanceHttpApi, "workspac
             const die = cause.reasons.find(Cause.isDieReason)
             const fail = cause.reasons.find(Cause.isFailReason)
             const reason: unknown = die?.defect ?? fail?.error
-            const message = reason instanceof Error ? reason.message : "Workspace creation failed"
+            const message = reason instanceof Error ? reason.message : t("cli.workspace.workspace-creation-failed")
             return Effect.fail(
               new ApiWorkspaceCreateError({
                 name: "WorkspaceCreateError",

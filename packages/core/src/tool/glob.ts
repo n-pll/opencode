@@ -12,16 +12,17 @@ import { PermissionV2 } from "../permission"
 import { ToolRegistry } from "./registry"
 import { Tool } from "./tool"
 import { Tools } from "./tools"
+import { t } from "../i18n"
 
 export const name = "glob"
 
 export const Input = Schema.Struct({
-  pattern: FileSystem.GlobInput.fields.pattern.annotate({ description: "Glob pattern to match files against" }),
+  pattern: FileSystem.GlobInput.fields.pattern.annotate({ description: t("core.config.glob_pattern_to_match_files_against") }),
   path: RelativePath.pipe(Schema.optional).annotate({
-    description: "Relative directory to search. Defaults to the active Location.",
+    description: t("core.config.relative_directory_to_search_defaults_to_the_active_location"),
   }),
   limit: FileSystem.GlobInput.fields.limit.annotate({
-    description: "Maximum results to return",
+    description: t("core.config.maximum_results_to_return"),
   }),
 })
 

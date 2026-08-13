@@ -2,6 +2,7 @@ export * as ConfigProviderV1 from "./provider"
 
 import { Schema } from "effect"
 import { PositiveInt } from "../../schema"
+import { t } from "../../i18n"
 
 export const ModelStatus = Schema.Literals(["alpha", "beta", "deprecated", "active"])
 
@@ -71,11 +72,11 @@ export const Model = Schema.Struct({
       Schema.String,
       Schema.StructWithRest(
         Schema.Struct({
-          disabled: Schema.optional(Schema.Boolean).annotate({ description: "Disable this variant for the model" }),
+          disabled: Schema.optional(Schema.Boolean).annotate({ description: t("core.config.disable_this_variant_for_the_model") }),
         }),
         [Schema.Record(Schema.String, Schema.Any)],
       ),
-    ).annotate({ description: "Variant-specific configuration" }),
+    ).annotate({ description: t("core.config.variant_specific_configuration") }),
   ),
 })
 
@@ -93,26 +94,26 @@ export const Info = Schema.Struct({
         apiKey: Schema.optional(Schema.String),
         baseURL: Schema.optional(Schema.String),
         enterpriseUrl: Schema.optional(Schema.String).annotate({
-          description: "GitHub Enterprise URL for copilot authentication",
+          description: t("core.config.github_enterprise_url_for_copilot_authentication"),
         }),
         setCacheKey: Schema.optional(Schema.Boolean).annotate({
-          description: "Enable promptCacheKey for this provider (default false)",
+          description: t("core.config.enable_promptcachekey_for_this_provider_default_false"),
         }),
         timeout: Schema.optional(
           Schema.Union([PositiveInt, Schema.Literal(false)]).annotate({
-            description: "Timeout in milliseconds for full requests to this provider. Set to false to disable timeout.",
+            description: t("core.config.timeout_in_milliseconds_for_full_requests_to_this_provider_s"),
           }),
         ).annotate({
-          description: "Timeout in milliseconds for full requests to this provider. Set to false to disable timeout.",
+          description: t("core.config.timeout_in_milliseconds_for_full_requests_to_this_provider_s"),
         }),
         headerTimeout: Schema.optional(
           Schema.Union([PositiveInt, Schema.Literal(false)]).annotate({
             description:
-              "Timeout in milliseconds to wait for response headers. Provider integrations may set defaults. Set to false to disable timeout.",
+              t("core.provider.timeout-in-milliseconds-to-wait-for-response-headers-provide"),
           }),
         ).annotate({
           description:
-            "Timeout in milliseconds to wait for response headers. Provider integrations may set defaults. Set to false to disable timeout.",
+            t("core.provider.timeout-in-milliseconds-to-wait-for-response-headers-provide"),
         }),
         chunkTimeout: Schema.optional(PositiveInt).annotate({
           description:

@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { NamedError } from "@opencode-ai/core/util/error"
 import { ConfigErrorV1 } from "@opencode-ai/core/v1/config/error"
 import { Cause, Effect } from "effect"
@@ -31,7 +32,7 @@ export const errorLayer = HttpRouter.middleware<{ handles: unknown }>()((effect)
         Effect.as(
           HttpServerResponse.jsonUnsafe(
             new NamedError.Unknown({
-              message: "Unexpected server error. Check server logs for details.",
+              message: t("cli.error.unexpected-server-error-check-server-logs-for-details"),
               ref,
             }).toObject(),
             { status: 500 },

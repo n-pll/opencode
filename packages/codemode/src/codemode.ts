@@ -2,6 +2,7 @@ import { Effect, Schema } from "effect"
 import { executeWithLimits } from "./interpreter/runtime.js"
 import { type HostTools, type Services, type ToolDescription, ToolRuntime } from "./tool-runtime.js"
 import type { Definition } from "./tool.js"
+import { t } from "./i18n"
 
 /** A tool call admitted during an execution. */
 export type { ToolCall, ToolCallEnded, ToolCallHooks, ToolCallStarted, ToolDescription } from "./tool-runtime.js"

@@ -25,6 +25,7 @@ import { described } from "./metadata"
 import { QueryBoolean } from "./query"
 import { ProviderV2 } from "@opencode-ai/core/provider"
 import { ModelV2 } from "@opencode-ai/core/model"
+import { t } from "@/i18n"
 
 const root = "/session"
 export const ListQuery = Schema.Struct({
@@ -114,8 +115,8 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.list",
-            summary: "List sessions",
-            description: "Get a list of all OpenCode sessions, sorted by most recently updated.",
+            summary: t("instance.experimental.experimental_session_list.summary"),
+            description: t("instance.session.session_list.description"),
           }),
         ),
         HttpApiEndpoint.get("status", SessionPaths.status, {
@@ -125,8 +126,8 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.status",
-            summary: "Get session status",
-            description: "Retrieve the current status of all sessions, including active, idle, and completed states.",
+            summary: t("instance.session.session_status.summary"),
+            description: t("instance.session.session_status.description"),
           }),
         ),
         HttpApiEndpoint.get("get", SessionPaths.get, {
@@ -137,8 +138,8 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.get",
-            summary: "Get session",
-            description: "Retrieve detailed information about a specific OpenCode session.",
+            summary: t("instance.session.session_get.summary"),
+            description: t("instance.session.session_get.description"),
           }),
         ),
         HttpApiEndpoint.get("children", SessionPaths.children, {
@@ -149,8 +150,8 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.children",
-            summary: "Get session children",
-            description: "Retrieve all child sessions that were forked from the specified parent session.",
+            summary: t("instance.session.session_children.summary"),
+            description: t("instance.session.session_children.description"),
           }),
         ),
         HttpApiEndpoint.get("todo", SessionPaths.todo, {
@@ -161,8 +162,8 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.todo",
-            summary: "Get session todos",
-            description: "Retrieve the todo list associated with a specific session, showing tasks and action items.",
+            summary: t("instance.session.session_todo.summary"),
+            description: t("instance.session.session_todo.description"),
           }),
         ),
         HttpApiEndpoint.get("diff", SessionPaths.diff, {
@@ -172,8 +173,8 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.diff",
-            summary: "Get message diff",
-            description: "Get the file changes (diff) that resulted from a specific user message in the session.",
+            summary: t("instance.session.session_diff.summary"),
+            description: t("instance.session.session_diff.description"),
           }),
         ),
         HttpApiEndpoint.get("messages", SessionPaths.messages, {
@@ -184,8 +185,8 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.messages",
-            summary: "Get session messages",
-            description: "Retrieve all messages in a session, including user prompts and AI responses.",
+            summary: t("instance.session.session_messages.summary"),
+            description: t("instance.session.session_messages.description"),
           }),
         ),
         HttpApiEndpoint.get("message", SessionPaths.message, {
@@ -196,8 +197,8 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.message",
-            summary: "Get message",
-            description: "Retrieve a specific message from a session by its message ID.",
+            summary: t("instance.session.session_message.summary"),
+            description: t("instance.session.session_message.description"),
           }),
         ),
         HttpApiEndpoint.post("create", SessionPaths.create, {
@@ -208,8 +209,8 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.create",
-            summary: "Create session",
-            description: "Create a new OpenCode session for interacting with AI assistants and managing conversations.",
+            summary: t("instance.session.session_create.summary"),
+            description: t("instance.session.session_create.description"),
           }),
         ),
         HttpApiEndpoint.delete("remove", SessionPaths.remove, {
@@ -220,8 +221,8 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.delete",
-            summary: "Delete session",
-            description: "Delete a session and permanently remove all associated data, including messages and history.",
+            summary: t("instance.session.session_delete.summary"),
+            description: t("instance.session.session_delete.description"),
           }),
         ),
         HttpApiEndpoint.patch("update", SessionPaths.update, {
@@ -233,8 +234,8 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.update",
-            summary: "Update session",
-            description: "Update properties of an existing session, such as title or other metadata.",
+            summary: t("instance.session.session_update.summary"),
+            description: t("instance.session.session_update.description"),
           }),
         ),
         HttpApiEndpoint.post("fork", SessionPaths.fork, {
@@ -246,8 +247,8 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.fork",
-            summary: "Fork session",
-            description: "Create a new session by forking an existing session at a specific message point.",
+            summary: t("instance.session.session_fork.summary"),
+            description: t("instance.session.session_fork.description"),
           }),
         ),
         HttpApiEndpoint.post("abort", SessionPaths.abort, {
@@ -258,8 +259,8 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.abort",
-            summary: "Abort session",
-            description: "Abort an active session and stop any ongoing AI processing or command execution.",
+            summary: t("instance.session.session_abort.summary"),
+            description: t("instance.session.session_abort.description"),
           }),
         ),
         HttpApiEndpoint.post("init", SessionPaths.init, {
@@ -271,9 +272,9 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.init",
-            summary: "Initialize session",
+            summary: t("instance.session.session_init.summary"),
             description:
-              "Analyze the current application and create an AGENTS.md file with project-specific agent configurations.",
+              t("cli.session.analyze-the-current-application-and-create-an-agents-md-file"),
           }),
         ),
         HttpApiEndpoint.post("share", SessionPaths.share, {
@@ -284,8 +285,8 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.share",
-            summary: "Share session",
-            description: "Create a shareable link for a session, allowing others to view the conversation.",
+            summary: t("instance.session.session_share.summary"),
+            description: t("instance.session.session_share.description"),
           }),
         ),
         HttpApiEndpoint.delete("unshare", SessionPaths.share, {
@@ -296,8 +297,8 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.unshare",
-            summary: "Unshare session",
-            description: "Remove the shareable link for a session, making it private again.",
+            summary: t("instance.session.session_unshare.summary"),
+            description: t("instance.session.session_unshare.description"),
           }),
         ),
         HttpApiEndpoint.post("summarize", SessionPaths.summarize, {
@@ -309,8 +310,8 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.summarize",
-            summary: "Summarize session",
-            description: "Generate a concise summary of the session using AI compaction to preserve key information.",
+            summary: t("instance.session.session_summarize.summary"),
+            description: t("instance.session.session_summarize.description"),
           }),
         ),
         HttpApiEndpoint.post("prompt", SessionPaths.prompt, {
@@ -322,8 +323,8 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.prompt",
-            summary: "Send message",
-            description: "Create and send a new message to a session, streaming the AI response.",
+            summary: t("instance.session.session_prompt.summary"),
+            description: t("instance.session.session_prompt.description"),
           }),
         ),
         HttpApiEndpoint.post("promptAsync", SessionPaths.promptAsync, {
@@ -335,7 +336,7 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.prompt_async",
-            summary: "Send async message",
+            summary: t("instance.session.session_prompt_async.summary"),
             description:
               "Create and send a new message to a session asynchronously, starting the session if needed and returning immediately.",
           }),
@@ -349,8 +350,8 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.command",
-            summary: "Send command",
-            description: "Send a new command to a session for execution by the AI assistant.",
+            summary: t("instance.session.session_command.summary"),
+            description: t("instance.session.session_command.description"),
           }),
         ),
         HttpApiEndpoint.post("shell", SessionPaths.shell, {
@@ -362,8 +363,8 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.shell",
-            summary: "Run shell command",
-            description: "Execute a shell command within the session context and return the AI's response.",
+            summary: t("instance.session.session_shell.summary"),
+            description: t("instance.session.session_shell.description"),
           }),
         ),
         HttpApiEndpoint.post("revert", SessionPaths.revert, {
@@ -375,7 +376,7 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.revert",
-            summary: "Revert message",
+            summary: t("instance.session.session_revert.summary"),
             description:
               "Revert a specific message in a session, undoing its effects and restoring the previous state.",
           }),
@@ -388,8 +389,8 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.unrevert",
-            summary: "Restore reverted messages",
-            description: "Restore all previously reverted messages in a session.",
+            summary: t("instance.session.session_unrevert.summary"),
+            description: t("instance.session.session_unrevert.description"),
           }),
         ),
         HttpApiEndpoint.post("permissionRespond", SessionPaths.permissions, {
@@ -401,8 +402,8 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "permission.respond",
-            summary: "Respond to permission",
-            description: "Approve or deny a permission request from the AI assistant.",
+            summary: t("instance.session.permission_respond.summary"),
+            description: t("instance.permission.permission_reply.description"),
             deprecated: true,
           }),
         ),
@@ -414,9 +415,9 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.deleteMessage",
-            summary: "Delete message",
+            summary: t("instance.session.session_deleteMessage.summary"),
             description:
-              "Permanently delete a specific message and all of its parts from a session without reverting file changes.",
+              t("cli.session.permanently-delete-a-specific-message-and-all-of-its-parts-f"),
           }),
         ),
         HttpApiEndpoint.delete("deletePart", SessionPaths.deletePart, {
@@ -427,7 +428,7 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "part.delete",
-            description: "Delete a part from a message.",
+            description: t("instance.session.part_delete.description"),
           }),
         ),
         HttpApiEndpoint.patch("updatePart", SessionPaths.updatePart, {
@@ -439,14 +440,14 @@ export const SessionApi = HttpApi.make("session")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "part.update",
-            description: "Update a part in a message.",
+            description: t("instance.session.part_update.description"),
           }),
         ),
       )
       .annotateMerge(
         OpenApi.annotations({
           title: "session",
-          description: "Experimental HttpApi session routes.",
+          description: t("instance.session.session_0.description"),
         }),
       )
       .middleware(InstanceContextMiddleware)
@@ -457,6 +458,6 @@ export const SessionApi = HttpApi.make("session")
     OpenApi.annotations({
       title: "opencode experimental HttpApi",
       version: "0.0.1",
-      description: "Experimental HttpApi surface for selected instance routes.",
+      description: t("instance.config.config_1.description"),
     }),
   )

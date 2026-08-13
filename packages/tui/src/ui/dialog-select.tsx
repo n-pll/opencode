@@ -1,3 +1,4 @@
+import { t } from "../i18n/t"
 import {
   InputRenderable,
   RGBA,
@@ -373,7 +374,7 @@ export function DialogSelect<T>(props: DialogSelectProps<T>) {
       commands: [
         {
           name: "dialog.select.prev",
-          title: "Previous item",
+          title: t("tui.dialog_select.previous-item"),
           category: "Dialog",
           run() {
             setStore("input", "keyboard")

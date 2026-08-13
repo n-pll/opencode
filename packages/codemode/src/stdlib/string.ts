@@ -37,7 +37,7 @@ export const stringStatics = new Set(["fromCharCode", "fromCodePoint"])
 
 export const invokeStringStatic = (name: string, args: Array<unknown>, node: AstNode): unknown => {
   const codes = args.map((arg) => {
-    if (typeof arg !== "number") throw new InterpreterRuntimeError(`String.${name} expects number arguments.`, node)
+    if (typeof arg !== "number") throw new InterpreterRuntimeError(t("codemode.string.0", { name }), node)
     return arg
   })
   switch (name) {
@@ -46,7 +46,8 @@ export const invokeStringStatic = (name: string, args: Array<unknown>, node: Ast
     case "fromCodePoint":
       return String.fromCodePoint(...codes)
     default:
-      throw new InterpreterRuntimeError(`String.${name} is not available in CodeMode.`, node)
+      throw new InterpreterRuntimeError(t("codemode.string.1", { name }), node)
   }
 }
 import { type AstNode, InterpreterRuntimeError } from "../interpreter/model.js"
+import { t } from "../i18n"

@@ -12,6 +12,7 @@ import { SessionSchema } from "../session/schema"
 import { SessionStore } from "../session/store"
 import { AbsolutePath, RelativePath } from "../schema"
 import path from "path"
+import { t } from "../i18n"
 
 export const Destination = Schema.Struct({
   directory: AbsolutePath,
@@ -89,7 +90,7 @@ const layer = Layer.effect(
       const moveChanges = input.moveChanges && source.directory !== destination.directory
       const sourceRepository = moveChanges ? yield* git.repo.discover(current.location.directory) : undefined
       if (moveChanges && !sourceRepository)
-        return yield* new CaptureChangesError({ message: "Source is not a Git repository" })
+        return yield* new CaptureChangesError({ message: t("core.config.source_is_not_a_git_repository") })
       const patch = sourceRepository
         ? yield* git.change
             .capture({ repository: sourceRepository, path: current.location.directory })
@@ -97,7 +98,7 @@ const layer = Layer.effect(
         : Git.ChangeSet.make("")
       if (patch) {
         const repository = yield* git.repo.discover(directory)
-        if (!repository) return yield* new ApplyChangesError({ message: "Destination is not a Git repository" })
+        if (!repository) return yield* new ApplyChangesError({ message: t("core.config.destination_is_not_a_git_repository") })
         yield* git.change
           .apply({ repository, path: directory, changes: patch })
           .pipe(Effect.mapError((error) => new ApplyChangesError({ message: error.message })))
@@ -115,7 +116,7 @@ const layer = Layer.effect(
         if (!repository)
           return yield* new ResetSourceChangesError({
             directory: current.location.directory,
-            message: "Source is not a Git repository",
+            message: t("core.config.source_is_not_a_git_repository"),
           })
         yield* git.change
           .discard({

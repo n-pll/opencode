@@ -7,6 +7,7 @@ import { Authorization } from "../middleware/authorization"
 import { InstanceContextMiddleware } from "../middleware/instance-context"
 import { WorkspaceRoutingMiddleware, WorkspaceRoutingQuery } from "../middleware/workspace-routing"
 import { described } from "./metadata"
+import { t } from "@/i18n"
 
 export const AddPayload = Schema.Struct({
   name: Schema.String,
@@ -48,8 +49,8 @@ export const McpApi = HttpApi.make("mcp")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "mcp.status",
-            summary: "Get MCP status",
-            description: "Get the status of all Model Context Protocol (MCP) servers.",
+            summary: t("instance.mcp.mcp_status.summary"),
+            description: t("instance.mcp.mcp_status.description"),
           }),
         ),
         HttpApiEndpoint.post("add", McpPaths.status, {
@@ -60,8 +61,8 @@ export const McpApi = HttpApi.make("mcp")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "mcp.add",
-            summary: "Add MCP server",
-            description: "Dynamically add a new Model Context Protocol (MCP) server to the system.",
+            summary: t("instance.mcp.mcp_add.summary"),
+            description: t("instance.mcp.mcp_add.description"),
           }),
         ),
         HttpApiEndpoint.post("authStart", McpPaths.auth, {
@@ -72,8 +73,8 @@ export const McpApi = HttpApi.make("mcp")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "mcp.auth.start",
-            summary: "Start MCP OAuth",
-            description: "Start OAuth authentication flow for a Model Context Protocol (MCP) server.",
+            summary: t("instance.mcp.mcp_auth_start.summary"),
+            description: t("instance.mcp.mcp_auth_start.description"),
           }),
         ),
         HttpApiEndpoint.post("authCallback", McpPaths.authCallback, {
@@ -85,9 +86,9 @@ export const McpApi = HttpApi.make("mcp")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "mcp.auth.callback",
-            summary: "Complete MCP OAuth",
+            summary: t("instance.mcp.mcp_auth_callback.summary"),
             description:
-              "Complete OAuth authentication for a Model Context Protocol (MCP) server using the authorization code.",
+              t("cli.mcp.complete-oauth-authentication-for-a-model-context-protocol-m"),
           }),
         ),
         HttpApiEndpoint.post("authAuthenticate", McpPaths.authAuthenticate, {
@@ -98,8 +99,8 @@ export const McpApi = HttpApi.make("mcp")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "mcp.auth.authenticate",
-            summary: "Authenticate MCP OAuth",
-            description: "Start OAuth flow and wait for callback (opens browser).",
+            summary: t("instance.mcp.mcp_auth_authenticate.summary"),
+            description: t("instance.mcp.mcp_auth_authenticate.description"),
           }),
         ),
         HttpApiEndpoint.delete("authRemove", McpPaths.auth, {
@@ -110,8 +111,8 @@ export const McpApi = HttpApi.make("mcp")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "mcp.auth.remove",
-            summary: "Remove MCP OAuth",
-            description: "Remove OAuth credentials for an MCP server.",
+            summary: t("instance.mcp.mcp_auth_remove.summary"),
+            description: t("instance.mcp.mcp_auth_remove.description"),
           }),
         ),
         HttpApiEndpoint.post("connect", McpPaths.connect, {
@@ -122,7 +123,7 @@ export const McpApi = HttpApi.make("mcp")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "mcp.connect",
-            description: "Connect an MCP server.",
+            description: t("instance.mcp.mcp_connect.description"),
           }),
         ),
         HttpApiEndpoint.post("disconnect", McpPaths.disconnect, {
@@ -133,14 +134,14 @@ export const McpApi = HttpApi.make("mcp")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "mcp.disconnect",
-            description: "Disconnect an MCP server.",
+            description: t("instance.mcp.mcp_disconnect.description"),
           }),
         ),
       )
       .annotateMerge(
         OpenApi.annotations({
           title: "mcp",
-          description: "Experimental HttpApi MCP routes.",
+          description: t("instance.mcp.mcp_0.description"),
         }),
       )
       .middleware(InstanceContextMiddleware)
@@ -151,6 +152,6 @@ export const McpApi = HttpApi.make("mcp")
     OpenApi.annotations({
       title: "opencode experimental HttpApi",
       version: "0.0.1",
-      description: "Experimental HttpApi surface for selected instance routes.",
+      description: t("instance.config.config_1.description"),
     }),
   )

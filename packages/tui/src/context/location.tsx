@@ -1,3 +1,4 @@
+import { useLanguage } from "../context/language"
 import type { LocationRef } from "@opencode-ai/sdk/v2"
 import { createContext, useContext, type Accessor, type ParentProps } from "solid-js"
 
@@ -8,7 +9,8 @@ export function LocationProvider(props: ParentProps<{ location?: LocationRef }>)
 }
 
 export function useLocation() {
+  const { t } = useLanguage()
   const value = useContext(context)
-  if (!value) throw new Error("Location context must be used within a LocationProvider")
+  if (!value) throw new Error(t("tui.location.location-context-must-be-used-within-a-locationprovider"))
   return value
 }

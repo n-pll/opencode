@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import type { AgentSideConnection } from "@agentclientprotocol/sdk"
 import type {
   Event,
@@ -166,7 +167,7 @@ export class Subscription {
 
   private async waitUntilConnected() {
     while (!this.connected) {
-      if (this.abort.signal.aborted) throw new Error("ACP event subscription stopped")
+      if (this.abort.signal.aborted) throw new Error(t("cli.event.acp-event-subscription-stopped"))
       await new Promise<void>((resolve) => this.connectionWaiters.add(resolve))
     }
   }
@@ -174,7 +175,7 @@ export class Subscription {
   private disconnected() {
     if (!this.connected) return
     this.connected = false
-    const error = new Error("ACP event stream disconnected")
+    const error = new Error(t("cli.event.acp-event-stream-disconnected"))
     for (const waiters of this.idleWaiters.values()) {
       for (const waiter of waiters) waiter.reject(error)
     }

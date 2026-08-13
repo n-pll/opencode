@@ -5,17 +5,18 @@ import {
   supportedSyntaxMessage,
 } from "../interpreter/model.js"
 import { copyIn, copyOut } from "../tool-runtime.js"
+import { t } from "../i18n"
 
 export const jsonStatics = new Set(["stringify", "parse"])
 
 export const invokeJsonMethod = (name: string, args: Array<unknown>, node: AstNode): unknown => {
-  if (!jsonStatics.has(name)) throw new InterpreterRuntimeError(`JSON.${name} is not available in CodeMode.`, node)
+  if (!jsonStatics.has(name)) throw new InterpreterRuntimeError(t("codemode.json.0", { name }), node)
   switch (name) {
     case "stringify": {
       const replacer = args[1]
       if (Array.isArray(replacer) || replacer instanceof CodeModeFunction) {
         throw new InterpreterRuntimeError(
-          "JSON.stringify replacers are not supported in CodeMode.",
+          t("codemode.json.1"),
           node,
           "UnsupportedSyntax",
           [supportedSyntaxMessage],
@@ -27,16 +28,16 @@ export const invokeJsonMethod = (name: string, args: Array<unknown>, node: AstNo
     }
     case "parse": {
       const text = args[0]
-      if (typeof text !== "string") throw new InterpreterRuntimeError("JSON.parse expects a string.", node)
+      if (typeof text !== "string") throw new InterpreterRuntimeError(t("codemode.json.2"), node)
       try {
         return copyIn(JSON.parse(text), "JSON.parse result")
       } catch (error) {
         throw new InterpreterRuntimeError(
-          `JSON.parse received invalid JSON: ${error instanceof Error ? error.message : String(error)}`,
+          t("codemode.json.3", { message: error instanceof Error ? error.message : String(error) }),
           node,
         ).as("SyntaxError")
       }
     }
   }
-  throw new InterpreterRuntimeError(`JSON.${name} is not available in CodeMode.`, node)
+  throw new InterpreterRuntimeError(t("codemode.json.0", { name }), node)
 }

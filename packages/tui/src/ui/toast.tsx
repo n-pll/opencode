@@ -1,3 +1,4 @@
+import { useLanguage } from "../context/language"
 import { createContext, useContext, type ParentProps, Show } from "solid-js"
 import { createStore } from "solid-js/store"
 import { useTheme } from "../context/theme"
@@ -51,6 +52,7 @@ export function Toast() {
 }
 
 function init() {
+  const { t } = useLanguage()
   const [store, setStore] = createStore({
     currentToast: null as ToastOptions | null,
   })
@@ -74,7 +76,7 @@ function init() {
         })
       toast.show({
         variant: "error",
-        message: "An unknown error has occurred",
+        message: t("tui.toast.an-unknown-error-has-occurred"),
       })
     },
     get currentToast(): ToastOptions | null {

@@ -4,6 +4,7 @@ import { Schema } from "effect"
 import { HttpApiEndpoint, HttpApiGroup, HttpApiSchema, OpenApi } from "effect/unstable/httpapi"
 import { InvalidRequestError } from "../errors"
 import { LocationQuery, locationQueryOpenApi } from "./location"
+import { t } from "../i18n"
 
 const Inputs = Schema.Record(Schema.String, Schema.String)
 
@@ -17,8 +18,8 @@ export const IntegrationGroup = HttpApiGroup.make("server.integration")
       .annotateMerge(
         OpenApi.annotations({
           identifier: "v2.integration.list",
-          summary: "List integrations",
-          description: "Retrieve available integrations and their authentication methods.",
+          summary: t("protocol.integration.integration_list.summary"),
+          description: t("protocol.integration.integration_list.description"),
         }),
       ),
   )
@@ -32,8 +33,8 @@ export const IntegrationGroup = HttpApiGroup.make("server.integration")
       .annotateMerge(
         OpenApi.annotations({
           identifier: "v2.integration.get",
-          summary: "Get integration",
-          description: "Retrieve one integration and its authentication methods.",
+          summary: t("protocol.integration.integration_get.summary"),
+          description: t("protocol.integration.integration_get.description"),
         }),
       ),
   )
@@ -52,8 +53,8 @@ export const IntegrationGroup = HttpApiGroup.make("server.integration")
       .annotateMerge(
         OpenApi.annotations({
           identifier: "v2.integration.connect.key",
-          summary: "Connect with key",
-          description: "Run a key authentication method and store the resulting credential.",
+          summary: t("protocol.integration.integration_connect_key.summary"),
+          description: t("protocol.integration.integration_connect_key.description"),
         }),
       ),
   )
@@ -73,8 +74,8 @@ export const IntegrationGroup = HttpApiGroup.make("server.integration")
       .annotateMerge(
         OpenApi.annotations({
           identifier: "v2.integration.connect.oauth",
-          summary: "Begin OAuth connection",
-          description: "Start an OAuth attempt and return the authorization details.",
+          summary: t("protocol.integration.integration_connect_oauth.summary"),
+          description: t("protocol.integration.integration_connect_oauth.description"),
         }),
       ),
   )
@@ -88,8 +89,8 @@ export const IntegrationGroup = HttpApiGroup.make("server.integration")
       .annotateMerge(
         OpenApi.annotations({
           identifier: "v2.integration.attempt.status",
-          summary: "Get OAuth attempt status",
-          description: "Poll the current status of an OAuth attempt.",
+          summary: t("protocol.integration.integration_attempt_status.summary"),
+          description: t("protocol.integration.integration_attempt_status.description"),
         }),
       ),
   )
@@ -105,8 +106,8 @@ export const IntegrationGroup = HttpApiGroup.make("server.integration")
       .annotateMerge(
         OpenApi.annotations({
           identifier: "v2.integration.attempt.complete",
-          summary: "Complete OAuth connection",
-          description: "Complete a code-based OAuth attempt and store the resulting credential.",
+          summary: t("protocol.integration.integration_attempt_complete.summary"),
+          description: t("protocol.integration.integration_attempt_complete.description"),
         }),
       ),
   )
@@ -120,11 +121,11 @@ export const IntegrationGroup = HttpApiGroup.make("server.integration")
       .annotateMerge(
         OpenApi.annotations({
           identifier: "v2.integration.attempt.cancel",
-          summary: "Cancel OAuth connection",
-          description: "Cancel an OAuth attempt and release its resources.",
+          summary: t("protocol.integration.integration_attempt_cancel.summary"),
+          description: t("protocol.integration.integration_attempt_cancel.description"),
         }),
       ),
   )
   .annotateMerge(
-    OpenApi.annotations({ title: "integrations", description: "Integration discovery and authentication routes." }),
+    OpenApi.annotations({ title: "integrations", description: t("protocol.integration.integrations.description") }),
   )

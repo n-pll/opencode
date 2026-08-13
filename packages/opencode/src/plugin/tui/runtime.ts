@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { runtimeModules as keymapRuntimeModules } from "@opentui/keymap/runtime-modules"
 import { ensureRuntimePluginSupport } from "@opentui/solid/runtime-plugin-support/configure"
 import {
@@ -897,7 +898,7 @@ async function installPluginBySpec(
   if (!state) {
     return {
       ok: false,
-      message: "Plugin runtime is not ready.",
+      message: t("cli.plugin_tui.runtime_not_ready"),
     }
   }
 
@@ -905,7 +906,7 @@ async function installPluginBySpec(
   if (!spec) {
     return {
       ok: false,
-      message: "Plugin package name is required",
+      message: t("cli.plugin_tui.package_name_required"),
     }
   }
 
@@ -913,7 +914,7 @@ async function installPluginBySpec(
   if (!dir.directory) {
     return {
       ok: false,
-      message: "Paths are still syncing. Try again in a moment.",
+      message: t("cli.plugin_tui.paths_syncing"),
     }
   }
 

@@ -1,3 +1,4 @@
+import { t } from "../i18n/t"
 import type { ClipboardService } from "../context/clipboard"
 
 type Toast = {
@@ -36,7 +37,7 @@ export function copy(renderer: Renderer, toast: Toast, clipboard: ClipboardServi
 
   clipboard
     ?.write?.(clipboardText)
-    .then(() => toast.show({ message: "Copied to clipboard", variant: "info" }))
+    .then(() => toast.show({ message: t("tui.selection.copied-to-clipboard"), variant: "info" }))
     .catch(toast.error)
 
   renderer.clearSelection()

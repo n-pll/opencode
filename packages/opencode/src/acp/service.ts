@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import {
   type AgentSideConnection,
   type AuthenticateRequest,
@@ -104,7 +105,7 @@ export function make(input: {
         "terminal-auth": {
           command: "opencode",
           args: ["auth", "login"],
-          label: "OpenCode Login",
+          label: t("cli.service.opencode-login"),
         },
       }
     }

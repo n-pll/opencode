@@ -18,6 +18,7 @@ import { PermissionV2 } from "../permission"
 import { ToolRegistry } from "./registry"
 import { Tool } from "./tool"
 import { Tools } from "./tools"
+import { t } from "../i18n"
 
 export const name = "edit"
 
@@ -26,10 +27,10 @@ export const Input = Schema.Struct({
     description:
       "File path to edit. Relative paths resolve within the active Location. Absolute paths inside that Location are accepted; external absolute paths require external_directory approval.",
   }),
-  oldString: Schema.String.annotate({ description: "Exact text to replace" }),
+  oldString: Schema.String.annotate({ description: t("core.config.exact_text_to_replace") }),
   newString: Schema.String.annotate({ description: "Replacement text, which must differ from oldString" }),
   replaceAll: Schema.Boolean.pipe(Schema.optional).annotate({
-    description: "Replace all exact occurrences of oldString (default false)",
+    description: t("core.config.replace_all_exact_occurrences_of_oldstring_default_false"),
   }),
 })
 
@@ -112,7 +113,7 @@ const layer = Layer.effectDiscard(
                   Effect.mapError((error) =>
                     error instanceof FileMutation.StaleContentError
                       ? new ToolFailure({
-                          message: "File changed after permission approval. Read it again before editing.",
+                          message: t("core.config.file_changed_after_permission_approval_read_it_again_before_"),
                         })
                       : new ToolFailure({ message: `Unable to edit ${input.path}` }),
                   ),
@@ -172,7 +173,7 @@ const layer = Layer.effectDiscard(
                 if (replacements > 1 && input.replaceAll !== true) {
                   return yield* new ToolFailure({
                     message:
-                      "Found multiple exact matches for oldString. Provide more surrounding context or set replaceAll to true.",
+                      t("core.edit.found-multiple-exact-matches-for-oldstring-provide-more-surr"),
                   })
                 }
 

@@ -49,3 +49,4 @@ export const spreadItems = (value: unknown): Array<unknown> | undefined => {
   return undefined
 }
 import { SandboxMap, SandboxSet, SandboxURLSearchParams } from "../values.js"
+import { t } from "../i18n"

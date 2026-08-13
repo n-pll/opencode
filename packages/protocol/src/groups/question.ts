@@ -5,6 +5,7 @@ import { Context, Schema } from "effect"
 import { HttpApiEndpoint, HttpApiGroup, HttpApiMiddleware, HttpApiSchema, OpenApi } from "effect/unstable/httpapi"
 import { QuestionNotFoundError, SessionNotFoundError } from "../errors"
 import { LocationQuery, locationQueryOpenApi } from "./location"
+import { t } from "../i18n"
 
 export const makeQuestionGroup = <
   LocationId extends HttpApiMiddleware.AnyId,
@@ -25,12 +26,12 @@ export const makeQuestionGroup = <
         .annotateMerge(
           OpenApi.annotations({
             identifier: "v2.question.request.list",
-            summary: "List pending question requests",
-            description: "Retrieve pending question requests for a location.",
+            summary: t("protocol.question.question_request_list.summary"),
+            description: t("protocol.question.question_request_list.description"),
           }),
         ),
     )
-    .annotateMerge(OpenApi.annotations({ title: "questions", description: "Experimental question routes." }))
+    .annotateMerge(OpenApi.annotations({ title: "questions", description: t("protocol.question.questions.description") }))
     // Effect applies group middleware only to endpoints already added; session endpoints use session placement below.
     .middleware(locationMiddleware)
     .add(
@@ -43,8 +44,8 @@ export const makeQuestionGroup = <
         .annotateMerge(
           OpenApi.annotations({
             identifier: "v2.session.question.list",
-            summary: "List session question requests",
-            description: "Retrieve pending question requests owned by a session.",
+            summary: t("protocol.question.session_question_list.summary"),
+            description: t("protocol.question.session_question_list.description"),
           }),
         ),
     )
@@ -59,8 +60,8 @@ export const makeQuestionGroup = <
         .annotateMerge(
           OpenApi.annotations({
             identifier: "v2.session.question.reply",
-            summary: "Reply to pending question request",
-            description: "Answer a pending question request owned by a session.",
+            summary: t("protocol.question.session_question_reply.summary"),
+            description: t("protocol.question.session_question_reply.description"),
           }),
         ),
     )
@@ -74,11 +75,11 @@ export const makeQuestionGroup = <
         .annotateMerge(
           OpenApi.annotations({
             identifier: "v2.session.question.reject",
-            summary: "Reject pending question request",
-            description: "Reject a pending question request owned by a session.",
+            summary: t("protocol.question.session_question_reject.summary"),
+            description: t("protocol.question.session_question_reject.description"),
           }),
         ),
     )
     .annotateMerge(
-      OpenApi.annotations({ title: "session questions", description: "Experimental session question routes." }),
+      OpenApi.annotations({ title: "session questions", description: t("protocol.question.session_questions.description") }),
     )

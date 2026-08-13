@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import * as Tool from "./tool"
 import DESCRIPTION from "./task.txt"
 import { ToolJsonSchema } from "./json-schema"
@@ -41,14 +42,14 @@ const BACKGROUND_UPDATED = [
 ].join("\n")
 
 const BaseParameterFields = {
-  description: Schema.String.annotate({ description: "A short (3-5 words) description of the task" }),
-  prompt: Schema.String.annotate({ description: "The task for the agent to perform" }),
-  subagent_type: Schema.String.annotate({ description: "The type of specialized agent to use for this task" }),
+  description: Schema.String.annotate({ description: t("cli.task.a-short-3-5-words-description-of-the-task") }),
+  prompt: Schema.String.annotate({ description: t("cli.task.the-task-for-the-agent-to-perform") }),
+  subagent_type: Schema.String.annotate({ description: t("cli.task.the-type-of-specialized-agent-to-use-for-this-task") }),
   task_id: Schema.optional(Schema.String).annotate({
     description:
       "This should only be set if you mean to resume a previous task (you can pass a prior task_id and the task will continue the same subagent session as before instead of creating a fresh one)",
   }),
-  command: Schema.optional(Schema.String).annotate({ description: "The command that triggered this task" }),
+  command: Schema.optional(Schema.String).annotate({ description: t("cli.task.the-command-that-triggered-this-task") }),
 }
 
 const BaseParameters = Schema.Struct(BaseParameterFields)
@@ -175,7 +176,7 @@ export const TaskTool = Tool.define(
         Effect.provideService(Database.Service, database),
         Effect.orDie,
       )
-      if (msg.info.role !== "assistant") return yield* Effect.fail(new Error("Not an assistant message"))
+      if (msg.info.role !== "assistant") return yield* Effect.fail(new Error(t("cli.task.not-an-assistant-message")))
       const variant = msg.info.variant
 
       const model = next.model ?? {
@@ -195,7 +196,7 @@ export const TaskTool = Tool.define(
       })
 
       const ops = ctx.extra?.promptOps as TaskPromptOps
-      if (!ops) return yield* Effect.fail(new Error("TaskTool requires promptOps in ctx.extra"))
+      if (!ops) return yield* Effect.fail(new Error(t("cli.task.tasktool-requires-promptops-in-ctx-extra")))
 
       const runTask = Effect.fn("TaskTool.runTask")(function* () {
         const parts = yield* ops.resolvePromptParts(params.prompt)
@@ -264,7 +265,7 @@ export const TaskTool = Tool.define(
           output: renderOutput({
             sessionID: nextSession.id,
             state: "running",
-            summary: "Background task updated",
+            summary: t("cli.task.background-task-updated"),
             text: BACKGROUND_UPDATED,
           }),
         }
@@ -296,7 +297,7 @@ export const TaskTool = Tool.define(
           output: renderOutput({
             sessionID: nextSession.id,
             state: "running",
-            summary: "Background task started",
+            summary: t("cli.task.background-task-started"),
             text: BACKGROUND_STARTED,
           }),
         }
@@ -326,7 +327,7 @@ export const TaskTool = Tool.define(
             )
             if (result?.metadata?.background === true) return backgroundResult()
             if (result?.status === "error") return yield* Effect.fail(new Error(result.error ?? "Task failed"))
-            if (result?.status === "cancelled") return yield* Effect.fail(new Error("Task cancelled"))
+            if (result?.status === "cancelled") return yield* Effect.fail(new Error(t("cli.task.task-cancelled")))
             return {
               title: params.description,
               metadata,

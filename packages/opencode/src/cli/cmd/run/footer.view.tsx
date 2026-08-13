@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 // Footer layout
 //
 // Renders the footer region as a compact vertical stack:
@@ -503,13 +504,13 @@ export function RunFooterView(props: RunFooterViewProps) {
     commands: [
       {
         name: "command.palette.show",
-        title: "Open command palette",
+        title: t("cli.footer_view.open-command-palette"),
         category: "Prompt",
         run: openCommand,
       },
       {
         name: "variant.cycle",
-        title: "Cycle model variant",
+        title: t("cli.footer_view.cycle-model-variant"),
         category: "Model",
         run: props.onCycle,
       },
@@ -527,7 +528,7 @@ export function RunFooterView(props: RunFooterViewProps) {
     commands: [
       {
         name: "session.background",
-        title: "Background subagents",
+        title: t("cli.footer_view.background-subagents"),
         category: "Session",
         run: () => props.onBackground?.(),
       },
@@ -541,7 +542,7 @@ export function RunFooterView(props: RunFooterViewProps) {
     commands: [
       {
         name: "session.child.first",
-        title: "View subagents",
+        title: t("cli.footer_view.view-subagents"),
         category: "Session",
         run: openSubagentMenu,
       },
@@ -555,7 +556,7 @@ export function RunFooterView(props: RunFooterViewProps) {
     commands: [
       {
         name: "session.queued_prompts",
-        title: "Manage queued prompts",
+        title: t("cli.footer_view.manage-queued-prompts"),
         category: "Session",
         run: openQueuedMenu,
       },

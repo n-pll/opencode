@@ -1,3 +1,4 @@
+import { t } from "../i18n/t"
 import { createStore } from "solid-js/store"
 import { createSimpleContext } from "./helper"
 import { batch, createEffect, createMemo } from "solid-js"
@@ -292,7 +293,7 @@ export const { use: useLocal, provider: LocalProvider } = createSimpleContext({
           if (!favorites.length) {
             toast.show({
               variant: "info",
-              message: "Add a favorite model to use this shortcut",
+              message: t("tui.local.add-a-favorite-model-to-use-this-shortcut"),
               duration: 3000,
             })
             return

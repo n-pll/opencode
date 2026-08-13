@@ -4,6 +4,7 @@ import { Effect, Schema } from "effect"
 import { HttpApiBuilder } from "effect/unstable/httpapi"
 import { Api } from "../api"
 import { InvalidCursorError, SessionNotFoundError, UnknownError } from "@opencode-ai/protocol/errors"
+import { t } from "../i18n"
 
 const DefaultMessagesLimit = 50
 
@@ -32,10 +33,10 @@ export const MessageHandler = HttpApiBuilder.group(Api, "server.message", (handl
       "session.messages",
       Effect.fn(function* (ctx) {
         if (ctx.query.cursor && ctx.query.order !== undefined)
-          return yield* new InvalidCursorError({ message: "Cursor cannot be combined with order" })
+          return yield* new InvalidCursorError({ message: t("server.error.cursor_with_order") })
         const decoded = yield* Effect.try({
           try: () => (ctx.query.cursor ? cursor.decode(ctx.query.cursor) : undefined),
-          catch: () => new InvalidCursorError({ message: "Invalid cursor" }),
+          catch: () => new InvalidCursorError({ message: t("server.error.invalid_cursor") }),
         })
         const order = decoded?.order ?? ctx.query.order ?? "desc"
         const messages = yield* session
@@ -60,7 +61,7 @@ export const MessageHandler = HttpApiBuilder.group(Api, "server.message", (handl
                 Effect.annotateLogs({ ref, sessionID: error.sessionID, messageID: error.messageID }),
                 Effect.andThen(
                   Effect.fail(
-                    new UnknownError({ message: "Unexpected server error. Check server logs for details.", ref }),
+                    new UnknownError({ message: t("server.error.unexpected"), ref }),
                   ),
                 ),
               )

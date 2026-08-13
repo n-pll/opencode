@@ -23,6 +23,7 @@ import {
   UnknownProviderReason,
 } from "../schema"
 import { isContextOverflow } from "../provider-error"
+import { t } from "../i18n"
 
 export interface Interface {
   readonly execute: (
@@ -325,12 +326,12 @@ const toHttpError = (redactedNames: ReadonlyArray<string | RegExp>) => (error: u
     return transportError({ message: error.message, kind: "Timeout" })
   }
   if (!HttpClientError.isHttpClientError(error)) {
-    return transportError({ message: "HTTP transport failed" })
+    return transportError({ message: t("llm.error.http_transport_failed") })
   }
   const request = "request" in error ? error.request : undefined
   if (error.reason._tag === "TransportError") {
     return transportError({
-      message: error.reason.description ?? "HTTP transport failed",
+      message: error.reason.description ?? t("llm.error.http_transport_failed"),
       kind: error.reason._tag,
       request,
     })

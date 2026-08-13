@@ -4,6 +4,7 @@ import { Schema } from "effect"
 import { HttpApiEndpoint, HttpApiGroup, OpenApi } from "effect/unstable/httpapi"
 import { ServiceUnavailableError } from "../errors"
 import { LocationQuery, locationQueryOpenApi } from "./location"
+import { t } from "../i18n"
 
 export const ModelGroup = HttpApiGroup.make("server.model")
   .add(
@@ -16,14 +17,14 @@ export const ModelGroup = HttpApiGroup.make("server.model")
       .annotateMerge(
         OpenApi.annotations({
           identifier: "v2.model.list",
-          summary: "List models",
-          description: "Retrieve available models ordered by release date.",
+          summary: t("protocol.model.model_list.summary"),
+          description: t("protocol.model.model_list.description"),
         }),
       ),
   )
   .annotateMerge(
     OpenApi.annotations({
       title: "models",
-      description: "Experimental model routes.",
+      description: t("protocol.model.models.description"),
     }),
   )

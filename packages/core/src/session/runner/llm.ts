@@ -39,6 +39,7 @@ import { MAX_STEPS_PROMPT } from "./max-steps"
 import { Snapshot } from "../../snapshot"
 import { makeLocationNode } from "../../effect/app-node"
 import { llmClient } from "../../effect/app-node-platform"
+import { t } from "../../i18n"
 
 /**
  * Runs one durable coding-agent Session until it settles.
@@ -128,7 +129,7 @@ const layer = Layer.effect(
             timestamp: yield* DateTime.now,
             assistantMessageID: message.id,
             callID: tool.id,
-            error: { type: "unknown", message: "Tool execution interrupted" },
+            error: { type: "unknown", message: t("core.config.tool_execution_interrupted") },
             provider: {
               executed: tool.provider?.executed === true,
               ...(tool.provider?.metadata === undefined ? {} : { metadata: tool.provider.metadata }),

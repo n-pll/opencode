@@ -4,6 +4,7 @@ import { Location } from "@opencode-ai/schema/location"
 import type { Definition } from "@opencode-ai/schema/event"
 import { Schema } from "effect"
 import { HttpApiEndpoint, HttpApiGroup, HttpApiSchema, OpenApi } from "effect/unstable/httpapi"
+import { t } from "../i18n"
 
 const fields = {
   id: Event.ID,
@@ -37,12 +38,12 @@ const make = <const Definitions extends ReadonlyArray<Definition>>(definitions: 
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "v2.event.subscribe",
-            summary: "Subscribe to events",
-            description: "Subscribe to native event payloads for the server.",
+            summary: t("protocol.event.event_subscribe.summary"),
+            description: t("protocol.event.event_subscribe.description"),
           }),
         ),
       )
-      .annotateMerge(OpenApi.annotations({ title: "events", description: "Experimental event stream route." })),
+      .annotateMerge(OpenApi.annotations({ title: "events", description: t("protocol.event.events.description") })),
   }
 }
 

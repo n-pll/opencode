@@ -1,3 +1,4 @@
+import { t } from "./i18n"
 import type * as Arr from "effect/Array"
 import { NodeFileSystem, NodeSink, NodeStream } from "@effect/platform-node"
 import * as NodePath from "@effect/platform-node/NodePath"
@@ -318,7 +319,7 @@ export const make = Effect.gen(function* () {
   ) =>
     Effect.suspend(() => {
       if (proc.kill(signal)) return Effect.void
-      return Effect.fail(toPlatformError("kill", new Error("Failed to kill child process"), command))
+      return Effect.fail(toPlatformError("kill", new Error(t("core.cross_spawn_spawner.failed-to-kill-child-process")), command))
     })
 
   const timeout =

@@ -4,6 +4,7 @@ import { PositiveInt, RelativePath } from "@opencode-ai/schema/schema"
 import { Schema } from "effect"
 import { HttpApiEndpoint, HttpApiGroup, HttpApiSchema, OpenApi } from "effect/unstable/httpapi"
 import { LocationQuery, locationQueryOpenApi } from "./location"
+import { t } from "../i18n"
 
 const ListQuery = Schema.Struct({
   ...LocationQuery.fields,
@@ -27,8 +28,8 @@ export const FileSystemGroup = HttpApiGroup.make("server.fs")
       .annotateMerge(
         OpenApi.annotations({
           identifier: "v2.fs.read",
-          summary: "Read file",
-          description: "Serve one file relative to the requested location.",
+          summary: t("protocol.fs.fs_read.summary"),
+          description: t("protocol.fs.fs_read.description"),
         }),
       ),
   )
@@ -41,8 +42,8 @@ export const FileSystemGroup = HttpApiGroup.make("server.fs")
       .annotateMerge(
         OpenApi.annotations({
           identifier: "v2.fs.list",
-          summary: "List directory",
-          description: "List direct children of one directory relative to the requested location.",
+          summary: t("protocol.fs.fs_list.summary"),
+          description: t("protocol.fs.fs_list.description"),
         }),
       ),
   )
@@ -55,14 +56,14 @@ export const FileSystemGroup = HttpApiGroup.make("server.fs")
       .annotateMerge(
         OpenApi.annotations({
           identifier: "v2.fs.find",
-          summary: "Find files",
-          description: "Find recursively ranked filesystem entries relative to the requested location.",
+          summary: t("protocol.fs.fs_find.summary"),
+          description: t("protocol.fs.fs_find.description"),
         }),
       ),
   )
   .annotateMerge(
     OpenApi.annotations({
       title: "filesystem",
-      description: "Experimental location-scoped filesystem routes.",
+      description: t("protocol.fs.filesystem.description"),
     }),
   )

@@ -6,6 +6,7 @@ import { Authorization } from "../middleware/authorization"
 import { InstanceContextMiddleware } from "../middleware/instance-context"
 import { WorkspaceRoutingMiddleware, WorkspaceRoutingQuery } from "../middleware/workspace-routing"
 import { described } from "./metadata"
+import { t } from "@/i18n"
 
 const root = "/config"
 
@@ -19,8 +20,8 @@ export const ConfigApi = HttpApi.make("config")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "config.get",
-            summary: "Get configuration",
-            description: "Retrieve the current OpenCode configuration settings and preferences.",
+            summary: t("instance.config.config_get.summary"),
+            description: t("instance.config.config_get.description"),
           }),
         ),
         HttpApiEndpoint.patch("update", root, {
@@ -31,8 +32,8 @@ export const ConfigApi = HttpApi.make("config")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "config.update",
-            summary: "Update configuration",
-            description: "Update OpenCode configuration settings and preferences.",
+            summary: t("instance.config.config_update.summary"),
+            description: t("instance.config.config_update.description"),
           }),
         ),
         HttpApiEndpoint.get("providers", `${root}/providers`, {
@@ -41,15 +42,15 @@ export const ConfigApi = HttpApi.make("config")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "config.providers",
-            summary: "List config providers",
-            description: "Get a list of all configured AI providers and their default models.",
+            summary: t("instance.config.config_providers.summary"),
+            description: t("instance.config.config_providers.description"),
           }),
         ),
       )
       .annotateMerge(
         OpenApi.annotations({
           title: "config",
-          description: "Experimental HttpApi config routes.",
+          description: t("instance.config.config_0.description"),
         }),
       )
       .middleware(InstanceContextMiddleware)
@@ -60,6 +61,6 @@ export const ConfigApi = HttpApi.make("config")
     OpenApi.annotations({
       title: "opencode experimental HttpApi",
       version: "0.0.1",
-      description: "Experimental HttpApi surface for selected instance routes.",
+      description: t("instance.config.config_1.description"),
     }),
   )

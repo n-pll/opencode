@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { LayerNode } from "@opencode-ai/core/effect/layer-node"
 import type { AuthOAuthResult, Hooks } from "@opencode-ai/plugin"
 import { serviceUse } from "@opencode-ai/core/effect/service-use"
@@ -54,14 +55,14 @@ export class Authorization extends Schema.Class<Authorization>("ProviderAuthAuth
 }) {}
 
 export const AuthorizeInput = Schema.Struct({
-  method: Schema.Finite.annotate({ description: "Auth method index" }),
-  inputs: Schema.optional(Schema.Record(Schema.String, Schema.String)).annotate({ description: "Prompt inputs" }),
+  method: Schema.Finite.annotate({ description: t("cli.auth.auth-method-index") }),
+  inputs: Schema.optional(Schema.Record(Schema.String, Schema.String)).annotate({ description: t("cli.auth.prompt-inputs") }),
 })
 export type AuthorizeInput = Schema.Schema.Type<typeof AuthorizeInput>
 
 export const CallbackInput = Schema.Struct({
-  method: Schema.Finite.annotate({ description: "Auth method index" }),
-  code: Schema.optional(Schema.String).annotate({ description: "OAuth authorization code" }),
+  method: Schema.Finite.annotate({ description: t("cli.auth.auth-method-index") }),
+  code: Schema.optional(Schema.String).annotate({ description: t("cli.auth.oauth-authorization-code") }),
 })
 export type CallbackInput = Schema.Schema.Type<typeof CallbackInput>
 

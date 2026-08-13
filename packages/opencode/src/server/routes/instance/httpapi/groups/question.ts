@@ -7,11 +7,12 @@ import { Authorization } from "../middleware/authorization"
 import { InstanceContextMiddleware } from "../middleware/instance-context"
 import { WorkspaceRoutingMiddleware, WorkspaceRoutingQuery } from "../middleware/workspace-routing"
 import { described } from "./metadata"
+import { t } from "@/i18n"
 
 const root = "/question"
 const ReplyPayload = Schema.Struct({
   answers: Schema.Array(Question.Answer).annotate({
-    description: "User answers in order of questions (each answer is an array of selected labels)",
+    description: t("instance.question.question_0.description"),
   }),
 })
 
@@ -25,8 +26,8 @@ export const QuestionApi = HttpApi.make("question")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "question.list",
-            summary: "List pending questions",
-            description: "Get all pending question requests across all sessions.",
+            summary: t("instance.question.question_list.summary"),
+            description: t("instance.question.question_list.description"),
           }),
         ),
         HttpApiEndpoint.post("reply", `${root}/:requestID/reply`, {
@@ -38,8 +39,8 @@ export const QuestionApi = HttpApi.make("question")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "question.reply",
-            summary: "Reply to question request",
-            description: "Provide answers to a question request from the AI assistant.",
+            summary: t("instance.question.question_reply.summary"),
+            description: t("instance.question.question_reply.description"),
           }),
         ),
         HttpApiEndpoint.post("reject", `${root}/:requestID/reject`, {
@@ -50,15 +51,15 @@ export const QuestionApi = HttpApi.make("question")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "question.reject",
-            summary: "Reject question request",
-            description: "Reject a question request from the AI assistant.",
+            summary: t("instance.question.question_reject.summary"),
+            description: t("instance.question.question_reject.description"),
           }),
         ),
       )
       .annotateMerge(
         OpenApi.annotations({
           title: "question",
-          description: "Question routes.",
+          description: t("instance.question.question_1.description"),
         }),
       )
       .middleware(InstanceContextMiddleware)
@@ -69,6 +70,6 @@ export const QuestionApi = HttpApi.make("question")
     OpenApi.annotations({
       title: "opencode HttpApi",
       version: "0.0.1",
-      description: "Effect HttpApi surface for instance routes.",
+      description: t("instance.question.question_2.description"),
     }),
   )

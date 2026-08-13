@@ -18,6 +18,7 @@ import { described } from "./metadata"
 import { QueryBoolean } from "./query"
 import { ProviderV2 } from "@opencode-ai/core/provider"
 import { ModelV2 } from "@opencode-ai/core/model"
+import { t } from "@/i18n"
 
 const ConsoleStateResponse = Schema.Struct({
   consoleManagedProviders: Schema.mutable(Schema.Array(Schema.String)),
@@ -111,8 +112,8 @@ export const ExperimentalApi = HttpApi.make("experimental")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "experimental.capabilities.get",
-            summary: "Get experimental capabilities",
-            description: "Get experimental features enabled on the OpenCode server.",
+            summary: t("instance.experimental.experimental_capabilities_get.summary"),
+            description: t("instance.experimental.experimental_capabilities_get.description"),
           }),
         ),
         HttpApiEndpoint.get("console", ExperimentalPaths.console, {
@@ -122,8 +123,8 @@ export const ExperimentalApi = HttpApi.make("experimental")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "experimental.console.get",
-            summary: "Get active Console provider metadata",
-            description: "Get the active Console org name and the set of provider IDs managed by that Console org.",
+            summary: t("instance.experimental.experimental_console_get.summary"),
+            description: t("instance.experimental.experimental_console_get.description"),
           }),
         ),
         HttpApiEndpoint.get("consoleOrgs", ExperimentalPaths.consoleOrgs, {
@@ -133,8 +134,8 @@ export const ExperimentalApi = HttpApi.make("experimental")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "experimental.console.listOrgs",
-            summary: "List switchable Console orgs",
-            description: "Get the available Console orgs across logged-in accounts, including the current active org.",
+            summary: t("instance.experimental.experimental_console_listOrgs.summary"),
+            description: t("instance.experimental.experimental_console_listOrgs.description"),
           }),
         ),
         HttpApiEndpoint.post("consoleSwitch", ExperimentalPaths.consoleSwitch, {
@@ -145,8 +146,8 @@ export const ExperimentalApi = HttpApi.make("experimental")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "experimental.console.switchOrg",
-            summary: "Switch active Console org",
-            description: "Persist a new active Console account/org selection for the current local OpenCode state.",
+            summary: t("instance.experimental.experimental_console_switchOrg.summary"),
+            description: t("instance.experimental.experimental_console_switchOrg.description"),
           }),
         ),
         HttpApiEndpoint.get("tool", ExperimentalPaths.tool, {
@@ -156,9 +157,9 @@ export const ExperimentalApi = HttpApi.make("experimental")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "tool.list",
-            summary: "List tools",
+            summary: t("instance.experimental.tool_list.summary"),
             description:
-              "Get a list of available tools with their JSON schema parameters for a specific provider and model combination.",
+              t("cli.experimental.get-a-list-of-available-tools-with-their-json-schema-paramet"),
           }),
         ),
         HttpApiEndpoint.get("toolIDs", ExperimentalPaths.toolIDs, {
@@ -168,7 +169,7 @@ export const ExperimentalApi = HttpApi.make("experimental")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "tool.ids",
-            summary: "List tool IDs",
+            summary: t("instance.experimental.tool_ids.summary"),
             description:
               "Get a list of all available tool IDs, including both built-in tools and dynamically registered tools.",
           }),
@@ -180,8 +181,8 @@ export const ExperimentalApi = HttpApi.make("experimental")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "worktree.list",
-            summary: "List worktrees",
-            description: "List all sandbox worktrees for the current project.",
+            summary: t("instance.experimental.worktree_list.summary"),
+            description: t("instance.experimental.worktree_list.description"),
           }),
         ),
         HttpApiEndpoint.post("worktreeCreate", ExperimentalPaths.worktree, {
@@ -193,8 +194,8 @@ export const ExperimentalApi = HttpApi.make("experimental")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "worktree.create",
-            summary: "Create worktree",
-            description: "Create a new git worktree for the current project and run any configured startup scripts.",
+            summary: t("instance.experimental.worktree_create.summary"),
+            description: t("instance.experimental.worktree_create.description"),
           }),
         ),
         HttpApiEndpoint.delete("worktreeRemove", ExperimentalPaths.worktree, {
@@ -205,8 +206,8 @@ export const ExperimentalApi = HttpApi.make("experimental")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "worktree.remove",
-            summary: "Remove worktree",
-            description: "Remove a git worktree and delete its branch.",
+            summary: t("instance.experimental.worktree_remove.summary"),
+            description: t("instance.experimental.worktree_remove.description"),
           }),
         ),
         HttpApiEndpoint.post("worktreeReset", ExperimentalPaths.worktreeReset, {
@@ -217,8 +218,8 @@ export const ExperimentalApi = HttpApi.make("experimental")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "worktree.reset",
-            summary: "Reset worktree",
-            description: "Reset a worktree branch to the primary default branch.",
+            summary: t("instance.experimental.worktree_reset.summary"),
+            description: t("instance.experimental.worktree_reset.description"),
           }),
         ),
         HttpApiEndpoint.get("session", ExperimentalPaths.session, {
@@ -227,7 +228,7 @@ export const ExperimentalApi = HttpApi.make("experimental")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "experimental.session.list",
-            summary: "List sessions",
+            summary: t("instance.experimental.experimental_session_list.summary"),
             description:
               "Get a list of all OpenCode sessions across projects, sorted by most recently updated. Archived sessions are excluded by default.",
           }),
@@ -240,9 +241,9 @@ export const ExperimentalApi = HttpApi.make("experimental")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "experimental.session.background",
-            summary: "Background subagents",
+            summary: t("instance.experimental.experimental_session_background.summary"),
             description:
-              "Detach any synchronous subagents currently blocking the session and continue them in the background.",
+              t("cli.experimental.detach-any-synchronous-subagents-currently-blocking-the-sess"),
           }),
         ),
         HttpApiEndpoint.get("resource", ExperimentalPaths.resource, {
@@ -251,15 +252,15 @@ export const ExperimentalApi = HttpApi.make("experimental")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "experimental.resource.list",
-            summary: "Get MCP resources",
-            description: "Get all available MCP resources from connected servers. Optionally filter by name.",
+            summary: t("instance.experimental.experimental_resource_list.summary"),
+            description: t("instance.experimental.experimental_resource_list.description"),
           }),
         ),
       )
       .annotateMerge(
         OpenApi.annotations({
           title: "experimental",
-          description: "Experimental HttpApi read-only routes.",
+          description: t("instance.experimental.experimental_0.description"),
         }),
       )
       .middleware(InstanceContextMiddleware)
@@ -270,6 +271,6 @@ export const ExperimentalApi = HttpApi.make("experimental")
     OpenApi.annotations({
       title: "opencode experimental HttpApi",
       version: "0.0.1",
-      description: "Experimental HttpApi surface for selected instance routes.",
+      description: t("instance.config.config_1.description"),
     }),
   )

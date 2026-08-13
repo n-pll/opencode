@@ -3,6 +3,7 @@ import { Project } from "@opencode-ai/schema/project"
 import { Schema, Struct } from "effect"
 import { HttpApiEndpoint, HttpApiGroup, HttpApiSchema, OpenApi } from "effect/unstable/httpapi"
 import { LocationQuery, locationQueryOpenApi } from "./location"
+import { t } from "../i18n"
 
 const root = "/experimental/project/:projectID/copy"
 
@@ -53,4 +54,4 @@ export const ProjectCopyGroup = HttpApiGroup.make("server.projectCopy")
       .annotateMerge(locationQueryOpenApi)
       .annotateMerge(OpenApi.annotations({ identifier: "v2.projectCopy.refresh" })),
   )
-  .annotateMerge(OpenApi.annotations({ title: "projectCopy", description: "Project copy management routes." }))
+  .annotateMerge(OpenApi.annotations({ title: "projectCopy", description: t("protocol.project-copy.projectcopy.description") }))

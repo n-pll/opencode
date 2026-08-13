@@ -20,7 +20,10 @@
     "random": "echo 'Random script'",
     "sso": "aws sso login --sso-session=opencode --no-browser",
     "translate:app": "bun run script/translate-app.ts",
-    "test": "echo 'do not run tests from root' && exit 1"
+    "test": "echo 'do not run tests from root' && exit 1",
+    "translate:fork": "bun run script/translate-fork.ts",
+    "i18n:codemod": "bun run script/i18n-codemod.ts",
+    "i18n:residual-scan": "bun run script/i18n-residual-scan.ts"
   },
   "workspaces": {
     "packages": [

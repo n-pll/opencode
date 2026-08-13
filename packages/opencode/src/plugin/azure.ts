@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import type { Hooks, PluginInput } from "@opencode-ai/plugin"
 
 export async function AzureAuthPlugin(_input: PluginInput): Promise<Hooks> {
@@ -6,7 +7,7 @@ export async function AzureAuthPlugin(_input: PluginInput): Promise<Hooks> {
     prompts.push({
       type: "text" as const,
       key: "resourceName",
-      message: "Enter Azure Resource Name",
+      message: t("cli.azure.enter-azure-resource-name"),
       placeholder: "e.g. my-models",
     })
   }

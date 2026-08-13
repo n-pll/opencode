@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { Effect, ScopedCache, Scope } from "effect"
 import type { InstanceContext } from "@/project/instance-context"
 import { InstanceRef, WorkspaceRef } from "./instance-ref"
@@ -13,7 +14,7 @@ export interface InstanceState<A, E = never, R = never> {
 
 export const context = Effect.gen(function* () {
   const ctx = yield* InstanceRef
-  if (!ctx) return yield* Effect.die(new Error("InstanceRef not provided"))
+  if (!ctx) return yield* Effect.die(new Error(t("cli.instance_state.instanceref-not-provided")))
   return ctx
 })
 

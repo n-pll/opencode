@@ -1,3 +1,4 @@
+import { t } from "./i18n"
 export * as Patch from "./patch"
 
 export type Hunk =
@@ -34,7 +35,7 @@ export function parse(patchText: string): ReadonlyArray<Hunk> {
     const line = lines[index]!
     if (line.startsWith("*** Add File:")) {
       const path = line.slice("*** Add File:".length).trim()
-      if (!path) throw new Error("Invalid add file path")
+      if (!path) throw new Error(t("core.patch.invalid-add-file-path"))
       const parsed = parseAdd(lines, index + 1)
       hunks.push({ type: "add", path, contents: parsed.content })
       index = parsed.next
@@ -42,19 +43,19 @@ export function parse(patchText: string): ReadonlyArray<Hunk> {
     }
     if (line.startsWith("*** Delete File:")) {
       const path = line.slice("*** Delete File:".length).trim()
-      if (!path) throw new Error("Invalid delete file path")
+      if (!path) throw new Error(t("core.patch.invalid-delete-file-path"))
       hunks.push({ type: "delete", path })
       index++
       continue
     }
     if (line.startsWith("*** Update File:")) {
       const path = line.slice("*** Update File:".length).trim()
-      if (!path) throw new Error("Invalid update file path")
+      if (!path) throw new Error(t("core.patch.invalid-update-file-path"))
       let next = index + 1
       let movePath: string | undefined
       if (lines[next]?.startsWith("*** Move to:")) {
         movePath = lines[next]!.slice("*** Move to:".length).trim()
-        if (!movePath) throw new Error("Invalid move file path")
+        if (!movePath) throw new Error(t("core.patch.invalid-move-file-path"))
         next++
       }
       const parsed = parseUpdate(lines, next)

@@ -5,6 +5,7 @@ import { jwtVerify, createRemoteJWKSet } from "jose"
 import { createAppAuth } from "@octokit/auth-app"
 import { Octokit } from "@octokit/rest"
 import { Resource } from "sst"
+import { t } from "./i18n"
 
 type Env = {
   SYNC_SERVER: DurableObjectNamespace<SyncServer>
@@ -84,7 +85,7 @@ export class SyncServer extends DurableObject<Env> {
   }
 
   public async assertSecret(secret: string) {
-    if (secret !== (await this.getSecret())) throw new Error("Invalid secret")
+    if (secret !== (await this.getSecret())) throw new Error(t("function.error.invalid_secret"))
   }
 
   private async getSecret() {
@@ -141,7 +142,7 @@ export default new Hono<{ Bindings: Env }>()
     const body = await c.req.json<{ sessionShortName: string; adminSecret: string }>()
     const sessionShortName = body.sessionShortName
     const adminSecret = body.adminSecret
-    if (adminSecret !== Resource.ADMIN_SECRET.value) throw new Error("Invalid admin secret")
+    if (adminSecret !== Resource.ADMIN_SECRET.value) throw new Error(t("function.error.invalid_admin_secret"))
     const id = c.env.SYNC_SERVER.idFromName(sessionShortName)
     const stub = c.env.SYNC_SERVER.get(id)
     await stub.clear()
@@ -164,18 +165,18 @@ export default new Hono<{ Bindings: Env }>()
   .get("/share_poll", async (c) => {
     const upgradeHeader = c.req.header("Upgrade")
     if (!upgradeHeader || upgradeHeader !== "websocket") {
-      return c.text("Error: Upgrade header is required", { status: 426 })
+      return c.text(t("function.error.upgrade_required"), { status: 426 })
     }
     const id = c.req.query("id")
     console.log("share_poll", id)
-    if (!id) return c.text("Error: Share ID is required", { status: 400 })
+    if (!id) return c.text(t("function.error.share_id_required"), { status: 400 })
     const stub = c.env.SYNC_SERVER.get(c.env.SYNC_SERVER.idFromName(id))
     return stub.fetch(c.req.raw)
   })
   .get("/share_data", async (c) => {
     const id = c.req.query("id")
     console.log("share_data", id)
-    if (!id) return c.text("Error: Share ID is required", { status: 400 })
+    if (!id) return c.text(t("function.error.share_id_required"), { status: 400 })
     const stub = c.env.SYNC_SERVER.get(c.env.SYNC_SERVER.idFromName(id))
     const data = await stub.getData()
 
@@ -250,7 +251,7 @@ export default new Hono<{ Bindings: Env }>()
 
     if (!response.ok) {
       console.error(await response.text())
-      return c.json({ error: "Discord bot message failed" }, { status: 502 })
+      return c.json({ error: t("function.error.discord_message_failed") }, { status: 502 })
     }
 
     return c.json({ ok: true })
@@ -265,7 +266,7 @@ export default new Hono<{ Bindings: Env }>()
 
     // get Authorization header
     const token = c.req.header("Authorization")?.replace(/^Bearer /, "")
-    if (!token) return c.json({ error: "Authorization header is required" }, { status: 401 })
+    if (!token) return c.json({ error: t("function.error.authorization_required") }, { status: 401 })
 
     // verify token
     const JWKS = createRemoteJWKSet(new URL(JWKS_URL))
@@ -281,7 +282,7 @@ export default new Hono<{ Bindings: Env }>()
       repo = parts[1]
     } catch (err) {
       console.error("Token verification failed:", err)
-      return c.json({ error: "Invalid or expired token" }, { status: 403 })
+      return c.json({ error: t("function.error.invalid_or_expired_token") }, { status: 403 })
     }
 
     // Create app JWT token
@@ -318,13 +319,13 @@ export default new Hono<{ Bindings: Env }>()
       // get Authorization header
       const authHeader = c.req.header("Authorization")
       const token = authHeader?.replace(/^Bearer /, "")
-      if (!token) throw new Error("Authorization header is required")
+      if (!token) throw new Error(t("function.error.authorization_required"))
 
       // Verify permissions
       const userClient = new Octokit({ auth: token })
       const { data: repoData } = await userClient.repos.get({ owner, repo })
       if (!repoData.permissions.admin && !repoData.permissions.push && !repoData.permissions.maintain)
-        throw new Error("User does not have write permissions")
+        throw new Error(t("function.error.no_write_permissions"))
 
       // Get installation token
       const auth = createAppAuth({

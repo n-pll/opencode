@@ -58,8 +58,10 @@ export const invokeUriFunction = (ref: UriFunction, args: Array<unknown>, node: 
         return decodeURIComponent(value)
     }
   } catch (error) {
+    const name = ref.name
+    const message = error instanceof Error ? error.message : String(error)
     throw new InterpreterRuntimeError(
-      `${ref.name} received malformed URI data: ${error instanceof Error ? error.message : String(error)}`,
+      t("codemode.url.0", { name, message }),
       node,
     ).as("URIError")
   }
@@ -69,8 +71,8 @@ export const urlArgument = (value: unknown, label: string): string =>
   value instanceof SandboxURL ? value.url.href : uriArgument(value, label)
 
 export const invokeURLStatic = (name: string, args: Array<unknown>, node: AstNode): unknown => {
-  if (!urlStatics.has(name)) throw new InterpreterRuntimeError(`URL.${name} is not available in CodeMode.`, node)
-  if (args.length === 0) throw new InterpreterRuntimeError(`URL.${name} requires a URL argument.`, node).as("TypeError")
+  if (!urlStatics.has(name)) throw new InterpreterRuntimeError(t("codemode.url.1", { name }), node)
+  if (args.length === 0) throw new InterpreterRuntimeError(t("codemode.url.2", { name }), node).as("TypeError")
   const input = urlArgument(args[0], `URL.${name} input`)
   const base = args[1] === undefined ? undefined : urlArgument(args[1], `URL.${name} base`)
   try {
@@ -83,8 +85,9 @@ export const invokeURLStatic = (name: string, args: Array<unknown>, node: AstNod
 
 export const invokeURLMethod = (value: SandboxURL, name: string, node: AstNode): string => {
   if (name === "toString" || name === "toJSON") return value.url.href
-  throw new InterpreterRuntimeError(`URL method '${name}' is not available in CodeMode.`, node)
+  throw new InterpreterRuntimeError(t("codemode.url.3", { name }), node)
 }
 import { type AstNode, InterpreterRuntimeError, UriFunction } from "../interpreter/model.js"
 import { SandboxURL } from "../values.js"
 import { boundedData, coerceToString } from "./value.js"
+import { t } from "../i18n"

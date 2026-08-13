@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 // the approaches in this edit tool are sourced from
 // https://github.com/cline/cline/blob/main/evals/diff-edits/diff-apply/diff-06-23-25.ts
 // https://github.com/google-gemini/gemini-cli/blob/main/packages/core/src/utils/editCorrector.ts
@@ -45,13 +46,13 @@ function lock(filePath: string) {
 }
 
 export const Parameters = Schema.Struct({
-  filePath: Schema.String.annotate({ description: "The absolute path to the file to modify" }),
-  oldString: Schema.String.annotate({ description: "The text to replace" }),
+  filePath: Schema.String.annotate({ description: t("cli.edit.the-absolute-path-to-the-file-to-modify") }),
+  oldString: Schema.String.annotate({ description: t("cli.edit.the-text-to-replace") }),
   newString: Schema.String.annotate({
-    description: "The text to replace it with (must be different from oldString)",
+    description: t("cli.edit.the-text-to-replace-it-with-must-be-different-from-oldstring"),
   }),
   replaceAll: Schema.optional(Schema.Boolean).annotate({
-    description: "Replace all occurrences of oldString (default false)",
+    description: t("cli.edit.replace-all-occurrences-of-oldstring-default-false"),
   }),
 })
 
@@ -725,7 +726,7 @@ export function replace(content: string, oldString: string, newString: string, r
       "Could not find oldString in the file. It must match exactly, including whitespace, indentation, and line endings.",
     )
   }
-  throw new Error("Found multiple matches for oldString. Provide more surrounding context to make the match unique.")
+  throw new Error(t("cli.edit.found-multiple-matches-for-oldstring-provide-more-surroundin"))
 }
 
 function isDisproportionateMatch(search: string, oldString: string) {

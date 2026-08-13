@@ -4,6 +4,7 @@ import { Schema } from "effect"
 import { define, inventory } from "./event"
 import { NonNegativeInt, optional } from "./schema"
 import { ProjectID } from "./project-id"
+import { t } from "./i18n"
 
 export const ID = ProjectID
 export type ID = typeof ID.Type
@@ -17,7 +18,7 @@ export const Icon = Schema.Struct({
 export interface Icon extends Schema.Schema.Type<typeof Icon> {}
 export const Commands = Schema.Struct({
   start: optional(
-    Schema.String.annotate({ description: "Startup script to run when creating a new workspace (worktree)" }),
+    Schema.String.annotate({ description: t("schema.project.startup_script") }),
   ),
 }).annotate({ identifier: "Project.Commands" })
 export interface Commands extends Schema.Schema.Type<typeof Commands> {}

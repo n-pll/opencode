@@ -1,3 +1,4 @@
+import { t } from "./i18n"
 export * as AISDK from "./aisdk"
 
 import { makeLocationNode } from "./effect/app-node"
@@ -33,7 +34,7 @@ function wrapSSE(res: Response, ms: number, ctl: AbortController) {
     async pull(ctrl) {
       const part = await new Promise<Awaited<ReturnType<typeof reader.read>>>((resolve, reject) => {
         const id = setTimeout(() => {
-          const err = new Error("SSE read timed out")
+          const err = new Error(t("core.aisdk.sse-read-timed-out"))
           ctl.abort(err)
           void reader.cancel(err)
           reject(err)
@@ -217,7 +218,7 @@ export const locationLayer = Layer.effect(
         if (!sdk)
           return yield* new InitError({
             providerID: model.providerID,
-            cause: new Error("No AISDK provider plugin returned an SDK"),
+            cause: new Error(t("core.aisdk.no-aisdk-provider-plugin-returned-an-sdk")),
           })
         sdks.set(sdkKey, sdk)
         const result = yield* service.runLanguage({ model, sdk, options }).pipe(initError(model.providerID))

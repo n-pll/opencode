@@ -6,6 +6,7 @@ import { define, inventory } from "./event"
 import { ascending } from "./identifier"
 import { SessionID } from "./session-id"
 import { statics } from "./schema"
+import { t } from "./i18n"
 
 export const ID = Schema.String.check(Schema.isStartsWith("que")).pipe(
   Schema.brand("QuestionV2.ID"),
@@ -20,22 +21,22 @@ export const ID = Schema.String.check(Schema.isStartsWith("que")).pipe(
 export type ID = typeof ID.Type
 
 export const Option = Schema.Struct({
-  label: Schema.String.annotate({ description: "Display text (1-5 words, concise)" }),
-  description: Schema.String.annotate({ description: "Explanation of choice" }),
+  label: Schema.String.annotate({ description: t("schema.question.option.label") }),
+  description: Schema.String.annotate({ description: t("schema.question.option.description") }),
 }).annotate({ identifier: "QuestionV2.Option" })
 export interface Option extends Schema.Schema.Type<typeof Option> {}
 
 const base = {
-  question: Schema.String.annotate({ description: "Complete question" }),
-  header: Schema.String.annotate({ description: "Very short label (max 30 chars)" }),
-  options: Schema.Array(Option).annotate({ description: "Available choices" }),
-  multiple: Schema.Boolean.pipe(optional).annotate({ description: "Allow selecting multiple choices" }),
+  question: Schema.String.annotate({ description: t("schema.question.info.question") }),
+  header: Schema.String.annotate({ description: t("schema.question.info.header") }),
+  options: Schema.Array(Option).annotate({ description: t("schema.question.info.options") }),
+  multiple: Schema.Boolean.pipe(optional).annotate({ description: t("schema.question.info.multiple") }),
 }
 
 export const Info = Schema.Struct({
   ...base,
   custom: Schema.Boolean.pipe(optional).annotate({
-    description: "Allow typing a custom answer (default: true)",
+    description: t("schema.question.info.custom"),
   }),
 }).annotate({ identifier: "QuestionV2.Info" })
 export interface Info extends Schema.Schema.Type<typeof Info> {}
@@ -52,7 +53,7 @@ export interface Tool extends Schema.Schema.Type<typeof Tool> {}
 export const Request = Schema.Struct({
   id: ID,
   sessionID: SessionID,
-  questions: Schema.Array(Info).annotate({ description: "Questions to ask" }),
+  questions: Schema.Array(Info).annotate({ description: t("schema.question.info.questions") }),
   tool: Tool.pipe(optional),
 }).annotate({ identifier: "QuestionV2.Request" })
 export interface Request extends Schema.Schema.Type<typeof Request> {}
@@ -62,7 +63,7 @@ export type Answer = typeof Answer.Type
 
 export const Reply = Schema.Struct({
   answers: Schema.Array(Answer).annotate({
-    description: "User answers in order of questions (each answer is an array of selected labels)",
+    description: t("schema.question.info.answers"),
   }),
 }).annotate({ identifier: "QuestionV2.Reply" })
 export interface Reply extends Schema.Schema.Type<typeof Reply> {}

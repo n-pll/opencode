@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import path from "path"
 import { SessionV1 } from "@opencode-ai/core/v1/session"
 import { Effect, Schema } from "effect"
@@ -35,8 +36,8 @@ export const PlanExitTool = Tool.define(
                 header: "Build Agent",
                 custom: false,
                 options: [
-                  { label: "Yes", description: "Switch to build agent and start implementing the plan" },
-                  { label: "No", description: "Stay with plan agent to continue refining the plan" },
+                  { label: "Yes", description: t("cli.plan.switch-to-build-agent-and-start-implementing-the-plan") },
+                  { label: "No", description: t("cli.plan.stay-with-plan-agent-to-continue-refining-the-plan") },
                 ],
               },
             ],
@@ -69,7 +70,7 @@ export const PlanExitTool = Tool.define(
           } satisfies SessionV1.TextPart)
 
           return {
-            title: "Switching to build agent",
+            title: t("cli.plan.switching-to-build-agent"),
             output: "User approved switching to build agent. Wait for further instructions.",
             metadata: {},
           }

@@ -13,6 +13,7 @@ import {
 } from "../middleware/workspace-routing"
 import { PtyForbiddenError, PtyNotFoundError } from "../errors"
 import { described } from "./metadata"
+import { t } from "@/i18n"
 
 const root = "/pty"
 export const Params = Schema.Struct({ ptyID: PtyID })
@@ -47,8 +48,8 @@ export const PtyApi = HttpApi.make("pty")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "pty.shells",
-            summary: "List available shells",
-            description: "Get a list of available shells on the system.",
+            summary: t("instance.pty.pty_shells.summary"),
+            description: t("instance.pty.pty_shells.description"),
           }),
         ),
         HttpApiEndpoint.get("list", PtyPaths.list, {
@@ -57,8 +58,8 @@ export const PtyApi = HttpApi.make("pty")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "pty.list",
-            summary: "List PTY sessions",
-            description: "Get a list of all active pseudo-terminal (PTY) sessions managed by OpenCode.",
+            summary: t("instance.pty.pty_list.summary"),
+            description: t("instance.pty.pty_list.description"),
           }),
         ),
         HttpApiEndpoint.post("create", PtyPaths.create, {
@@ -69,8 +70,8 @@ export const PtyApi = HttpApi.make("pty")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "pty.create",
-            summary: "Create PTY session",
-            description: "Create a new pseudo-terminal (PTY) session for running shell commands and processes.",
+            summary: t("instance.pty.pty_create.summary"),
+            description: t("instance.pty.pty_create.description"),
           }),
         ),
         HttpApiEndpoint.get("get", PtyPaths.get, {
@@ -81,8 +82,8 @@ export const PtyApi = HttpApi.make("pty")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "pty.get",
-            summary: "Get PTY session",
-            description: "Retrieve detailed information about a specific pseudo-terminal (PTY) session.",
+            summary: t("instance.pty.pty_get.summary"),
+            description: t("instance.pty.pty_get.description"),
           }),
         ),
         HttpApiEndpoint.put("update", PtyPaths.update, {
@@ -94,8 +95,8 @@ export const PtyApi = HttpApi.make("pty")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "pty.update",
-            summary: "Update PTY session",
-            description: "Update properties of an existing pseudo-terminal (PTY) session.",
+            summary: t("instance.pty.pty_update.summary"),
+            description: t("instance.pty.pty_update.description"),
           }),
         ),
         HttpApiEndpoint.delete("remove", PtyPaths.remove, {
@@ -106,8 +107,8 @@ export const PtyApi = HttpApi.make("pty")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "pty.remove",
-            summary: "Remove PTY session",
-            description: "Remove and terminate a specific pseudo-terminal (PTY) session.",
+            summary: t("instance.pty.pty_remove.summary"),
+            description: t("instance.pty.pty_remove.description"),
           }),
         ),
         HttpApiEndpoint.post("connectToken", PtyPaths.connectToken, {
@@ -118,12 +119,12 @@ export const PtyApi = HttpApi.make("pty")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "pty.connectToken",
-            summary: "Create PTY WebSocket token",
-            description: "Create a short-lived ticket for opening a PTY WebSocket connection.",
+            summary: t("instance.pty.pty_connectToken.summary"),
+            description: t("instance.pty.pty_connectToken.description"),
           }),
         ),
       )
-      .annotateMerge(OpenApi.annotations({ title: "pty", description: "Experimental HttpApi PTY routes." }))
+      .annotateMerge(OpenApi.annotations({ title: "pty", description: t("instance.pty.pty_0.description") }))
       .middleware(InstanceContextMiddleware)
       .middleware(WorkspaceRoutingMiddleware)
       .middleware(Authorization),
@@ -132,7 +133,7 @@ export const PtyApi = HttpApi.make("pty")
     OpenApi.annotations({
       title: "opencode experimental HttpApi",
       version: "0.0.1",
-      description: "Experimental HttpApi surface for selected instance routes.",
+      description: t("instance.config.config_1.description"),
     }),
   )
 
@@ -148,9 +149,9 @@ export const PtyConnectApi = HttpApi.make("pty-connect").add(
       }).annotateMerge(
         OpenApi.annotations({
           identifier: "pty.connect",
-          summary: "Connect to PTY session",
+          summary: t("instance.pty.pty_connect.summary"),
           description:
-            "Establish a WebSocket connection to interact with a pseudo-terminal (PTY) session in real-time.",
+            t("cli.pty.establish-a-websocket-connection-to-interact-with-a-pseudo-t"),
           transform: (operation) => ({
             ...operation,
             parameters: [
@@ -165,7 +166,7 @@ export const PtyConnectApi = HttpApi.make("pty-connect").add(
         }),
       ),
     )
-    .annotateMerge(OpenApi.annotations({ title: "pty", description: "PTY websocket route." }))
+    .annotateMerge(OpenApi.annotations({ title: "pty", description: t("instance.pty.pty_2.description") }))
     .middleware(InstanceContextMiddleware)
     .middleware(WorkspaceRoutingMiddleware)
     .middleware(PtyConnectAuthorization),

@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { LayerNode } from "@opencode-ai/core/effect/layer-node"
 import { path } from "@opencode-ai/core/effect/app-node-platform"
 import { Global } from "@opencode-ai/core/global"
@@ -30,7 +31,7 @@ export type Info = Schema.Schema.Type<typeof Info>
 export const CreateInput = Schema.Struct({
   name: Schema.optional(Schema.String),
   startCommand: Schema.optional(
-    Schema.String.annotate({ description: "Additional startup script to run after the project's start command" }),
+    Schema.String.annotate({ description: t("cli.index.additional-startup-script-to-run-after-the-project-s-start-c") }),
   ),
 }).annotate({ identifier: "WorktreeCreateInput" })
 export type CreateInput = Schema.Schema.Type<typeof CreateInput>
@@ -193,7 +194,7 @@ const layer: Layer.Layer<
 
         return { name, directory, ...(branch ? { branch } : {}) }
       }
-      return yield* new NameGenerationFailedError({ message: "Failed to generate a unique worktree name" })
+      return yield* new NameGenerationFailedError({ message: t("cli.index.failed-to-generate-a-unique-worktree-name") })
     })
 
     const makeWorktreeInfo = Effect.fn("Worktree.makeWorktreeInfo")(function* (input?: {
@@ -202,7 +203,7 @@ const layer: Layer.Layer<
     }) {
       const ctx = yield* InstanceState.context
       if (ctx.project.vcs !== "git") {
-        return yield* new NotGitError({ message: "Worktrees are only supported for git projects" })
+        return yield* new NotGitError({ message: t("cli.index.worktrees-are-only-supported-for-git-projects") })
       }
 
       const root = pathSvc.join(Global.Path.data, "worktree", ctx.project.id)
@@ -388,7 +389,7 @@ const layer: Layer.Layer<
     const remove = Effect.fn("Worktree.remove")(function* (input: RemoveInput) {
       const ctx = yield* InstanceState.context
       if (ctx.project.vcs !== "git") {
-        return yield* new NotGitError({ message: "Worktrees are only supported for git projects" })
+        return yield* new NotGitError({ message: t("cli.index.worktrees-are-only-supported-for-git-projects") })
       }
 
       const directory = yield* canonical(input.directory)
@@ -525,13 +526,13 @@ const layer: Layer.Layer<
     const reset = Effect.fn("Worktree.reset")(function* (input: ResetInput) {
       const ctx = yield* InstanceState.context
       if (ctx.project.vcs !== "git") {
-        return yield* new NotGitError({ message: "Worktrees are only supported for git projects" })
+        return yield* new NotGitError({ message: t("cli.index.worktrees-are-only-supported-for-git-projects") })
       }
 
       const directory = yield* canonical(input.directory)
       const primary = yield* canonical(ctx.worktree)
       if (directory === primary) {
-        return yield* new ResetFailedError({ message: "Cannot reset the primary workspace" })
+        return yield* new ResetFailedError({ message: t("cli.index.cannot-reset-the-primary-workspace") })
       }
 
       const list = yield* git(["worktree", "list", "--porcelain"], { cwd: ctx.worktree })
@@ -541,14 +542,14 @@ const layer: Layer.Layer<
 
       const entry = yield* locateWorktree(parseWorktreeList(list.text), directory)
       if (!entry?.path) {
-        return yield* new ResetFailedError({ message: "Worktree not found" })
+        return yield* new ResetFailedError({ message: t("cli.index.worktree-not-found") })
       }
 
       const worktreePath = entry.path
 
       const base = yield* gitSvc.defaultBranch(ctx.worktree)
       if (!base) {
-        return yield* new ResetFailedError({ message: "Default branch not found" })
+        return yield* new ResetFailedError({ message: t("cli.index.default-branch-not-found") })
       }
 
       const sep = base.ref.indexOf("/")

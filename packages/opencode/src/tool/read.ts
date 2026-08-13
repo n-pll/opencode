@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { Effect, Option, Schema, Scope, Stream } from "effect"
 import { NonNegativeInt } from "@opencode-ai/core/schema"
 import * as path from "path"
@@ -26,12 +27,12 @@ class ReadStop extends Schema.TaggedErrorClass<ReadStop>()("ReadStop", {}) {}
 // Schema output is identical (`type: "number"`), so the LLM view is
 // unchanged; purely CLI-facing uses must now send numbers rather than strings.
 export const Parameters = Schema.Struct({
-  filePath: Schema.String.annotate({ description: "The absolute path to the file or directory to read" }),
+  filePath: Schema.String.annotate({ description: t("cli.read.the-absolute-path-to-the-file-or-directory-to-read") }),
   offset: Schema.optional(NonNegativeInt).annotate({
-    description: "The line number to start reading from (1-indexed)",
+    description: t("cli.read.the-line-number-to-start-reading-from-1-indexed"),
   }),
   limit: Schema.optional(NonNegativeInt).annotate({
-    description: "The maximum number of lines to read (defaults to 2000)",
+    description: t("cli.read.the-maximum-number-of-lines-to-read-defaults-to-2000"),
   }),
 })
 

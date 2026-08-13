@@ -1,3 +1,4 @@
+import { t } from "../../i18n"
 import { Duration, Effect, Schema, Semaphore, Stream } from "effect"
 import type { Scope } from "effect"
 import type { IntegrationOAuthMethodRegistration } from "@opencode-ai/plugin/v2/effect/integration"
@@ -40,7 +41,7 @@ function oauth(http: HttpClient.HttpClient) {
     method: {
       id: methodID,
       type: "oauth",
-      label: "OpenCode Console account",
+      label: t("core.opencode.opencode-console-account"),
     },
     authorize: () =>
       Effect.gen(function* () {
@@ -103,7 +104,7 @@ export const OpencodePlugin = define<HttpClient.HttpClient | EventV2.Service | S
         integration.name = "OpenCode"
       })
       draft.method.update(oauth(http))
-      draft.method.update({ integrationID: "opencode", method: { type: "key", label: "API key (service account)" } })
+      draft.method.update({ integrationID: "opencode", method: { type: "key", label: t("core.opencode.api-key-service-account") } })
     })
 
     connected = (yield* ctx.integration.connection.active("opencode")) !== undefined

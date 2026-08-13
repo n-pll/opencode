@@ -1,4 +1,5 @@
 import type { PromiseMethodName } from "../interpreter/model.js"
+import { t } from "../i18n"
 
 export const promiseStatics = new Set<PromiseMethodName>(["all", "allSettled", "race", "resolve", "reject"])
 

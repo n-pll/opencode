@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/language"
 import { createEffect, createMemo, createSignal, onCleanup } from "solid-js"
 import path from "path"
 import { useTuiPaths } from "../../context/runtime"
@@ -16,6 +17,7 @@ function moveReminderText(directory: string) {
 }
 
 export function usePromptMove(input: { projectID: () => string | undefined; sessionID: () => string | undefined }) {
+  const { t } = useLanguage()
   const dialog = useDialog()
   const sdk = useSDK()
   const sync = useSync()
@@ -48,7 +50,7 @@ export function usePromptMove(input: { projectID: () => string | undefined; sess
         { throwOnError: true },
       )
       const directory = result.data?.directory
-      if (!directory) throw new Error("No project copy directory returned")
+      if (!directory) throw new Error(t("tui.move.no-project-copy-directory-returned"))
 
       // Call a location-based route to make sure it's bootstrapped
       // before moving on
@@ -60,7 +62,7 @@ export function usePromptMove(input: { projectID: () => string | undefined; sess
       homeDestination?.clear()
       setProgress(undefined)
       setCreating(false)
-      toast.show({ title: "Creating workspace failed", message: errorMessage(err), variant: "error" })
+      toast.show({ title: t("tui.move.creating-workspace-failed"), message: errorMessage(err), variant: "error" })
       return
     }
   }

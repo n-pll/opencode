@@ -1,4 +1,5 @@
 import { Effect, JsonSchema, Schema } from "effect"
+import { t } from "./i18n"
 import { LLMClient } from "./route/client"
 import {
   GenerationOptions,
@@ -79,7 +80,7 @@ export const updateRequest = (input: LLMRequest, patch: Partial<RequestInput>) =
 
 const GENERATE_OBJECT_TOOL_NAME = "generate_object"
 
-const GENERATE_OBJECT_TOOL_DESCRIPTION = "Return the structured result by calling this tool."
+const GENERATE_OBJECT_TOOL_DESCRIPTION = t("llm.generate_object.description")
 
 type GenerateObjectBase = Omit<RequestInput, "tools" | "toolChoice" | "responseFormat">
 

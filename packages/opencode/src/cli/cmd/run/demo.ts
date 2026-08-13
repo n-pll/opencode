@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 // Demo mode for testing direct interactive mode without a real SDK.
 //
 // Enabled with `--demo`. Intercepts prompt submissions and generates synthetic
@@ -586,7 +587,7 @@ async function emitBash(state: State, signal?: AbortSignal): Promise<void> {
   const ref = make(state, "bash", {
     command: "git status",
     workdir: process.cwd(),
-    description: "Show git status",
+    description: t("cli.demo.show-git-status"),
   })
   startTool(state, ref)
   await wait(70, signal)
@@ -661,7 +662,7 @@ function emitTask(state: State): void {
     subagent_type: "explore",
   })
   doneTool(state, ref, {
-    title: "Reducer touchpoints found",
+    title: t("cli.demo.reducer-touchpoints-found"),
     output: "",
     metadata: {
       toolcalls: 4,
@@ -694,7 +695,7 @@ function emitTask(state: State): void {
     label: "Explore",
     description: "Scan run/* for reducer touchpoints",
     status: "completed",
-    title: "Reducer touchpoints found",
+    title: t("cli.demo.reducer-touchpoints-found"),
     toolCalls: 4,
     commits: [
       {
@@ -764,8 +765,8 @@ function emitQuestionTool(state: State): void {
         header: "Style",
         question: "Which output style do you want to inspect?",
         options: [
-          { label: "Diff", description: "Show diff block" },
-          { label: "Code", description: "Show code block" },
+          { label: "Diff", description: t("cli.demo.show-diff-block") },
+          { label: "Code", description: t("cli.demo.show-code-block") },
         ],
         multiple: false,
       },
@@ -773,8 +774,8 @@ function emitQuestionTool(state: State): void {
         header: "Extras",
         question: "Pick extra rows",
         options: [
-          { label: "Usage", description: "Add usage row" },
-          { label: "Duration", description: "Add duration row" },
+          { label: "Usage", description: t("cli.demo.add-usage-row") },
+          { label: "Duration", description: t("cli.demo.add-duration-row") },
         ],
         multiple: true,
         custom: true,
@@ -799,7 +800,7 @@ function emitPermission(state: State, kind: PermissionKind = "edit"): void {
     const ref = make(state, "bash", {
       command,
       workdir: root,
-      description: "Inspect worktree changes",
+      description: t("cli.demo.inspect-worktree-changes"),
     })
     askPermission(state, {
       ref,
@@ -840,7 +841,7 @@ function emitPermission(state: State, kind: PermissionKind = "edit"): void {
 
   if (kind === "task") {
     const ref = make(state, "task", {
-      description: "Inspect footer spacing across direct-mode prompts",
+      description: t("cli.demo.inspect-footer-spacing-across-direct-mode-prompts"),
       subagent_type: "explore",
     })
     askPermission(state, {
@@ -849,7 +850,7 @@ function emitPermission(state: State, kind: PermissionKind = "edit"): void {
       patterns: ["explore"],
       always: ["*"],
       done: {
-        title: "Footer spacing checked",
+        title: t("cli.demo.footer-spacing-checked"),
         output: "",
         metadata: {
           toolcalls: 3,
@@ -888,7 +889,7 @@ function emitPermission(state: State, kind: PermissionKind = "edit"): void {
 
   if (kind === "doom") {
     const ref = make(state, "task", {
-      description: "Retry the formatter after repeated failures",
+      description: t("cli.demo.retry-the-formatter-after-repeated-failures"),
       subagent_type: "general",
     })
     askPermission(state, {
@@ -897,7 +898,7 @@ function emitPermission(state: State, kind: PermissionKind = "edit"): void {
       patterns: ["*"],
       always: ["*"],
       done: {
-        title: "Retry allowed",
+        title: t("cli.demo.retry-allowed"),
         output: "Continuing after repeated failures.\n",
         metadata: {},
       },
@@ -934,9 +935,9 @@ function emitQuestion(state: State, kind: QuestionKind = "multi"): void {
           header: "Mode",
           question: "Which footer should be the reference for spacing checks?",
           options: [
-            { label: "Permission", description: "Inspect the permission footer" },
-            { label: "Question", description: "Keep this question footer open" },
-            { label: "Prompt", description: "Return to the normal composer" },
+            { label: "Permission", description: t("cli.demo.inspect-the-permission-footer") },
+            { label: "Question", description: t("cli.demo.keep-this-question-footer-open") },
+            { label: "Prompt", description: t("cli.demo.return-to-the-normal-composer") },
           ],
           multiple: false,
           custom: false,
@@ -950,10 +951,10 @@ function emitQuestion(state: State, kind: QuestionKind = "multi"): void {
           header: "Checks",
           question: "Select the direct-mode cases you want to inspect next",
           options: [
-            { label: "Diff", description: "Show an edit diff in the footer" },
-            { label: "Task", description: "Show a structured task summary" },
-            { label: "Todo", description: "Show a todo snapshot" },
-            { label: "Error", description: "Show an error transcript row" },
+            { label: "Diff", description: t("cli.demo.show-an-edit-diff-in-the-footer") },
+            { label: "Task", description: t("cli.demo.show-a-structured-task-summary") },
+            { label: "Todo", description: t("cli.demo.show-a-todo-snapshot") },
+            { label: "Error", description: t("cli.demo.show-an-error-transcript-row") },
           ],
           multiple: true,
           custom: false,
@@ -967,8 +968,8 @@ function emitQuestion(state: State, kind: QuestionKind = "multi"): void {
           header: "Reply",
           question: "What custom answer should appear in the footer preview?",
           options: [
-            { label: "Short note", description: "Keep the answer to one line" },
-            { label: "Wrapped note", description: "Use a longer answer to test wrapping" },
+            { label: "Short note", description: t("cli.demo.keep-the-answer-to-one-line") },
+            { label: "Wrapped note", description: t("cli.demo.use-a-longer-answer-to-test-wrapping") },
           ],
           multiple: false,
           custom: true,
@@ -981,8 +982,8 @@ function emitQuestion(state: State, kind: QuestionKind = "multi"): void {
         header: "Layout",
         question: "Which footer view should stay active while testing?",
         options: [
-          { label: "Prompt", description: "Return to prompt" },
-          { label: "Question", description: "Keep question open" },
+          { label: "Prompt", description: t("cli.demo.return-to-prompt") },
+          { label: "Question", description: t("cli.demo.keep-question-open") },
         ],
         multiple: false,
       },
@@ -990,9 +991,9 @@ function emitQuestion(state: State, kind: QuestionKind = "multi"): void {
         header: "Rows",
         question: "Pick formatting previews",
         options: [
-          { label: "Diff", description: "Emit edit diff" },
-          { label: "Task", description: "Emit task card" },
-          { label: "Todo", description: "Emit todo card" },
+          { label: "Diff", description: t("cli.demo.emit-edit-diff") },
+          { label: "Task", description: t("cli.demo.emit-task-card") },
+          { label: "Todo", description: t("cli.demo.emit-todo-card") },
         ],
         multiple: true,
         custom: true,

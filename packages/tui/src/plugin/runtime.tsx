@@ -1,3 +1,4 @@
+import { t } from "../i18n/t"
 import type {
   TuiPluginApi,
   TuiPluginInstallOptions,
@@ -52,7 +53,7 @@ const emptyCommands: PluginRuntimeCommands = {
     return false
   },
   async install() {
-    return { ok: false, message: "Plugin runtime is not available." }
+    return { ok: false, message: t("tui.runtime.plugin-runtime-is-not-available") }
   },
 }
 

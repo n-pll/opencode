@@ -3,6 +3,7 @@ export * as ConfigAgentV1 from "./agent"
 import { Schema, SchemaGetter } from "effect"
 import { PositiveInt } from "../../schema"
 import { ConfigPermissionV1 } from "./permission"
+import { t } from "../../i18n"
 
 const Color = Schema.Union([
   Schema.String.check(Schema.isPattern(/^#[0-9a-fA-F]{6}$/)),
@@ -13,7 +14,7 @@ const AgentSchema = Schema.StructWithRest(
   Schema.Struct({
     model: Schema.optional(Schema.String),
     variant: Schema.optional(Schema.String).annotate({
-      description: "Default model variant for this agent (applies only when using the agent's configured model).",
+      description: t("core.config.default_model_variant_for_this_agent_applies_only_when_using"),
     }),
     temperature: Schema.optional(Schema.Finite),
     top_p: Schema.optional(Schema.Finite),
@@ -22,7 +23,7 @@ const AgentSchema = Schema.StructWithRest(
       description: "@deprecated Use 'permission' field instead",
     }),
     disable: Schema.optional(Schema.Boolean),
-    description: Schema.optional(Schema.String).annotate({ description: "Description of when to use the agent" }),
+    description: Schema.optional(Schema.String).annotate({ description: t("core.config.description_of_when_to_use_the_agent") }),
     mode: Schema.optional(Schema.Literals(["subagent", "primary", "all"])),
     hidden: Schema.optional(Schema.Boolean).annotate({
       description: "Hide this subagent from the @ autocomplete menu (default: false, only applies to mode: subagent)",
@@ -32,7 +33,7 @@ const AgentSchema = Schema.StructWithRest(
       description: "Hex color code (e.g., #FF5733) or theme color (e.g., primary)",
     }),
     steps: Schema.optional(PositiveInt).annotate({
-      description: "Maximum number of agentic iterations before forcing text-only response",
+      description: t("core.config.maximum_number_of_agentic_iterations_before_forcing_text_onl"),
     }),
     maxSteps: Schema.optional(PositiveInt).annotate({ description: "@deprecated Use 'steps' field instead." }),
     permission: Schema.optional(ConfigPermissionV1.Info),

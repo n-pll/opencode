@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import type { Hooks, PluginInput } from "@opencode-ai/plugin"
 import type { Model } from "@opencode-ai/sdk/v2"
 import { InstallationVersion } from "@opencode-ai/core/installation/version"
@@ -182,12 +183,12 @@ export async function CopilotAuthPlugin(input: PluginInput): Promise<Hooks> {
       methods: [
         {
           type: "oauth",
-          label: "Login with GitHub Copilot",
+          label: t("cli.copilot.login-with-github-copilot"),
           prompts: [
             {
               type: "select",
               key: "deploymentType",
-              message: "Select GitHub deployment type",
+              message: t("cli.copilot.select-github-deployment-type"),
               options: [
                 {
                   label: "GitHub.com",
@@ -195,7 +196,7 @@ export async function CopilotAuthPlugin(input: PluginInput): Promise<Hooks> {
                   hint: "Public",
                 },
                 {
-                  label: "GitHub Enterprise",
+                  label: t("cli.copilot.github-enterprise"),
                   value: "enterprise",
                   hint: "Data residency or self-hosted",
                 },
@@ -204,7 +205,7 @@ export async function CopilotAuthPlugin(input: PluginInput): Promise<Hooks> {
             {
               type: "text",
               key: "enterpriseUrl",
-              message: "Enter your GitHub Enterprise URL or domain",
+              message: t("cli.copilot.enter-your-github-enterprise-url-or-domain"),
               placeholder: "company.ghe.com or https://company.ghe.com",
               when: { key: "deploymentType", op: "eq", value: "enterprise" },
               validate: (value) => {
@@ -245,7 +246,7 @@ export async function CopilotAuthPlugin(input: PluginInput): Promise<Hooks> {
             })
 
             if (!deviceResponse.ok) {
-              throw new Error("Failed to initiate device authorization")
+              throw new Error(t("cli.copilot.failed-to-initiate-device-authorization"))
             }
 
             const deviceData = (await deviceResponse.json()) as {

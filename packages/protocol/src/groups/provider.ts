@@ -4,6 +4,7 @@ import { Schema } from "effect"
 import { HttpApiEndpoint, HttpApiGroup, OpenApi } from "effect/unstable/httpapi"
 import { ProviderNotFoundError, ServiceUnavailableError } from "../errors"
 import { LocationQuery, locationQueryOpenApi } from "./location"
+import { t } from "../i18n"
 
 export const ProviderGroup = HttpApiGroup.make("server.provider")
   .add(
@@ -16,8 +17,8 @@ export const ProviderGroup = HttpApiGroup.make("server.provider")
       .annotateMerge(
         OpenApi.annotations({
           identifier: "v2.provider.list",
-          summary: "List providers",
-          description: "Retrieve active AI providers so clients can show provider availability and configuration.",
+          summary: t("protocol.provider.provider_list.summary"),
+          description: t("protocol.provider.provider_list.description"),
         }),
       ),
   )
@@ -32,14 +33,14 @@ export const ProviderGroup = HttpApiGroup.make("server.provider")
       .annotateMerge(
         OpenApi.annotations({
           identifier: "v2.provider.get",
-          summary: "Get provider",
-          description: "Retrieve a single AI provider so clients can inspect its availability and endpoint settings.",
+          summary: t("protocol.provider.provider_get.summary"),
+          description: t("protocol.provider.provider_get.description"),
         }),
       ),
   )
   .annotateMerge(
     OpenApi.annotations({
       title: "providers",
-      description: "Experimental provider routes.",
+      description: t("protocol.provider.providers.description"),
     }),
   )

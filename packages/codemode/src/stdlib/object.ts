@@ -2,21 +2,22 @@ import { type AstNode, InterpreterRuntimeError } from "../interpreter/model.js"
 import { isBlockedMember } from "../tool-runtime.js"
 import { isSandboxValue, SandboxMap, SandboxURLSearchParams } from "../values.js"
 import { boundedData, coerceToString } from "./value.js"
+import { t } from "../i18n"
 
 export const objectStatics = new Set(["keys", "values", "entries", "hasOwn", "assign", "fromEntries"])
 
 export const invokeObjectMethod = (name: string, args: Array<unknown>, node: AstNode): unknown => {
-  if (!objectStatics.has(name)) throw new InterpreterRuntimeError(`Object.${name} is not available in CodeMode.`, node)
+  if (!objectStatics.has(name)) throw new InterpreterRuntimeError(t("codemode.object.0", { name }), node)
   const requireObject = (): Record<string, unknown> => {
     const value = boundedData(args[0], `Object.${name} input`)
     if (isSandboxValue(value)) return {}
     if (value === null || typeof value !== "object" || Array.isArray(value)) {
-      throw new InterpreterRuntimeError(`Object.${name} expects a data object.`, node)
+      throw new InterpreterRuntimeError(t("codemode.object.1", { name }), node)
     }
     return value as Record<string, unknown>
   }
   const guardedSet = (out: Record<string, unknown>, key: string, item: unknown): void => {
-    if (isBlockedMember(key)) throw new InterpreterRuntimeError(`Property '${key}' is not available in CodeMode.`, node)
+    if (isBlockedMember(key)) throw new InterpreterRuntimeError(t("codemode.runtime.34", { key }), node)
     out[key] = item
   }
   switch (name) {
@@ -25,7 +26,7 @@ export const invokeObjectMethod = (name: string, args: Array<unknown>, node: Ast
       if (isSandboxValue(value)) return []
       if (Array.isArray(value)) return Object.keys(value)
       if (value === null || typeof value !== "object") {
-        throw new InterpreterRuntimeError("Object.keys expects a data object or array.", node)
+        throw new InterpreterRuntimeError(t("codemode.object.3"), node)
       }
       return Object.keys(value)
     }
@@ -42,7 +43,7 @@ export const invokeObjectMethod = (name: string, args: Array<unknown>, node: Ast
         const value = boundedData(source, "Object.assign input")
         if (isSandboxValue(value)) continue
         if (value === null || typeof value !== "object" || Array.isArray(value)) {
-          throw new InterpreterRuntimeError("Object.assign expects data objects.", node)
+          throw new InterpreterRuntimeError(t("codemode.object.4"), node)
         }
         for (const [key, item] of Object.entries(value)) guardedSet(out, key, item)
       }
@@ -61,17 +62,17 @@ export const invokeObjectMethod = (name: string, args: Array<unknown>, node: Ast
       }
       const pairs = boundedData(args[0], "Object.fromEntries input")
       if (!Array.isArray(pairs)) {
-        throw new InterpreterRuntimeError("Object.fromEntries expects an array of [key, value] pairs.", node)
+        throw new InterpreterRuntimeError(t("codemode.object.5"), node)
       }
       const out: Record<string, unknown> = Object.create(null)
       for (const pair of pairs) {
         if (!Array.isArray(pair)) {
-          throw new InterpreterRuntimeError("Object.fromEntries expects [key, value] pairs.", node)
+          throw new InterpreterRuntimeError(t("codemode.object.6"), node)
         }
         guardedSet(out, String(pair[0]), pair[1])
       }
       return out
     }
   }
-  throw new InterpreterRuntimeError(`Object.${name} is not available in CodeMode.`, node)
+  throw new InterpreterRuntimeError(t("codemode.object.0", { name }), node)
 }

@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 // Prompt composer and its state machine for direct interactive mode.
 //
 // createPromptState() wires keymap command layers, history navigation, and
@@ -981,7 +982,7 @@ export function createPromptState(input: PromptInput): PromptState {
     commands: [
       {
         name: "prompt.clear",
-        title: "Clear prompt or exit",
+        title: t("cli.footer_prompt.clear-prompt-or-exit"),
         category: "Prompt",
         run() {
           if (requestExit()) return
@@ -998,7 +999,7 @@ export function createPromptState(input: PromptInput): PromptState {
     commands: [
       {
         name: "session.interrupt",
-        title: "Interrupt session",
+        title: t("cli.footer_prompt.interrupt-session"),
         category: "Session",
         run() {
           if (input.onInterrupt()) return
@@ -1031,7 +1032,7 @@ export function createPromptState(input: PromptInput): PromptState {
     commands: [
       {
         name: "prompt.history.previous",
-        title: "Previous prompt history",
+        title: t("cli.footer_prompt.previous-prompt-history"),
         category: "Prompt",
         run(ctx: { event: KeyEvent }) {
           return historyCommand(-1, ctx.event)
@@ -1039,7 +1040,7 @@ export function createPromptState(input: PromptInput): PromptState {
       },
       {
         name: "prompt.history.next",
-        title: "Next prompt history",
+        title: t("cli.footer_prompt.next-prompt-history"),
         category: "Prompt",
         run(ctx: { event: KeyEvent }) {
           return historyCommand(1, ctx.event)
@@ -1099,25 +1100,25 @@ export function createPromptState(input: PromptInput): PromptState {
     commands: [
       {
         name: "prompt.autocomplete.prev",
-        title: "Previous autocomplete item",
+        title: t("cli.footer_prompt.previous-autocomplete-item"),
         category: "Autocomplete",
         run: () => menu.move(-1),
       },
       {
         name: "prompt.autocomplete.next",
-        title: "Next autocomplete item",
+        title: t("cli.footer_prompt.next-autocomplete-item"),
         category: "Autocomplete",
         run: () => menu.move(1),
       },
       {
         name: "prompt.autocomplete.hide",
-        title: "Hide autocomplete",
+        title: t("cli.footer_prompt.hide-autocomplete"),
         category: "Autocomplete",
         run: cancelAutocomplete,
       },
       {
         name: "prompt.autocomplete.select",
-        title: "Select autocomplete item",
+        title: t("cli.footer_prompt.select-autocomplete-item"),
         category: "Autocomplete",
         run() {
           if (mode() === "slash" && options().length === 0) {
@@ -1129,7 +1130,7 @@ export function createPromptState(input: PromptInput): PromptState {
       },
       {
         name: "prompt.autocomplete.complete",
-        title: "Complete autocomplete item",
+        title: t("cli.footer_prompt.complete-autocomplete-item"),
         category: "Autocomplete",
         run() {
           if (mode() === "slash" && options().length === 0) {

@@ -14,6 +14,7 @@ import type { Connection } from "effect/unstable/sql/SqlConnection"
 import { classifySqliteError, SqlError } from "effect/unstable/sql/SqlError"
 import * as Statement from "effect/unstable/sql/Statement"
 import { Sqlite } from "./sqlite"
+import { t } from "../i18n"
 
 const ATTR_DB_SYSTEM_NAME = "db.system.name"
 
@@ -62,7 +63,7 @@ const make = (options: Config) =>
         } catch (cause) {
           return Effect.fail(
             new SqlError({
-              reason: classifySqliteError(cause, { message: "Failed to execute statement", operation: "execute" }),
+              reason: classifySqliteError(cause, { message: t("core.config.failed_to_execute_statement"), operation: "execute" }),
             }),
           )
         }
@@ -80,7 +81,7 @@ const make = (options: Config) =>
         } catch (cause) {
           return Effect.fail(
             new SqlError({
-              reason: classifySqliteError(cause, { message: "Failed to execute statement", operation: "execute" }),
+              reason: classifySqliteError(cause, { message: t("core.config.failed_to_execute_statement"), operation: "execute" }),
             }),
           )
         }
@@ -107,7 +108,7 @@ const make = (options: Config) =>
           try: () => native.loadExtension(path),
           catch: (cause) =>
             new SqlError({
-              reason: classifySqliteError(cause, { message: "Failed to load extension", operation: "loadExtension" }),
+              reason: classifySqliteError(cause, { message: t("core.config.failed_to_load_extension"), operation: "loadExtension" }),
             }),
         }),
     })

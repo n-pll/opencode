@@ -101,6 +101,7 @@ import {
   invokeCoercion,
   valueConstructors,
 } from "../stdlib/value.js"
+import { t } from "../i18n"
 import {
   isSandboxValue,
   SandboxDate,
@@ -124,7 +125,7 @@ const parseProgram = (code: string): ProgramNode => {
 
   if (diagnostic) {
     throw new InterpreterRuntimeError(
-      `Failed to parse TypeScript: ${flattenDiagnosticMessageText(diagnostic.messageText, "\n")}`,
+      t("codemode.runtime.0", { message: flattenDiagnosticMessageText(diagnostic.messageText, "\n") }),
       undefined,
       "ParseError",
     )
@@ -142,7 +143,7 @@ const parseProgram = (code: string): ProgramNode => {
   }) as unknown
 
   if (!isRecord(parsed) || parsed.type !== "Program" || !Array.isArray(parsed.body)) {
-    throw new InterpreterRuntimeError("Failed to parse script as a Program node.")
+    throw new InterpreterRuntimeError(t("codemode.runtime.1"))
   }
 
   return parsed as ProgramNode
@@ -200,7 +201,7 @@ const normalizeError = (error: unknown): Diagnostic => {
   if (error instanceof RangeError && /call stack|recursion/i.test(error.message)) {
     return {
       kind: "ExecutionFailure",
-      message: "Execution exceeded the maximum nesting depth.",
+      message: t("codemode.runtime.max_nesting"),
     }
   }
 
@@ -327,7 +328,7 @@ const instanceofValue = (lhs: unknown, rhs: unknown, node: AstNode): boolean => 
     return false
   }
   throw new InterpreterRuntimeError(
-    "The right-hand side of 'instanceof' must be a constructor CodeMode knows: Error (or a specific error type like TypeError), Date, RegExp, Map, Set, URL, URLSearchParams, Array, Object, or Promise.",
+    t("codemode.runtime.2"),
     node,
   )
 }
@@ -336,13 +337,13 @@ const invokeStringMethod = (value: string, name: string, args: Array<unknown>, n
   const str = (index: number): string => {
     const arg = args[index]
     if (typeof arg !== "string")
-      throw new InterpreterRuntimeError(`String.${name} expects argument ${index + 1} to be a string.`, node)
+      throw new InterpreterRuntimeError(t("codemode.runtime.3", { name, index: index + 1 }), node)
     return arg
   }
   const num = (index: number): number => {
     const arg = args[index]
     if (typeof arg !== "number")
-      throw new InterpreterRuntimeError(`String.${name} expects argument ${index + 1} to be a number.`, node)
+      throw new InterpreterRuntimeError(t("codemode.runtime.4", { name, index: index + 1 }), node)
     return arg
   }
   const optNum = (index: number): number | undefined => (args[index] === undefined ? undefined : num(index))
@@ -379,7 +380,7 @@ const invokeStringMethod = (value: string, name: string, args: Array<unknown>, n
         result = value.normalize(form)
       } catch {
         throw new InterpreterRuntimeError(
-          `String.normalize expects the form "NFC", "NFD", "NFKC", or "NFKD" (got ${JSON.stringify(form)}).`,
+          t("codemode.runtime.5", { form: JSON.stringify(form) }),
           node,
         ).as("RangeError")
       }
@@ -423,7 +424,7 @@ const invokeStringMethod = (value: string, name: string, args: Array<unknown>, n
         const replacement = str(1)
         if (name === "replaceAll" && !pattern.global) {
           throw new InterpreterRuntimeError(
-            `String.replaceAll requires a regular expression with the global (g) flag: write /${pattern.source}/${pattern.flags}g, or use String.replace to replace only the first match.`,
+            t("codemode.runtime.6", { source: pattern.source, flags: pattern.flags }),
             node,
           )
         }
@@ -450,7 +451,7 @@ const invokeStringMethod = (value: string, name: string, args: Array<unknown>, n
       const pattern = toHostRegex(args[0], name, node, "g")
       if (!pattern.global) {
         throw new InterpreterRuntimeError(
-          `String.matchAll requires a regular expression with the global (g) flag: write /${pattern.source}/${pattern.flags}g, or use String.match for a single match.`,
+          t("codemode.runtime.7", { source: pattern.source, flags: pattern.flags }),
           node,
         )
       }
@@ -465,7 +466,7 @@ const invokeStringMethod = (value: string, name: string, args: Array<unknown>, n
     case "repeat": {
       const count = num(0)
       if (!Number.isFinite(count) || count < 0)
-        throw new InterpreterRuntimeError("String.repeat expects a finite non-negative count.", node)
+        throw new InterpreterRuntimeError(t("codemode.runtime.8"), node)
       result = value.repeat(count)
       break
     }
@@ -503,7 +504,7 @@ const invokeStringMethod = (value: string, name: string, args: Array<unknown>, n
       break
     }
     default:
-      throw new InterpreterRuntimeError(`String method '${name}' is not available in CodeMode.`, node)
+      throw new InterpreterRuntimeError(t("codemode.runtime.9", { name }), node)
   }
   return boundedData(result, `String.${name} result`)
 }
@@ -517,7 +518,7 @@ const invokeArrayStatic = (name: string, args: Array<unknown>, node: AstNode): u
     case "from": {
       if (args.length > 1) {
         throw new InterpreterRuntimeError(
-          "Array.from(...) does not support a map function in CodeMode; call .map() on the result instead.",
+          t("codemode.runtime.10"),
           node,
           "UnsupportedSyntax",
           [supportedSyntaxMessage],
@@ -540,16 +541,16 @@ const invokeArrayStatic = (name: string, args: Array<unknown>, node: AstNode): u
       ) {
         return Array.from(source as ArrayLike<unknown>)
       }
-      throw new InterpreterRuntimeError("Array.from expects an array, string, Map, Set, or array-like value.", node)
+      throw new InterpreterRuntimeError(t("codemode.runtime.11"), node)
     }
     default:
-      throw new InterpreterRuntimeError(`Array.${name} is not available in CodeMode.`, node)
+      throw new InterpreterRuntimeError(t("codemode.runtime.12", { name }), node)
   }
 }
 
 const invokeGlobalMethod = (ref: GlobalMethodReference, args: Array<unknown>, node: AstNode): unknown => {
   if (ref.namespace === "console")
-    throw new InterpreterRuntimeError(`console.${ref.name} is not available in CodeMode.`, node)
+    throw new InterpreterRuntimeError(t("codemode.runtime.13", { name: ref.name }), node)
   if (ref.namespace === "Object") return invokeObjectMethod(ref.name, args, node)
   if (ref.namespace === "Math") return invokeMathMethod(ref.name, args, node)
   if (ref.namespace === "Array") return invokeArrayStatic(ref.name, args, node)
@@ -558,7 +559,7 @@ const invokeGlobalMethod = (ref: GlobalMethodReference, args: Array<unknown>, no
   if (ref.namespace === "URL") return invokeURLStatic(ref.name, args, node)
   if (ref.namespace === "Date") {
     if (!dateStatics.has(ref.name))
-      throw new InterpreterRuntimeError(`Date.${ref.name} is not available in CodeMode.`, node)
+      throw new InterpreterRuntimeError(t("codemode.runtime.14", { name: ref.name }), node)
     return invokeDateStatic(ref.name, args, node)
   }
   if (
@@ -567,7 +568,7 @@ const invokeGlobalMethod = (ref: GlobalMethodReference, args: Array<unknown>, no
     ref.namespace === "Set" ||
     ref.namespace === "URLSearchParams"
   ) {
-    throw new InterpreterRuntimeError(`${ref.namespace}.${ref.name} is not available in CodeMode.`, node)
+    throw new InterpreterRuntimeError(t("codemode.runtime.15", { namespace: ref.namespace, name: ref.name }), node)
   }
   return invokeJsonMethod(ref.name, args, node)
 }
@@ -680,7 +681,7 @@ class Interpreter<R> {
         }
 
         if (result.kind === "break" || result.kind === "continue") {
-          throw new InterpreterRuntimeError(`Unexpected '${result.kind}' outside of a loop.`, statement)
+          throw new InterpreterRuntimeError(t("codemode.runtime.16", { kind: result.kind }), statement)
         }
 
         if (result.kind === "value") {
@@ -710,7 +711,7 @@ class Interpreter<R> {
         if (Exit.isSuccess(exit) || Cause.hasInterruptsOnly(exit.cause)) continue
         const failure = normalizeError(Cause.squash(exit.cause))
         throw new InterpreterRuntimeError(
-          `Unhandled rejection from an un-awaited tool call: ${failure.message}`,
+          t("codemode.runtime.17", { message: failure.message }),
           undefined,
           failure.kind,
           ["Await tool calls - `const result = await tools.ns.tool(...)` - so failures can be caught and handled."],
@@ -767,7 +768,7 @@ class Interpreter<R> {
     if (promise?.interrupted === true && Cause.hasInterruptsOnly(exit.cause)) {
       return Effect.fail(
         new InterpreterRuntimeError(
-          "This tool call was interrupted because another value settled a Promise.race first.",
+          t("codemode.runtime.18"),
           node,
         ),
       )
@@ -848,7 +849,7 @@ class Interpreter<R> {
   private createFunction(node: AstNode): CodeModeFunction {
     if (node.generator === true) {
       throw new InterpreterRuntimeError(
-        "Generator functions are not supported in CodeMode.",
+        t("codemode.runtime.19"),
         node,
         "UnsupportedSyntax",
         [supportedSyntaxMessage],
@@ -892,7 +893,7 @@ class Interpreter<R> {
       const discriminant = yield* self.evaluateExpression(getNode(node, "discriminant"))
       if (containsOpaqueReference(discriminant)) {
         throw new InterpreterRuntimeError(
-          "Switch discriminants must be data values in CodeMode.",
+          t("codemode.runtime.20"),
           node,
           "InvalidDataValue",
         )
@@ -909,7 +910,7 @@ class Interpreter<R> {
         const candidate = yield* self.evaluateExpression(test)
         if (containsOpaqueReference(candidate)) {
           throw new InterpreterRuntimeError(
-            "Switch case values must be data values in CodeMode.",
+            t("codemode.runtime.21"),
             test,
             "InvalidDataValue",
           )
@@ -1068,7 +1069,7 @@ class Interpreter<R> {
 
   private evaluateForOfStatement(node: AstNode): Effect.Effect<StatementResult, unknown, R> {
     if (getBoolean(node, "await")) {
-      throw new InterpreterRuntimeError("for await...of is not supported.", node)
+      throw new InterpreterRuntimeError(t("codemode.runtime.22"), node)
     }
 
     const self = this
@@ -1081,7 +1082,7 @@ class Interpreter<R> {
       // pairs and Sets iterate values over a snapshot (mutation during iteration is safe).
       const iterable = Array.isArray(right) ? right : spreadItems(right)
       if (iterable === undefined) {
-        throw new InterpreterRuntimeError("for...of requires an array, string, Map, or Set value in CodeMode.", node)
+        throw new InterpreterRuntimeError(t("codemode.runtime.23"), node)
       }
 
       let declaration: { readonly pattern: AstNode; readonly mutable: boolean } | undefined
@@ -1090,7 +1091,7 @@ class Interpreter<R> {
       if (left.type === "VariableDeclaration") {
         const declarations = getArray(left, "declarations")
         if (declarations.length !== 1) {
-          throw new InterpreterRuntimeError("for...of supports one declared binding.", left)
+          throw new InterpreterRuntimeError(t("codemode.runtime.24"), left)
         }
 
         const declarator = asNode(declarations[0], "declarations[0]")
@@ -1098,7 +1099,7 @@ class Interpreter<R> {
       } else if (left.type === "Identifier") {
         assignmentName = getString(left, "name")
       } else {
-        throw new InterpreterRuntimeError("Unsupported for...of binding.", left)
+        throw new InterpreterRuntimeError(t("codemode.runtime.25"), left)
       }
 
       for (const value of iterable) {
@@ -1172,7 +1173,7 @@ class Interpreter<R> {
       const keys = self.enumerableKeys(right)
       if (keys === undefined) {
         throw new InterpreterRuntimeError(
-          "for...in requires a plain object, array, or tools reference in CodeMode. Use for...of for arrays/strings/Maps/Sets, or Object.keys(value) for a key list.",
+          t("codemode.runtime.26"),
           node,
         )
       }
@@ -1183,7 +1184,7 @@ class Interpreter<R> {
       if (left.type === "VariableDeclaration") {
         const declarations = getArray(left, "declarations")
         if (declarations.length !== 1) {
-          throw new InterpreterRuntimeError("for...in supports one declared binding.", left)
+          throw new InterpreterRuntimeError(t("codemode.runtime.27"), left)
         }
 
         const declarator = asNode(declarations[0], "declarations[0]")
@@ -1191,7 +1192,7 @@ class Interpreter<R> {
       } else if (left.type === "Identifier") {
         assignmentName = getString(left, "name")
       } else {
-        throw new InterpreterRuntimeError("Unsupported for...in binding.", left)
+        throw new InterpreterRuntimeError(t("codemode.runtime.28"), left)
       }
 
       for (const key of keys) {
@@ -1235,7 +1236,7 @@ class Interpreter<R> {
     const labelNode = getOptionalNode(node, "label")
 
     if (labelNode) {
-      throw new InterpreterRuntimeError("Labeled break is not supported in v1.", node)
+      throw new InterpreterRuntimeError(t("codemode.runtime.29"), node)
     }
 
     return { kind: "break" }
@@ -1245,7 +1246,7 @@ class Interpreter<R> {
     const labelNode = getOptionalNode(node, "label")
 
     if (labelNode) {
-      throw new InterpreterRuntimeError("Labeled continue is not supported in v1.", node)
+      throw new InterpreterRuntimeError(t("codemode.runtime.30"), node)
     }
 
     return { kind: "continue" }
@@ -1309,7 +1310,7 @@ class Interpreter<R> {
         const declaration = asNode(declarationValue, "declarations")
 
         if (declaration.type !== "VariableDeclarator") {
-          throw new InterpreterRuntimeError("Unsupported variable declaration shape.", declaration)
+          throw new InterpreterRuntimeError(t("codemode.runtime.31"), declaration)
         }
 
         const init = getOptionalNode(declaration, "init")
@@ -1342,7 +1343,7 @@ class Interpreter<R> {
       if (pattern.type === "ObjectPattern") {
         if (value === null || typeof value !== "object" || Array.isArray(value) || isRuntimeReference(value)) {
           throw new InterpreterRuntimeError(
-            "Object destructuring requires a data object value.",
+            t("codemode.runtime.32"),
             pattern,
             "InvalidDataValue",
           )
@@ -1367,13 +1368,13 @@ class Interpreter<R> {
             getBoolean(property, "computed") ||
             getString(property, "kind") !== "init"
           ) {
-            throw new InterpreterRuntimeError("Only named object destructuring properties are supported.", property)
+            throw new InterpreterRuntimeError(t("codemode.runtime.33"), property)
           }
 
           const keyNode = getNode(property, "key")
           const key = keyNode.type === "Identifier" ? getString(keyNode, "name") : String(keyNode.value)
           if (isBlockedMember(key)) {
-            throw new InterpreterRuntimeError(`Property '${key}' is not available in CodeMode.`, keyNode)
+            throw new InterpreterRuntimeError(t("codemode.runtime.34", { key }), keyNode)
           }
           consumed.add(key)
           yield* self.declarePattern(getNode(property, "value"), (value as SafeObject)[key], mutable, property)
@@ -1383,7 +1384,7 @@ class Interpreter<R> {
 
       if (pattern.type === "ArrayPattern") {
         if (!Array.isArray(value)) {
-          throw new InterpreterRuntimeError("Array destructuring requires an array value.", pattern)
+          throw new InterpreterRuntimeError(t("codemode.runtime.35"), pattern)
         }
 
         for (const [index, item] of getArray(pattern, "elements").entries()) {
@@ -1399,7 +1400,7 @@ class Interpreter<R> {
         return
       }
 
-      throw new InterpreterRuntimeError(`Unsupported binding pattern '${pattern.type}'.`, pattern)
+      throw new InterpreterRuntimeError(t("codemode.runtime.36", { type: pattern.type }), pattern)
     })
   }
 
@@ -1472,7 +1473,7 @@ class Interpreter<R> {
     const self = this
     if (name === "Promise") {
       throw new InterpreterRuntimeError(
-        "new Promise(...) is not supported in CodeMode; tool calls already return promises - call the tool and await the result.",
+        t("codemode.runtime.37"),
         node,
         "UnsupportedSyntax",
         [supportedSyntaxMessage],
@@ -1528,7 +1529,7 @@ class Interpreter<R> {
     const flagsArg = args[1]
     if (flagsArg !== undefined && typeof flagsArg !== "string") {
       throw new InterpreterRuntimeError(
-        `RegExp flags must be a string of flag characters (e.g. "g", "gi"), not ${flagsArg === null ? "null" : typeof flagsArg}.`,
+        t("codemode.runtime.38", { flags: flagsArg === null ? "null" : typeof flagsArg }),
         node,
       )
     }
@@ -1559,13 +1560,13 @@ class Interpreter<R> {
         : undefined
     if (entries === undefined) {
       throw new InterpreterRuntimeError(
-        "new Map(...) expects an array of [key, value] pairs, a Map, or no argument.",
+        t("codemode.runtime.39"),
         node,
       )
     }
     for (const pair of entries) {
       if (!Array.isArray(pair)) {
-        throw new InterpreterRuntimeError("new Map(...) expects [key, value] pairs.", node)
+        throw new InterpreterRuntimeError(t("codemode.runtime.40"), node)
       }
       target.map.set(pair[0], pair[1])
     }
@@ -1583,7 +1584,7 @@ class Interpreter<R> {
           ? Array.from(init)
           : undefined
     if (items === undefined) {
-      throw new InterpreterRuntimeError("new Set(...) expects an array, Set, string, or no argument.", node)
+      throw new InterpreterRuntimeError(t("codemode.runtime.41"), node)
     }
     for (const item of items) target.set.add(item)
     return target
@@ -1591,7 +1592,7 @@ class Interpreter<R> {
 
   private constructURL(args: Array<unknown>, node: AstNode): SandboxURL {
     if (args.length === 0) {
-      throw new InterpreterRuntimeError("new URL(...) requires a URL string and an optional base URL.", node).as(
+      throw new InterpreterRuntimeError(t("codemode.runtime.42"), node).as(
         "TypeError",
       )
     }
@@ -1601,7 +1602,7 @@ class Interpreter<R> {
       return new SandboxURL(new URL(input, base))
     } catch {
       throw new InterpreterRuntimeError(
-        `new URL(...) received an invalid URL${base === undefined ? "" : " or base URL"}.`,
+        t("codemode.runtime.43", { base: base === undefined ? "" : " or base URL" }),
         node,
       ).as("TypeError")
     }
@@ -1626,7 +1627,7 @@ class Interpreter<R> {
       const entries = init.map((pair) => {
         if (!Array.isArray(pair) || pair.length !== 2) {
           throw new InterpreterRuntimeError(
-            "new URLSearchParams(...) expects an array of [name, value] pairs.",
+            t("codemode.runtime.44"),
             node,
           ).as("TypeError")
         }
@@ -1641,7 +1642,7 @@ class Interpreter<R> {
     const data = boundedData(init, "new URLSearchParams input")
     if (data === null || typeof data !== "object") {
       throw new InterpreterRuntimeError(
-        "new URLSearchParams(...) expects a query string, data object, array of pairs, or URLSearchParams.",
+        t("codemode.runtime.45"),
         node,
       ).as("TypeError")
     }
@@ -1671,7 +1672,7 @@ class Interpreter<R> {
    */
   private applyBinaryOperator(operator: string, lhs: unknown, rhs: unknown, node: AstNode): unknown {
     if (containsOpaqueReference(lhs) || containsOpaqueReference(rhs)) {
-      throw new InterpreterRuntimeError("Binary operators require data values in CodeMode.", node, "InvalidDataValue")
+      throw new InterpreterRuntimeError(t("codemode.runtime.46"), node, "InvalidDataValue")
     }
     // Data objects/arrays are null-prototype, so JS's ToPrimitive throws an opaque host
     // "No default value" TypeError when an operator coerces them. Coerce to their JS string
@@ -1730,12 +1731,12 @@ class Interpreter<R> {
         return (l as number) >>> (r as number)
       case "in":
         if (rhs === null || typeof rhs !== "object") {
-          throw new InterpreterRuntimeError("The 'in' operator requires a data object on the right-hand side.", node)
+          throw new InterpreterRuntimeError(t("codemode.runtime.47"), node)
         }
         // Own properties only, so arrays don't leak the host Array.prototype (map/constructor/...).
         return Object.hasOwn(rhs as object, coerceOperand(lhs) as PropertyKey)
       default:
-        throw new InterpreterRuntimeError(`Unsupported binary operator '${operator}'.`, node)
+        throw new InterpreterRuntimeError(t("codemode.runtime.48", { operator }), node)
     }
   }
 
@@ -1748,7 +1749,7 @@ class Interpreter<R> {
         return left !== null && left !== undefined
           ? Effect.succeed(left)
           : this.evaluateExpression(getNode(node, "right"))
-      throw new InterpreterRuntimeError(`Unsupported logical operator '${operator}'.`, node)
+      throw new InterpreterRuntimeError(t("codemode.runtime.49", { operator }), node)
     })
   }
 
@@ -1767,7 +1768,7 @@ class Interpreter<R> {
       if (operator === "typeof") return typeofValue(value)
       if (operator === "!") return !value
       if (containsOpaqueReference(value)) {
-        throw new InterpreterRuntimeError("Unary operators require data values in CodeMode.", node, "InvalidDataValue")
+        throw new InterpreterRuntimeError(t("codemode.runtime.50"), node, "InvalidDataValue")
       }
       // Numeric/bitwise unary operators ToPrimitive their operand; a Date yields its time value
       // (`+date` is the epoch-ms idiom), other null-prototype data objects/arrays coerce to
@@ -1790,7 +1791,7 @@ class Interpreter<R> {
           result = ~(operand as number)
           break
         default:
-          throw new InterpreterRuntimeError(`Unsupported unary operator '${operator}'.`, node)
+          throw new InterpreterRuntimeError(t("codemode.runtime.51", { operator }), node)
       }
       return boundedData(result, "Unary expression result")
     })
@@ -1824,7 +1825,7 @@ class Interpreter<R> {
           return Effect.succeed({ write: true, next, result: next })
         })
       }
-      throw new InterpreterRuntimeError("Assignment target must be an Identifier or MemberExpression.", left)
+      throw new InterpreterRuntimeError(t("codemode.runtime.52"), left)
     })
   }
 
@@ -1857,7 +1858,7 @@ class Interpreter<R> {
           : Effect.succeed({ write: false, next: current, result: current }),
       )
     }
-    throw new InterpreterRuntimeError("Assignment target must be an Identifier or MemberExpression.", left)
+    throw new InterpreterRuntimeError(t("codemode.runtime.52"), left)
   }
 
   private evaluateUpdateExpression(node: AstNode): Effect.Effect<unknown, unknown, R> {
@@ -1868,7 +1869,7 @@ class Interpreter<R> {
     const increment = operator === "++" ? 1 : operator === "--" ? -1 : undefined
 
     if (increment === undefined) {
-      throw new InterpreterRuntimeError(`Unsupported update operator '${operator}'.`, node)
+      throw new InterpreterRuntimeError(t("codemode.runtime.54", { operator }), node)
     }
 
     if (argument.type === "Identifier") {
@@ -1889,7 +1890,7 @@ class Interpreter<R> {
       })
     }
 
-    throw new InterpreterRuntimeError("Update target must be an Identifier or MemberExpression.", argument)
+    throw new InterpreterRuntimeError(t("codemode.runtime.55"), argument)
   }
 
   private evaluateCallExpression(node: AstNode): Effect.Effect<unknown, unknown, R> {
@@ -1905,7 +1906,7 @@ class Interpreter<R> {
       const args = yield* self.evaluateCallArguments(argNodes)
 
       if (callable instanceof ToolReference) {
-        if (callable.path.length === 0) throw new InterpreterRuntimeError("The tools root is not callable.", callee)
+        if (callable.path.length === 0) throw new InterpreterRuntimeError(t("codemode.runtime.56"), callee)
         // An un-awaited tool call is a first-class promise value; the call itself starts now.
         return yield* self.createToolCallPromise(callable.path, args)
       }
@@ -1935,7 +1936,7 @@ class Interpreter<R> {
       if (callable instanceof ErrorConstructorReference) {
         return createErrorValue(callable.name, args[0] === undefined ? "" : coerceToString(args[0]))
       }
-      throw new InterpreterRuntimeError("Only tools are callable in CodeMode.", callee)
+      throw new InterpreterRuntimeError(t("codemode.runtime.57"), callee)
     })
   }
 
@@ -1948,7 +1949,7 @@ class Interpreter<R> {
       return boundedData(this.enumerableKeys(ref)!, "Object.keys result")
     }
     throw new InterpreterRuntimeError(
-      `Object.${name}(...) cannot read tool references: they are not plain data. Use Object.keys(tools) for names, or tools.$codemode.search({ query }) for signatures.`,
+      t("codemode.runtime.58", { name }),
       node,
       "InvalidDataValue",
     )
@@ -1956,7 +1957,7 @@ class Interpreter<R> {
 
   private invokeConsole(name: string, args: Array<unknown>, node: AstNode): undefined {
     if (!consoleMethods.has(name))
-      throw new InterpreterRuntimeError(`console.${name} is not available in CodeMode.`, node)
+      throw new InterpreterRuntimeError(t("codemode.runtime.59", { name }), node)
     this.logs.push(publicErrorMessage(this.formatConsoleMessage(name, args, node)))
     return undefined
   }
@@ -2088,7 +2089,7 @@ class Interpreter<R> {
           const items = spreadItems(spread)
           if (items === undefined)
             throw new InterpreterRuntimeError(
-              "Spread arguments require an array, string, Map, or Set in CodeMode.",
+              t("codemode.runtime.60"),
               argNode,
             )
           args.push(...items)
@@ -2126,7 +2127,7 @@ class Interpreter<R> {
     const items = Array.isArray(args[0]) ? args[0] : spreadItems(args[0])
     if (items === undefined) {
       throw new InterpreterRuntimeError(
-        `Promise.${ref.name} expects an array of promises or plain values (e.g. Promise.${ref.name}(items.map((item) => tools.ns.tool(item)))).`,
+        t("codemode.runtime.61", { name: ref.name }),
         node,
       )
     }
@@ -2168,7 +2169,7 @@ class Interpreter<R> {
             }
             const thrown = raceInterrupted
               ? new InterpreterRuntimeError(
-                  "This tool call was interrupted because another value settled a Promise.race first.",
+                  t("codemode.runtime.18"),
                   node,
                 )
               : Cause.squash(exit.cause)
@@ -2185,7 +2186,7 @@ class Interpreter<R> {
       case "race": {
         if (items.length === 0) {
           throw new InterpreterRuntimeError(
-            "Promise.race([]) would never settle; provide at least one promise or value.",
+            t("codemode.runtime.63"),
             node,
           )
         }
@@ -2292,7 +2293,7 @@ class Interpreter<R> {
     if (ref.receiver instanceof SandboxURLSearchParams) {
       return this.invokeURLSearchParamsMethod(ref.receiver, ref.name, args, node)
     }
-    throw new InterpreterRuntimeError(`Method '${ref.name}' is not available in CodeMode.`, node)
+    throw new InterpreterRuntimeError(t("codemode.runtime.64", { name: ref.name }), node)
   }
 
   private invokeStringReplacer(
@@ -2309,7 +2310,7 @@ class Interpreter<R> {
       const hasGroups = groups !== null && typeof groups === "object"
       const offset = callbackArgs[callbackArgs.length - (hasGroups ? 3 : 2)]
       if (typeof match !== "string" || typeof offset !== "number") {
-        throw new InterpreterRuntimeError(`String.${name} produced an invalid replacement match.`, node)
+        throw new InterpreterRuntimeError(t("codemode.runtime.65", { name }), node)
       }
       if (hasGroups) {
         const safeGroups: SafeObject = Object.create(null) as SafeObject
@@ -2326,7 +2327,7 @@ class Interpreter<R> {
     if (pattern instanceof SandboxRegExp) {
       if (name === "replaceAll" && !pattern.regex.global) {
         throw new InterpreterRuntimeError(
-          `String.replaceAll requires a regular expression with the global (g) flag: write /${pattern.regex.source}/${pattern.regex.flags}g, or use String.replace to replace only the first match.`,
+          t("codemode.runtime.66", { source: pattern.regex.source, flags: pattern.regex.flags }),
           node,
         )
       }
@@ -2334,7 +2335,7 @@ class Interpreter<R> {
       else value.replaceAll(pattern.regex, collect)
     } else {
       if (typeof pattern !== "string") {
-        throw new InterpreterRuntimeError(`String.${name} expects argument 1 to be a string.`, node)
+        throw new InterpreterRuntimeError(t("codemode.runtime.67", { name }), node)
       }
       if (name === "replace") value.replace(pattern, collect)
       else value.replaceAll(pattern, collect)
@@ -2367,7 +2368,7 @@ class Interpreter<R> {
       !(callback instanceof CoercionFunction) &&
       !(callback instanceof UriFunction)
     ) {
-      throw new InterpreterRuntimeError(`${name} expects a function callback.`, node)
+      throw new InterpreterRuntimeError(t("codemode.runtime.68", { name }), node)
     }
     return (callbackArgs) =>
       callback instanceof CoercionFunction
@@ -2415,7 +2416,7 @@ class Interpreter<R> {
         })
       }
       default:
-        throw new InterpreterRuntimeError(`Map method '${name}' is not available in CodeMode.`, node)
+        throw new InterpreterRuntimeError(t("codemode.runtime.69", { name }), node)
     }
   }
 
@@ -2453,7 +2454,7 @@ class Interpreter<R> {
         })
       }
       default:
-        throw new InterpreterRuntimeError(`Set method '${name}' is not available in CodeMode.`, node)
+        throw new InterpreterRuntimeError(t("codemode.runtime.70", { name }), node)
     }
   }
 
@@ -2467,7 +2468,7 @@ class Interpreter<R> {
     const requireArgs = (count: number): void => {
       if (args.length < count) {
         throw new InterpreterRuntimeError(
-          `URLSearchParams.${name} requires ${count} argument${count === 1 ? "" : "s"}.`,
+          t("codemode.runtime.71", { name, count, plural: count === 1 ? "" : "s" }),
           node,
         ).as("TypeError")
       }
@@ -2528,7 +2529,7 @@ class Interpreter<R> {
         })
       }
       default:
-        throw new InterpreterRuntimeError(`URLSearchParams method '${name}' is not available in CodeMode.`, node)
+        throw new InterpreterRuntimeError(t("codemode.runtime.72", { name }), node)
     }
   }
 
@@ -2541,13 +2542,13 @@ class Interpreter<R> {
     const optNumber = (value: unknown, label: string): number | undefined => {
       if (value === undefined) return undefined
       if (typeof value !== "number")
-        throw new InterpreterRuntimeError(`Array.${name} expects ${label} to be a number.`, node)
+        throw new InterpreterRuntimeError(t("codemode.runtime.73", { name, label }), node)
       return value
     }
     switch (name) {
       case "join": {
         if (args.length > 1 || (args.length === 1 && typeof args[0] !== "string")) {
-          throw new InterpreterRuntimeError("Array.join expects zero arguments or one string separator.", node)
+          throw new InterpreterRuntimeError(t("codemode.runtime.74"), node)
         }
         const input = boundedData(target, "Array.join input") as Array<unknown>
         return Effect.succeed(
@@ -2556,7 +2557,7 @@ class Interpreter<R> {
       }
       case "includes":
         if (args.length === 0 || args.length > 2)
-          throw new InterpreterRuntimeError("Array.includes expects a value and optional start index.", node)
+          throw new InterpreterRuntimeError(t("codemode.runtime.75"), node)
         return Effect.succeed(target.includes(args[0], optNumber(args[1], "start index")))
       case "indexOf":
         return Effect.succeed(target.indexOf(args[0], optNumber(args[1], "start index")))
@@ -2585,7 +2586,7 @@ class Interpreter<R> {
         const index = optNumber(args[0], "index") ?? 0
         const resolved = index < 0 ? target.length + index : index
         if (resolved < 0 || resolved >= target.length) {
-          throw new InterpreterRuntimeError("Array.with index is out of range.", node)
+          throw new InterpreterRuntimeError(t("codemode.runtime.76"), node)
         }
         const copied = [...target]
         copied[resolved] = args[1]
@@ -2646,7 +2647,7 @@ class Interpreter<R> {
       !(callback instanceof CoercionFunction) &&
       !(callback instanceof UriFunction)
     ) {
-      throw new InterpreterRuntimeError(`Array.${name} expects a function callback.`, node)
+      throw new InterpreterRuntimeError(t("codemode.runtime.77", { name }), node)
     }
     const self = this
     // Accept a user function or supported builtin callable, so idioms such as
@@ -2715,7 +2716,7 @@ class Interpreter<R> {
             start = 0
           } else {
             if (items.length === 0)
-              throw new InterpreterRuntimeError("Array.reduce of an empty array with no initial value.", node)
+              throw new InterpreterRuntimeError(t("codemode.runtime.78"), node)
             accumulator = items[0]
             start = 1
           }
@@ -2732,7 +2733,7 @@ class Interpreter<R> {
             start = items.length - 1
           } else {
             if (items.length === 0)
-              throw new InterpreterRuntimeError("Array.reduceRight of an empty array with no initial value.", node)
+              throw new InterpreterRuntimeError(t("codemode.runtime.79"), node)
             accumulator = items[items.length - 1]
             start = items.length - 2
           }
@@ -2752,7 +2753,7 @@ class Interpreter<R> {
           }
           return -1
       }
-      throw new InterpreterRuntimeError(`Array method '${name}' is not available in CodeMode.`, node)
+      throw new InterpreterRuntimeError(t("codemode.runtime.80", { name }), node)
     })
   }
 
@@ -2762,7 +2763,7 @@ class Interpreter<R> {
     node: AstNode,
   ): Effect.Effect<Array<unknown>, unknown, R> {
     if (comparator !== undefined && !(comparator instanceof CodeModeFunction)) {
-      throw new InterpreterRuntimeError("Array.sort expects an arrow function comparator.", node)
+      throw new InterpreterRuntimeError(t("codemode.runtime.81"), node)
     }
     if (!(comparator instanceof CodeModeFunction)) {
       return Effect.sync(() =>
@@ -2815,25 +2816,25 @@ class Interpreter<R> {
           if (spread === null || spread === undefined || isSandboxValue(spread)) continue
           if (typeof spread !== "object" || Array.isArray(spread) || isRuntimeReference(spread)) {
             throw new InterpreterRuntimeError(
-              "Object spread requires a data object in CodeMode.",
+              t("codemode.runtime.82"),
               property,
               "InvalidDataValue",
             )
           }
           for (const [key, value] of Object.entries(spread)) {
             if (isBlockedMember(key))
-              throw new InterpreterRuntimeError(`Property '${key}' is not available in CodeMode.`, property)
+              throw new InterpreterRuntimeError(t("codemode.runtime.34", { key }), property)
             objectValue[key] = value
           }
           continue
         }
 
         if (property.type !== "Property") {
-          throw new InterpreterRuntimeError("Only standard object properties are supported.", property)
+          throw new InterpreterRuntimeError(t("codemode.runtime.84"), property)
         }
 
         if (getString(property, "kind") !== "init") {
-          throw new InterpreterRuntimeError("Only init object properties are supported.", property)
+          throw new InterpreterRuntimeError(t("codemode.runtime.85"), property)
         }
 
         const keyNode = getNode(property, "key")
@@ -2849,11 +2850,11 @@ class Interpreter<R> {
         } else if (keyNode.type === "Literal") {
           key = self.toPropertyKey(keyNode.value, keyNode)
         } else {
-          throw new InterpreterRuntimeError("Unsupported object property key shape.", keyNode)
+          throw new InterpreterRuntimeError(t("codemode.runtime.86"), keyNode)
         }
 
         if (isBlockedMember(String(key))) {
-          throw new InterpreterRuntimeError(`Property '${String(key)}' is not available in CodeMode.`, keyNode)
+          throw new InterpreterRuntimeError(t("codemode.runtime.87", { key }), keyNode)
         }
         objectValue[String(key)] = yield* self.evaluateExpression(valueNode)
       }
@@ -2879,7 +2880,7 @@ class Interpreter<R> {
           const items = spreadItems(spread)
           if (items === undefined)
             throw new InterpreterRuntimeError(
-              "Array spread requires an array, string, Map, or Set in CodeMode.",
+              t("codemode.runtime.88"),
               element,
             )
           values.push(...items)
@@ -2904,7 +2905,7 @@ class Interpreter<R> {
         const rawValue = quasi.value
 
         if (!isRecord(rawValue) || typeof rawValue.cooked !== "string") {
-          throw new InterpreterRuntimeError("Invalid template literal quasi.", quasi)
+          throw new InterpreterRuntimeError(t("codemode.runtime.89"), quasi)
         }
 
         output += rawValue.cooked
@@ -2933,7 +2934,7 @@ class Interpreter<R> {
     // Only the arithmetic/bitwise operators are compoundable; logical assignments (&&=/||=/??=)
     // short-circuit and are handled by evaluateLogicalAssignment before reaching here.
     if (!compoundOperators.has(operator)) {
-      throw new InterpreterRuntimeError(`Unsupported assignment operator '${operator}'.`, node)
+      throw new InterpreterRuntimeError(t("codemode.runtime.90", { operator }), node)
     }
     return this.applyBinaryOperator(operator.slice(0, -1), current, incoming, node)
   }
@@ -2970,7 +2971,7 @@ class Interpreter<R> {
 
       if (objectValue instanceof ToolReference) {
         if (typeof key !== "string" || isBlockedMember(key)) {
-          throw new InterpreterRuntimeError("Tool paths must use safe string property names.", propertyNode)
+          throw new InterpreterRuntimeError(t("codemode.runtime.91"), propertyNode)
         }
         return new ToolReference([...objectValue.path, key])
       }
@@ -2980,7 +2981,7 @@ class Interpreter<R> {
           return new PromiseMethodReference(key as PromiseMethodName)
         }
         throw new InterpreterRuntimeError(
-          `Promise.${String(key)} is not available in CodeMode. Available: Promise.all, Promise.allSettled, Promise.race, Promise.resolve, and Promise.reject; consume promises with await.`,
+          t("codemode.runtime.92", { key }),
           propertyNode,
         )
       }
@@ -2988,7 +2989,7 @@ class Interpreter<R> {
       if (objectValue instanceof GlobalNamespace) {
         if (typeof key !== "string" || isBlockedMember(key)) {
           throw new InterpreterRuntimeError(
-            `${objectValue.name}.${String(key)} is not available in CodeMode.`,
+            t("codemode.runtime.93", { name: objectValue.name, key }),
             propertyNode,
           )
         }
@@ -3070,14 +3071,14 @@ class Interpreter<R> {
       if (objectValue instanceof SandboxPromise) {
         if (key === "then" || key === "catch" || key === "finally") {
           throw new InterpreterRuntimeError(
-            `Promise.prototype.${String(key)} is not supported in CodeMode; use await instead (with try/catch to handle failures) - e.g. \`const result = await tools.ns.tool(...)\`.`,
+            t("codemode.runtime.94", { key }),
             propertyNode,
             "UnsupportedSyntax",
             [supportedSyntaxMessage],
           )
         }
         throw new InterpreterRuntimeError(
-          "This value is an un-awaited Promise and has no readable properties; await it first - e.g. `const result = await tools.ns.tool(...)`.",
+          t("codemode.runtime.95"),
           objectNode,
           "InvalidDataValue",
         )
@@ -3085,18 +3086,18 @@ class Interpreter<R> {
 
       if (isRuntimeReference(objectValue)) {
         throw new InterpreterRuntimeError(
-          "CodeMode runtime references are opaque and do not expose properties.",
+          t("codemode.runtime.96"),
           objectNode,
           "InvalidDataValue",
         )
       }
 
       if (typeof objectValue !== "object" || objectValue === null) {
-        throw new InterpreterRuntimeError("Cannot access a property on a non-object value.", objectNode)
+        throw new InterpreterRuntimeError(t("codemode.runtime.97"), objectNode)
       }
 
       if (typeof key === "string" && isBlockedMember(key)) {
-        throw new InterpreterRuntimeError(`Property '${key}' is not available in CodeMode.`, propertyNode)
+        throw new InterpreterRuntimeError(t("codemode.runtime.34", { key }), propertyNode)
       }
 
       if (Array.isArray(objectValue)) {
@@ -3170,13 +3171,13 @@ class Interpreter<R> {
         reference instanceof IntrinsicReference ||
         reference instanceof GlobalMethodReference
       ) {
-        throw new InterpreterRuntimeError("Only data fields may be assigned in CodeMode.", node)
+        throw new InterpreterRuntimeError(t("codemode.runtime.99"), node)
       }
       if (Array.isArray(reference.target)) {
         if (reference.key === "length")
-          throw new InterpreterRuntimeError("Array length cannot be assigned in CodeMode.", node)
+          throw new InterpreterRuntimeError(t("codemode.runtime.100"), node)
         if (typeof reference.key === "string" && arrayMethods.has(reference.key)) {
-          throw new InterpreterRuntimeError("Array methods cannot be assigned in CodeMode.", node)
+          throw new InterpreterRuntimeError(t("codemode.runtime.101"), node)
         }
       }
       const key = Array.isArray(reference.target) ? Number(reference.key) : String(reference.key)
@@ -3200,7 +3201,7 @@ class Interpreter<R> {
     seen = new Set<object>(),
   ): void {
     if (value === container)
-      throw new InterpreterRuntimeError(`${label} contains a circular value.`, node, "InvalidDataValue")
+      throw new InterpreterRuntimeError(t("codemode.runtime.102", { label }), node, "InvalidDataValue")
     if (value === null || typeof value !== "object" || isRuntimeReference(value) || seen.has(value)) return
     seen.add(value)
     const items = Array.isArray(value) ? value : Object.values(value)
@@ -3214,7 +3215,7 @@ class Interpreter<R> {
       const index = key as number
       if (!Number.isInteger(index) || index < 0) {
         throw new InterpreterRuntimeError(
-          "Array assignment index must be a non-negative integer.",
+          t("codemode.runtime.103"),
           node,
           "InvalidDataValue",
         )
@@ -3226,7 +3227,7 @@ class Interpreter<R> {
     if (reference.target instanceof SandboxURL) {
       const property = key as string
       if (!urlWritableProperties.has(property)) {
-        throw new InterpreterRuntimeError(`URL.${property} is read-only.`, node).as("TypeError")
+        throw new InterpreterRuntimeError(t("codemode.runtime.104", { property }), node).as("TypeError")
       }
       try {
         const url = reference.target.url as unknown as Record<string, string>
@@ -3234,7 +3235,7 @@ class Interpreter<R> {
         return
       } catch (error) {
         if (error instanceof InterpreterRuntimeError || error instanceof ToolRuntimeError) throw error
-        throw new InterpreterRuntimeError(`URL.${property} received an invalid value.`, node).as("TypeError")
+        throw new InterpreterRuntimeError(t("codemode.runtime.105", { property }), node).as("TypeError")
       }
     }
     const target = reference.target as SafeObject
@@ -3248,7 +3249,7 @@ class Interpreter<R> {
       return value
     }
 
-    throw new InterpreterRuntimeError("Property key must be a string or number.", node)
+    throw new InterpreterRuntimeError(t("codemode.runtime.106"), node)
   }
 
   private declare(name: string, value: unknown, mutable: boolean, node: AstNode): void {
@@ -3258,7 +3259,7 @@ class Interpreter<R> {
     // anything else already present is a genuine duplicate declaration.
     const existing = scope.get(name)
     if (existing && existing.initialized !== false) {
-      throw new InterpreterRuntimeError(`Identifier '${name}' has already been declared.`, node)
+      throw new InterpreterRuntimeError(t("codemode.runtime.107", { name }), node)
     }
 
     scope.set(name, { mutable, value, initialized: true })
@@ -3268,12 +3269,12 @@ class Interpreter<R> {
     const binding = this.resolveBinding(name)
 
     if (!binding) {
-      throw new InterpreterRuntimeError(`Unknown identifier '${name}'.`, node).as("ReferenceError")
+      throw new InterpreterRuntimeError(t("codemode.runtime.108", { name }), node).as("ReferenceError")
     }
 
     // A parameter default that forward-references a later (not-yet-bound) parameter - JS TDZ.
     if (binding.initialized === false) {
-      throw new InterpreterRuntimeError(`Cannot access '${name}' before initialization.`, node).as("ReferenceError")
+      throw new InterpreterRuntimeError(t("codemode.runtime.109", { name }), node).as("ReferenceError")
     }
 
     return binding.value
@@ -3283,11 +3284,11 @@ class Interpreter<R> {
     const binding = this.resolveBinding(name)
 
     if (!binding) {
-      throw new InterpreterRuntimeError(`Unknown identifier '${name}'.`, node).as("ReferenceError")
+      throw new InterpreterRuntimeError(t("codemode.runtime.108", { name }), node).as("ReferenceError")
     }
 
     if (!binding.mutable) {
-      throw new InterpreterRuntimeError(`Cannot assign to constant '${name}'.`, node).as("TypeError")
+      throw new InterpreterRuntimeError(t("codemode.runtime.111", { name }), node).as("TypeError")
     }
 
     binding.value = value
@@ -3311,7 +3312,7 @@ class Interpreter<R> {
     const scope = this.scopes[this.scopes.length - 1]
 
     if (!scope) {
-      throw new InterpreterRuntimeError("Interpreter scope stack is empty.")
+      throw new InterpreterRuntimeError(t("codemode.runtime.112"))
     }
 
     return scope
@@ -3358,7 +3359,7 @@ export const executeWithLimits = <const Tools extends Record<string, unknown>>(
   if (options.code.trim().length === 0) {
     return Effect.succeed({
       ok: false,
-      error: { kind: "ParseError", message: "Code cannot be empty." },
+      error: { kind: "ParseError", message: t("codemode.runtime.code_empty") },
       toolCalls: tools.calls,
     })
   }

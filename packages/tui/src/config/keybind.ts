@@ -1,3 +1,4 @@
+import { t } from "../i18n/t"
 export * as TuiKeybind from "./keybind"
 
 import type { KeyEvent, Renderable } from "@opentui/core"
@@ -250,7 +251,7 @@ export const KeybindOverrides = Schema.Struct(
       Schema.optional(BindingValueSchema).annotate({ description: item.description }),
     ]),
   ),
-).annotate({ description: "TUI keybinding overrides" })
+).annotate({ description: t("tui.keybind.tui-keybinding-overrides") })
 export const Descriptions = Object.fromEntries(
   Object.entries(Definitions).map(([name, item]) => [name, item.description]),
 ) as Record<KeybindName, string>

@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import type { ChildProcessWithoutNullStreams } from "child_process"
 import { Process } from "@/util/process"
 
@@ -15,7 +16,7 @@ export function spawn(cmd: string, argsOrOpts?: string[] | Process.Options, opts
     stderr: "pipe",
   }) as Child
 
-  if (!proc.stdin || !proc.stdout || !proc.stderr) throw new Error("Process output not available")
+  if (!proc.stdin || !proc.stdout || !proc.stderr) throw new Error(t("cli.launch.process-output-not-available"))
 
   return proc
 }

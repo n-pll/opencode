@@ -24,14 +24,17 @@ export const toHostRegex = (arg: unknown, method: string, node: AstNode, extraFl
     try {
       return new RegExp(arg, extraFlags)
     } catch (error) {
+      const received = JSON.stringify(arg)
+      const failureReason = regexFailureReason(error)
       throw new InterpreterRuntimeError(
-        `String.${method} received the string ${JSON.stringify(arg)}, which is not a valid regular expression pattern (${regexFailureReason(error)}). ${escapeRegexHint}`,
+        t("codemode.regexp.0", { method, arg: received, reason: failureReason, hint: escapeRegexHint }),
         node,
       ).as("SyntaxError")
     }
   }
+  const argType = arg === null ? "null" : typeof arg
   throw new InterpreterRuntimeError(
-    `String.${method} expects a regular expression (a /pattern/flags literal or new RegExp(...)) or a string pattern, not ${arg === null ? "null" : typeof arg}.`,
+    t("codemode.regexp.1", { method, arg: argType }),
     node,
   )
 }
@@ -65,10 +68,11 @@ export const invokeRegExpMethod = (
     case "toString":
       return coerceToString(value)
     default:
-      throw new InterpreterRuntimeError(`RegExp method '${name}' is not available in CodeMode.`, node)
+      throw new InterpreterRuntimeError(t("codemode.regexp.2", { name }), node)
   }
 }
 import { type AstNode, InterpreterRuntimeError } from "../interpreter/model.js"
 import { isBlockedMember, type SafeObject } from "../tool-runtime.js"
 import { SandboxRegExp } from "../values.js"
 import { coerceToString } from "./value.js"
+import { t } from "../i18n"

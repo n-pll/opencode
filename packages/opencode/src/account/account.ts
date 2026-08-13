@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { LayerNode } from "@opencode-ai/core/effect/layer-node"
 import { httpClient } from "@opencode-ai/core/effect/app-node-platform"
 import { Cache, Clock, Duration, Effect, Layer, Option, Schema, SchemaGetter, Context } from "effect"
@@ -230,7 +231,7 @@ const layer: Layer.Layer<Service, never, AccountRepo.Service | HttpClient.HttpCl
       )
 
       const parsed = yield* HttpClientResponse.schemaBodyJson(TokenRefresh)(response).pipe(
-        mapAccountServiceError("Failed to decode response"),
+        mapAccountServiceError(t("cli.account.failed-to-decode-response")),
       )
 
       const expiry = Option.some(now + Duration.toMillis(parsed.expires_in))
@@ -251,7 +252,7 @@ const layer: Layer.Layer<Service, never, AccountRepo.Service | HttpClient.HttpCl
       lookup: Effect.fnUntraced(function* (accountID) {
         const maybeAccount = yield* repo.getRow(accountID)
         if (Option.isNone(maybeAccount)) {
-          return yield* Effect.fail(new AccountServiceError({ message: "Account not found during token refresh" }))
+          return yield* Effect.fail(new AccountServiceError({ message: t("cli.account.account-not-found-during-token-refresh") }))
         }
 
         const account = maybeAccount.value
@@ -291,7 +292,7 @@ const layer: Layer.Layer<Service, never, AccountRepo.Service | HttpClient.HttpCl
       )
 
       return yield* HttpClientResponse.schemaBodyJson(Schema.Array(Org))(response).pipe(
-        mapAccountServiceError("Failed to decode response"),
+        mapAccountServiceError(t("cli.account.failed-to-decode-response")),
       )
     })
 
@@ -304,7 +305,7 @@ const layer: Layer.Layer<Service, never, AccountRepo.Service | HttpClient.HttpCl
       )
 
       return yield* HttpClientResponse.schemaBodyJson(User)(response).pipe(
-        mapAccountServiceError("Failed to decode response"),
+        mapAccountServiceError(t("cli.account.failed-to-decode-response")),
       )
     })
 
@@ -379,7 +380,7 @@ const layer: Layer.Layer<Service, never, AccountRepo.Service | HttpClient.HttpCl
       const ok = yield* HttpClientResponse.filterStatusOk(response).pipe(mapAccountServiceError())
 
       const parsed = yield* HttpClientResponse.schemaBodyJson(RemoteConfig)(ok).pipe(
-        mapAccountServiceError("Failed to decode response"),
+        mapAccountServiceError(t("cli.account.failed-to-decode-response")),
       )
       return Option.some(parsed.config)
     })
@@ -394,7 +395,7 @@ const layer: Layer.Layer<Service, never, AccountRepo.Service | HttpClient.HttpCl
       )
 
       const parsed = yield* HttpClientResponse.schemaBodyJson(DeviceAuth)(response).pipe(
-        mapAccountServiceError("Failed to decode response"),
+        mapAccountServiceError(t("cli.account.failed-to-decode-response")),
       )
       return new Login({
         code: parsed.device_code,
@@ -421,7 +422,7 @@ const layer: Layer.Layer<Service, never, AccountRepo.Service | HttpClient.HttpCl
       )
 
       const parsed = yield* HttpClientResponse.schemaBodyJson(DeviceToken)(response).pipe(
-        mapAccountServiceError("Failed to decode response"),
+        mapAccountServiceError(t("cli.account.failed-to-decode-response")),
       )
 
       if (parsed instanceof DeviceTokenError) return parsed.toPollResult()

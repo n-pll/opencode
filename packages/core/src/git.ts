@@ -10,6 +10,7 @@ import { AppProcess } from "./process"
 import { makeGlobalNode } from "./effect/app-node"
 import { File } from "./file"
 import { KeyedMutex } from "./effect/keyed-mutex"
+import { t } from "./i18n"
 
 export class Repository extends Schema.Class<Repository>("Git.Repository")({
   worktree: AbsolutePath,
@@ -278,7 +279,7 @@ const layer = Layer.effect(
       return yield* new OperationError({
         operation: "clone",
         directory: input.directory,
-        message: "Cloned repository could not be opened",
+        message: t("core.config.cloned_repository_could_not_be_opened"),
       })
     })
 
@@ -367,7 +368,7 @@ const layer = Layer.effect(
             new OperationError({
               operation: "create",
               directory: input.gitDirectory,
-              message: "Failed to create Git storage",
+              message: t("core.config.failed_to_create_git_storage"),
               cause,
             }),
         ),
@@ -399,7 +400,7 @@ const layer = Layer.effect(
             new OperationError({
               operation: "create",
               directory: input.gitDirectory,
-              message: "Failed to configure shared Git objects",
+              message: t("core.config.failed_to_configure_shared_git_objects"),
               cause,
             }),
         ),
@@ -415,7 +416,7 @@ const layer = Layer.effect(
               new OperationError({
                 operation: "create",
                 directory: input.gitDirectory,
-                message: "Failed to configure shared Git objects",
+                message: t("core.config.failed_to_configure_shared_git_objects"),
                 cause,
               }),
           ),
@@ -891,7 +892,7 @@ const layer = Layer.effect(
       return yield* new WorktreeError({
         operation: "create",
         directory: input.directory,
-        message: "Created worktree could not be opened",
+        message: t("core.config.created_worktree_could_not_be_opened"),
       })
     })
 

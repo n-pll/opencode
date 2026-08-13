@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import type { Plugin } from "@opencode-ai/plugin"
 import { rename, writeFile } from "node:fs/promises"
 import { randomInt } from "node:crypto"
@@ -46,7 +47,7 @@ async function writeDebugData(port: number, id: string, env: Record<string, stri
 export const DebugWorkspacePlugin: Plugin = async ({ experimental_workspace }) => {
   experimental_workspace.register("debug", {
     name: "Debug",
-    description: "Create a debugging server",
+    description: t("cli.debug_workspace_plugin.create-a-debugging-server"),
     configure(config) {
       return config
     },

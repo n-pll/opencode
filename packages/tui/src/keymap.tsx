@@ -16,7 +16,7 @@ import { KeymapProvider, useKeymap, useKeymapSelector, useBindings } from "@open
 import { createMemo, type Accessor } from "solid-js"
 import { useTuiConfig } from "./config"
 import { TuiKeybind, resolveCommandDescription } from "./config/keybind"
-import { useLanguage } from "./context/language"
+import { t } from "./i18n/t"
 
 export const LEADER_TOKEN = "leader"
 export const OPENCODE_BASE_MODE = "base"
@@ -106,7 +106,7 @@ export function useOpencodeModeStack() {
 
 export function getOpencodeModeStack(keymap: OpenTuiKeymap) {
   const value = modeStacks.get(keymap)
-  if (!value) throw new Error("Opencode mode stack is not registered for this keymap")
+  if (!value) throw new Error(t("tui.keymap.opencode-mode-stack-is-not-registered-for-this-keymap"))
   return value
 }
 
@@ -260,7 +260,6 @@ export function useCommandShortcut(command: string): Accessor<string> {
 
 export function useCommandSlashes(): Accessor<readonly CommandSlashEntry[]> {
   const keymap = useOpencodeKeymap()
-  const { t } = useLanguage()
   const entries = useKeymapSelector((keymap: OpenTuiKeymap) =>
     keymap.getCommandEntries({
       visibility: "reachable",

@@ -11,6 +11,7 @@ import { HttpRouter } from "effect/unstable/http"
 import { HttpApiMiddleware } from "effect/unstable/httpapi"
 import { InvalidRequestError, SessionNotFoundError } from "@opencode-ai/protocol/errors"
 import type { LocationServices } from "../location"
+import { t } from "../i18n"
 
 export class SessionLocationMiddleware extends HttpApiMiddleware.Service<
   SessionLocationMiddleware,
@@ -34,7 +35,7 @@ export const sessionLocationLayer = Layer.effect(
           Effect.mapError(
             () =>
               new InvalidRequestError({
-                message: "Invalid session ID",
+                message: t("server.error.invalid_session_id"),
                 field: "sessionID",
               }),
           ),

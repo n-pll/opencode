@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import type { Hooks, PluginInput } from "@opencode-ai/plugin"
 import { OAUTH_DUMMY_KEY } from "../auth"
 import { InstallationVersion } from "@opencode-ai/core/installation/version"
@@ -304,7 +305,7 @@ export async function XaiAuthPlugin(input: PluginInput, options: XaiAuthPluginOp
           // user's browser. Defends the only attack surface (the polling
           // loop) with the standard authorization_pending / slow_down
           // backoff and a hard deadline from xAI's `expires_in`.
-          label: "SuperGrok Subscription",
+          label: t("cli.xai.supergrok-subscription"),
           type: "oauth",
           authorize: async () => {
             const device = await requestDeviceCode(options)
@@ -330,7 +331,7 @@ export async function XaiAuthPlugin(input: PluginInput, options: XaiAuthPluginOp
           },
         },
         {
-          label: "Manually enter API Key",
+          label: t("cli.xai.manually-enter-api-key"),
           type: "api",
         },
       ],

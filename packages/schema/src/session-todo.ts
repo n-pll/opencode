@@ -3,14 +3,15 @@ export * as SessionTodo from "./session-todo"
 import { Schema } from "effect"
 import { define, inventory } from "./event"
 import { SessionID } from "./session-id"
+import { t } from "./i18n"
 
 export const Info = Schema.Struct({
-  content: Schema.String.annotate({ description: "Brief description of the task" }),
+  content: Schema.String.annotate({ description: t("schema.session_todo.content") }),
   status: Schema.String.annotate({
-    description: "Current status of the task: pending, in_progress, completed, cancelled",
+    description: t("schema.session_todo.status"),
   }),
   priority: Schema.String.annotate({
-    description: "Priority level of the task: high, medium, low",
+    description: t("schema.session_todo.priority"),
   }),
 }).annotate({ identifier: "Todo" })
 export interface Info extends Schema.Schema.Type<typeof Info> {}

@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { Effect, Schema } from "effect"
 import * as Tool from "./tool"
 import path from "path"
@@ -21,8 +22,8 @@ const operations = [
 ] as const
 
 export const Parameters = Schema.Struct({
-  operation: Schema.Literals(operations).annotate({ description: "The LSP operation to perform" }),
-  filePath: Schema.String.annotate({ description: "The absolute or relative path to the file" }),
+  operation: Schema.Literals(operations).annotate({ description: t("cli.lsp.the-lsp-operation-to-perform") }),
+  filePath: Schema.String.annotate({ description: t("cli.lsp.the-absolute-or-relative-path-to-the-file") }),
   line: Schema.Int.check(Schema.isGreaterThanOrEqualTo(1)).annotate({
     description: "The line number (1-based, as shown in editors)",
   }),
@@ -30,7 +31,7 @@ export const Parameters = Schema.Struct({
     description: "The character offset (1-based, as shown in editors)",
   }),
   query: Schema.optional(Schema.String).annotate({
-    description: "Search query for workspaceSymbol. Empty string requests all symbols.",
+    description: t("cli.lsp.search-query-for-workspacesymbol-empty-string-requests-all-s"),
   }),
 })
 
@@ -75,7 +76,7 @@ export const LspTool = Tool.define(
           if (!exists) throw new Error(`File not found: ${file}`)
 
           const available = yield* lsp.hasClients(file)
-          if (!available) throw new Error("No LSP server available for this file type.")
+          if (!available) throw new Error(t("cli.lsp.no-lsp-server-available-for-this-file-type"))
 
           yield* lsp.touchFile(file, "document")
 

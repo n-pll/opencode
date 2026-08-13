@@ -10,6 +10,7 @@ import { Location } from "./location"
 import { makeGlobalNode } from "./effect/app-node"
 import { isDeepStrictEqual } from "node:util"
 import { Durable } from "@opencode-ai/schema/durable-event-manifest"
+import { t } from "./i18n"
 
 export const ID = Event.ID
 export type ID = import("@opencode-ai/schema/event").ID
@@ -372,7 +373,7 @@ export const layerWith = (options?: LayerOptions) =>
             return yield* Effect.die(
               new InvalidDurableEventError({
                 type: event.type,
-                message: "Local commit hooks require a durable event",
+                message: t("core.config.local_commit_hooks_require_a_durable_event"),
               }),
             )
           if (definition?.durable) {
@@ -488,7 +489,7 @@ export const layerWith = (options?: LayerOptions) =>
             yield* Effect.die(
               new InvalidDurableEventError({
                 type: events[0]?.type ?? "unknown",
-                message: "Replay events must belong to the same aggregate",
+                message: t("core.config.replay_events_must_belong_to_the_same_aggregate"),
               }),
             )
           }

@@ -34,7 +34,7 @@ export const invokeDateStatic = (name: string, args: Array<unknown>, node: AstNo
     case "UTC":
       return Date.UTC(...(args.map((arg) => coerceToNumber(arg)) as Parameters<typeof Date.UTC>))
     default:
-      throw new InterpreterRuntimeError(`Date.${name} is not available in CodeMode.`, node)
+      throw new InterpreterRuntimeError(t("codemode.date.0", { name }), node)
   }
 }
 
@@ -45,7 +45,7 @@ export const invokeDateMethod = (value: SandboxDate, name: string, node: AstNode
     case "valueOf":
       return value.time
     case "toISOString":
-      if (!Number.isFinite(value.time)) throw new InterpreterRuntimeError("Invalid time value.", node)
+      if (!Number.isFinite(value.time)) throw new InterpreterRuntimeError(t("codemode.date.1"), node)
       return hosted.toISOString()
     case "toJSON":
       return Number.isFinite(value.time) ? hosted.toISOString() : null
@@ -86,9 +86,10 @@ export const invokeDateMethod = (value: SandboxDate, name: string, node: AstNode
     case "getTimezoneOffset":
       return hosted.getTimezoneOffset()
     default:
-      throw new InterpreterRuntimeError(`Date method '${name}' is not available in CodeMode.`, node)
+      throw new InterpreterRuntimeError(t("codemode.date.2", { name }), node)
   }
 }
 import { type AstNode, InterpreterRuntimeError } from "../interpreter/model.js"
 import { SandboxDate } from "../values.js"
 import { coerceToNumber, coerceToString } from "./value.js"
+import { t } from "../i18n"

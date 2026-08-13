@@ -1,10 +1,11 @@
+import { t } from "@/i18n"
 import { Effect, Schema } from "effect"
 import * as path from "path"
 import { FSUtil } from "@opencode-ai/core/fs-util"
 import * as Bom from "../util/bom"
 
 export const PatchSchema = Schema.Struct({
-  patchText: Schema.String.annotate({ description: "The full patch text that describes all changes to be made" }),
+  patchText: Schema.String.annotate({ description: t("cli.index.the-full-patch-text-that-describes-all-changes-to-be-made") }),
 })
 
 export type PatchParams = Schema.Schema.Type<typeof PatchSchema>
@@ -513,7 +514,7 @@ function generateUnifiedDiff(oldContent: string, newContent: string): string {
 // Apply hunks to filesystem
 export const applyHunksToFiles = Effect.fn("Patch.applyHunksToFiles")(function* (hunks: Hunk[]) {
   if (hunks.length === 0) {
-    return yield* Effect.fail(new Error("No files were modified."))
+    return yield* Effect.fail(new Error(t("cli.index.no-files-were-modified")))
   }
 
   const fs = yield* FSUtil.Service

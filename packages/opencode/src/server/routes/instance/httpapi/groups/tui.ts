@@ -7,6 +7,7 @@ import { InstanceContextMiddleware } from "../middleware/instance-context"
 import { WorkspaceRoutingMiddleware, WorkspaceRoutingQuery } from "../middleware/workspace-routing"
 import { ApiNotFoundError } from "../errors"
 import { described } from "./metadata"
+import { t } from "@/i18n"
 
 const root = "/tui"
 export const CommandPayload = Schema.Struct({ command: Schema.String })
@@ -61,8 +62,8 @@ export const TuiApi = HttpApi.make("tui")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "tui.appendPrompt",
-            summary: "Append TUI prompt",
-            description: "Append prompt to the TUI.",
+            summary: t("instance.tui.tui_appendPrompt.summary"),
+            description: t("instance.tui.tui_appendPrompt.description"),
           }),
         ),
         HttpApiEndpoint.post("openHelp", TuiPaths.openHelp, {
@@ -71,8 +72,8 @@ export const TuiApi = HttpApi.make("tui")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "tui.openHelp",
-            summary: "Open help dialog",
-            description: "Open the help dialog in the TUI to display user assistance information.",
+            summary: t("instance.tui.tui_openHelp.summary"),
+            description: t("instance.tui.tui_openHelp.description"),
           }),
         ),
         HttpApiEndpoint.post("openSessions", TuiPaths.openSessions, {
@@ -81,8 +82,8 @@ export const TuiApi = HttpApi.make("tui")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "tui.openSessions",
-            summary: "Open sessions dialog",
-            description: "Open the session dialog.",
+            summary: t("instance.tui.tui_openSessions.summary"),
+            description: t("instance.tui.tui_openSessions.description"),
           }),
         ),
         HttpApiEndpoint.post("openThemes", TuiPaths.openThemes, {
@@ -91,8 +92,8 @@ export const TuiApi = HttpApi.make("tui")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "tui.openThemes",
-            summary: "Open themes dialog",
-            description: "Open the theme dialog.",
+            summary: t("instance.tui.tui_openThemes.summary"),
+            description: t("instance.tui.tui_openThemes.description"),
           }),
         ),
         HttpApiEndpoint.post("openModels", TuiPaths.openModels, {
@@ -101,8 +102,8 @@ export const TuiApi = HttpApi.make("tui")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "tui.openModels",
-            summary: "Open models dialog",
-            description: "Open the model dialog.",
+            summary: t("instance.tui.tui_openModels.summary"),
+            description: t("instance.tui.tui_openModels.description"),
           }),
         ),
         HttpApiEndpoint.post("submitPrompt", TuiPaths.submitPrompt, {
@@ -111,8 +112,8 @@ export const TuiApi = HttpApi.make("tui")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "tui.submitPrompt",
-            summary: "Submit TUI prompt",
-            description: "Submit the prompt.",
+            summary: t("instance.tui.tui_submitPrompt.summary"),
+            description: t("instance.tui.tui_submitPrompt.description"),
           }),
         ),
         HttpApiEndpoint.post("clearPrompt", TuiPaths.clearPrompt, {
@@ -121,8 +122,8 @@ export const TuiApi = HttpApi.make("tui")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "tui.clearPrompt",
-            summary: "Clear TUI prompt",
-            description: "Clear the prompt.",
+            summary: t("instance.tui.tui_clearPrompt.summary"),
+            description: t("instance.tui.tui_clearPrompt.description"),
           }),
         ),
         HttpApiEndpoint.post("executeCommand", TuiPaths.executeCommand, {
@@ -133,8 +134,8 @@ export const TuiApi = HttpApi.make("tui")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "tui.executeCommand",
-            summary: "Execute TUI command",
-            description: "Execute a TUI command.",
+            summary: t("instance.tui.tui_executeCommand.summary"),
+            description: t("instance.tui.tui_executeCommand.description"),
           }),
         ),
         HttpApiEndpoint.post("showToast", TuiPaths.showToast, {
@@ -144,8 +145,8 @@ export const TuiApi = HttpApi.make("tui")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "tui.showToast",
-            summary: "Show TUI toast",
-            description: "Show a toast notification in the TUI.",
+            summary: t("instance.tui.tui_showToast.summary"),
+            description: t("instance.tui.tui_showToast.description"),
           }),
         ),
         HttpApiEndpoint.post("publish", TuiPaths.publish, {
@@ -156,8 +157,8 @@ export const TuiApi = HttpApi.make("tui")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "tui.publish",
-            summary: "Publish TUI event",
-            description: "Publish a TUI event.",
+            summary: t("instance.tui.tui_publish.summary"),
+            description: t("instance.tui.tui_publish.description"),
           }),
         ),
         HttpApiEndpoint.post("selectSession", TuiPaths.selectSession, {
@@ -168,8 +169,8 @@ export const TuiApi = HttpApi.make("tui")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "tui.selectSession",
-            summary: "Select session",
-            description: "Navigate the TUI to display the specified session.",
+            summary: t("instance.tui.tui_selectSession.summary"),
+            description: t("instance.tui.tui_selectSession.description"),
           }),
         ),
         HttpApiEndpoint.get("controlNext", TuiPaths.controlNext, {
@@ -178,8 +179,8 @@ export const TuiApi = HttpApi.make("tui")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "tui.control.next",
-            summary: "Get next TUI request",
-            description: "Retrieve the next TUI request from the queue for processing.",
+            summary: t("instance.tui.tui_control_next.summary"),
+            description: t("instance.tui.tui_control_next.description"),
           }),
         ),
         HttpApiEndpoint.post("controlResponse", TuiPaths.controlResponse, {
@@ -189,12 +190,12 @@ export const TuiApi = HttpApi.make("tui")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "tui.control.response",
-            summary: "Submit TUI response",
-            description: "Submit a response to the TUI request queue to complete a pending request.",
+            summary: t("instance.tui.tui_control_response.summary"),
+            description: t("instance.tui.tui_control_response.description"),
           }),
         ),
       )
-      .annotateMerge(OpenApi.annotations({ title: "tui", description: "Experimental HttpApi TUI routes." }))
+      .annotateMerge(OpenApi.annotations({ title: "tui", description: t("instance.tui.tui_0.description") }))
       .middleware(InstanceContextMiddleware)
       .middleware(WorkspaceRoutingMiddleware)
       .middleware(Authorization),
@@ -203,6 +204,6 @@ export const TuiApi = HttpApi.make("tui")
     OpenApi.annotations({
       title: "opencode experimental HttpApi",
       version: "0.0.1",
-      description: "Experimental HttpApi surface for selected instance routes.",
+      description: t("instance.config.config_1.description"),
     }),
   )

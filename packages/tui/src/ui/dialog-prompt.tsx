@@ -1,3 +1,4 @@
+import { useLanguage } from "../context/language"
 import { TextareaRenderable, TextAttributes } from "@opentui/core"
 import { useTheme } from "../context/theme"
 import { useDialog, type DialogContext } from "./dialog"
@@ -18,6 +19,7 @@ export type DialogPromptProps = {
 }
 
 export function DialogPrompt(props: DialogPromptProps) {
+  const { t } = useLanguage()
   const dialog = useDialog()
   const { theme } = useTheme()
   const tuiConfig = useTuiConfig()
@@ -38,7 +40,7 @@ export function DialogPrompt(props: DialogPromptProps) {
     commands: [
       {
         name: "dialog.prompt.submit",
-        title: "Submit dialog prompt",
+        title: t("tui.dialog_prompt.submit-dialog-prompt"),
         category: "Dialog",
         run: confirm,
       },

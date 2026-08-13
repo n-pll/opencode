@@ -1,3 +1,4 @@
+import { t } from "../../i18n"
 import { createServer } from "node:http"
 import type { IntegrationOAuthMethodRegistration } from "@opencode-ai/plugin/v2/effect/integration"
 import { define } from "@opencode-ai/plugin/v2/effect/plugin"
@@ -41,7 +42,7 @@ const browser = {
   method: {
     id: browserMethodID,
     type: "oauth",
-    label: "ChatGPT Pro/Plus (browser)",
+    label: t("core.openai.chatgpt-pro-plus-browser"),
   },
   authorize: () =>
     Effect.gen(function* () {
@@ -98,7 +99,7 @@ const headless = {
   method: {
     id: headlessMethodID,
     type: "oauth",
-    label: "ChatGPT Pro/Plus (headless)",
+    label: t("core.openai.chatgpt-pro-plus-headless"),
   },
   authorize: () =>
     Effect.gen(function* () {

@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/language"
 import { createStore } from "solid-js/store"
 import { createMemo, createSignal, For, onCleanup, onMount, Show } from "solid-js"
 import { useRenderer } from "@opentui/solid"
@@ -12,6 +13,7 @@ import { useBindings, useOpencodeModeStack } from "../../keymap"
 const QUESTION_MODE = "question"
 
 export function QuestionPrompt(props: { request: QuestionRequest; directory?: string }) {
+  const { t } = useLanguage()
   const sdk = useSDK()
   const { theme } = useTheme()
   const renderer = useRenderer()
@@ -136,7 +138,7 @@ export function QuestionPrompt(props: { request: QuestionRequest; directory?: st
     commands: [
       {
         name: "prompt.clear",
-        title: "Clear answer edit",
+        title: t("tui.question.clear-answer-edit"),
         category: "Question",
         run() {
           const text = textarea?.plainText ?? ""
@@ -217,7 +219,7 @@ export function QuestionPrompt(props: { request: QuestionRequest; directory?: st
       commands: [
         {
           name: "app.exit",
-          title: "Reject question",
+          title: t("tui.question.reject-question"),
           category: "Question",
           run() {
             reject()
@@ -250,7 +252,7 @@ export function QuestionPrompt(props: { request: QuestionRequest; directory?: st
         ...(confirm()
           ? [
               { key: "return", desc: "Submit answer", group: "Question", cmd: () => submit() },
-              { key: "escape", desc: "Reject question", group: "Question", cmd: () => reject() },
+              { key: "escape", desc: t("tui.question.reject-question"), group: "Question", cmd: () => reject() },
               ...tuiConfig.keybinds.get("app.exit"),
             ]
           : [
@@ -278,7 +280,7 @@ export function QuestionPrompt(props: { request: QuestionRequest; directory?: st
               { key: "down", desc: "Next answer", group: "Question", cmd: () => moveTo((store.selected + 1) % total) },
               { key: "j", desc: "Next answer", group: "Question", cmd: () => moveTo((store.selected + 1) % total) },
               { key: "return", desc: "Select answer", group: "Question", cmd: () => selectOption() },
-              { key: "escape", desc: "Reject question", group: "Question", cmd: () => reject() },
+              { key: "escape", desc: t("tui.question.reject-question"), group: "Question", cmd: () => reject() },
               ...tuiConfig.keybinds.get("app.exit"),
             ]),
       ],

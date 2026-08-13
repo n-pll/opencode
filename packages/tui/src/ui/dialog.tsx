@@ -1,3 +1,4 @@
+import { useLanguage } from "../context/language"
 import { useRenderer, useTerminalDimensions } from "@opentui/solid"
 import { batch, createContext, createEffect, onCleanup, Show, useContext, type JSX, type ParentProps } from "solid-js"
 import { useTheme } from "../context/theme"
@@ -180,6 +181,7 @@ export type DialogContext = ReturnType<typeof init>
 const ctx = createContext<DialogContext>()
 
 export function DialogProvider(props: ParentProps) {
+  const { t } = useLanguage()
   const value = init()
   const renderer = useRenderer()
   const toast = useToast()
@@ -189,7 +191,7 @@ export function DialogProvider(props: ParentProps) {
     const text = renderer.getSelection()?.getSelectedText()
     if (!text || !clipboard.write) return false
     void clipboard.write(text).then(
-      () => toast.show({ message: "Copied to clipboard", variant: "info" }),
+      () => toast.show({ message: t("tui.dialog.copied-to-clipboard"), variant: "info" }),
       (error) => toast.error(error),
     )
     renderer.clearSelection()

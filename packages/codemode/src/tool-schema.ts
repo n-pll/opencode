@@ -1,5 +1,6 @@
 import { JsonPointer, Schema } from "effect"
 import type { Definition, JsonSchema, SchemaType } from "./tool.js"
+import { t } from "./i18n"
 
 const isEffectSchema = (schema: SchemaType): schema is Schema.Decoder<unknown> & Schema.Top => Schema.isSchema(schema)
 

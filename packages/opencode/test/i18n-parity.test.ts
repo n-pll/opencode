@@ -10,6 +10,12 @@ const stripped = (value: string) => value.replace(/{{[^}]+}}/g, "")
 const isUrl = (value: string) => /^https?:\/\//i.test(value.trim())
 const isTranslatable = (value: string) => /[a-z]/i.test(stripped(value)) && !isUrl(value)
 
+// Aligns with the upstream translate-app findDrift placeholder check: the
+// sorted multiset of {{tokens}} must match exactly, so a translation can never
+// drop or rename a placeholder.
+const tokens = (value: string) =>
+  Array.from(value.matchAll(/{{\s*([^}]+?)\s*}}/g), (match) => match[1] ?? "").sort()
+
 describe("i18n parity", () => {
   test("zh translates every translatable en key", () => {
     const untranslated: string[] = []
@@ -21,6 +27,15 @@ describe("i18n parity", () => {
     // Allow a small number of intentionally-verbatim technical tokens.
     expect(untranslated.length <= 15).toBe(true)
     if (untranslated.length > 0) console.log("verbatim in zh:", untranslated.join(", "))
+  })
+
+  test("zh preserves the {{tokens}} of every en key", () => {
+    const mismatched: string[] = []
+    for (const key of Object.keys(en)) {
+      const zhValue = zh[key as keyof typeof zh]
+      if (zhValue !== undefined && tokens(en[key]).join() !== tokens(zhValue).join()) mismatched.push(key)
+    }
+    expect(mismatched).toEqual([])
   })
 
   test("zh does not define keys absent from en", () => {

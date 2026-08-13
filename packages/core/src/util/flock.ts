@@ -1,3 +1,4 @@
+import { t } from "../i18n"
 import path from "path"
 import os from "os"
 import { randomBytes, randomUUID } from "crypto"
@@ -17,7 +18,7 @@ export namespace Flock {
   }
 
   const root = () => {
-    if (!global) throw new Error("Flock global not set")
+    if (!global) throw new Error(t("core.flock.flock-global-not-set"))
     return path.join(global.state, "locks")
   }
 
@@ -212,12 +213,12 @@ export namespace Flock {
 
     await writeFile(heartbeatPath, "", { flag: "wx" }).catch(async () => {
       await rm(lockDir, { recursive: true, force: true })
-      throw new Error("Lock acquired but heartbeat already existed (possible compromise).")
+      throw new Error(t("core.flock.lock-acquired-but-heartbeat-already-existed-possible-comprom"))
     })
 
     await writeFile(metaPath, JSON.stringify(meta, null, 2), { flag: "wx" }).catch(async () => {
       await rm(lockDir, { recursive: true, force: true })
-      throw new Error("Lock acquired but meta.json already existed (possible compromise).")
+      throw new Error(t("core.flock.lock-acquired-but-meta-json-already-existed-possible-comprom"))
     })
 
     let timer: NodeJS.Timeout | undefined

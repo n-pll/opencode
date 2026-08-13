@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 // Low-level OpenAI Responses WebSocket protocol helpers. Session pooling,
 // fallback, and continuation state intentionally live above this file.
 
@@ -93,7 +94,7 @@ export function connectResponsesWebSocket(options: ConnectResponsesWebSocketOpti
           cleanup()
           socket.on("error", () => {})
           socket.terminate()
-          reject(new Error("WebSocket connect timed out"))
+          reject(new Error(t("cli.ws.websocket-connect-timed-out")))
         }, options.timeout)
       : undefined
 
@@ -180,7 +181,7 @@ export function streamResponsesWebSocket(options: StreamResponsesWebSocketOption
   async function onMessage(data: WebSocket.RawData, isBinary: boolean) {
     if (completed) return
     if (isBinary) {
-      invalidate(new ProviderError.ResponseStreamError("Unexpected binary WebSocket frame"))
+      invalidate(new ProviderError.ResponseStreamError(t("cli.ws.unexpected-binary-websocket-frame")))
       return
     }
 

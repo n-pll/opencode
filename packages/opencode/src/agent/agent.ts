@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { LayerNode } from "@opencode-ai/core/effect/layer-node"
 import { PermissionV1 } from "@opencode-ai/core/v1/permission"
 import { Config } from "@/config/config"
@@ -140,7 +141,7 @@ const layer = Layer.effect(
         const agents: Record<string, Info> = {
           build: {
             name: "build",
-            description: "The default agent. Executes tools based on configured permissions.",
+            description: t("cli.agent.the-default-agent-executes-tools-based-on-configured-permiss"),
             options: {},
             permission: Permission.merge(
               defaults,
@@ -155,7 +156,7 @@ const layer = Layer.effect(
           },
           plan: {
             name: "plan",
-            description: "Plan mode. Disallows all edit tools.",
+            description: t("cli.agent.plan-mode-disallows-all-edit-tools"),
             options: {},
             permission: Permission.merge(
               defaults,
@@ -181,7 +182,7 @@ const layer = Layer.effect(
           },
           general: {
             name: "general",
-            description: `General-purpose agent for researching complex questions and executing multi-step tasks. Use this agent to execute multiple units of work in parallel.`,
+            description: t("cli.agent.general.description"),
             permission: Permission.merge(
               defaults,
               Permission.fromConfig({
@@ -210,7 +211,7 @@ const layer = Layer.effect(
               }),
               user,
             ),
-            description: `Fast agent specialized for exploring codebases. Use this when you need to quickly find files by patterns (eg. "src/components/**/*.tsx"), search code for keywords (eg. "API endpoints"), or answer questions about the codebase (eg. "how do API endpoints work?"). When calling this agent, specify the desired thoroughness level: "quick" for basic searches, "medium" for moderate exploration, or "very thorough" for comprehensive analysis across multiple locations and naming conventions.`,
+            description: t("cli.agent.explore.description"),
             prompt: PROMPT_EXPLORE,
             options: {},
             mode: "subagent",

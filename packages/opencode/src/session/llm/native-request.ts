@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import type { JsonSchema, LLMRequest, ProviderMetadata } from "@opencode-ai/llm"
 import { LLM, Message, SystemPart, ToolCallPart, ToolDefinition, ToolResultPart } from "@opencode-ai/llm"
 import {
@@ -55,7 +56,7 @@ const textPart = (part: Record<string, unknown>) => ({
 
 const mediaPart = (part: Record<string, unknown>) => {
   if (typeof part.data !== "string" && !(part.data instanceof Uint8Array))
-    throw new Error("Native LLM request adapter only supports file parts with string or Uint8Array data")
+    throw new Error(t("cli.native_request.native-llm-request-adapter-only-supports-file-parts-with-str"))
   return {
     type: "media" as const,
     mediaType: typeof part.mediaType === "string" ? part.mediaType : "application/octet-stream",
@@ -78,7 +79,7 @@ const toolResult = (part: Record<string, unknown>) => {
 }
 
 const contentPart = (part: unknown) => {
-  if (!isRecord(part)) throw new Error("Native LLM request adapter only supports object content parts")
+  if (!isRecord(part)) throw new Error(t("cli.native_request.native-llm-request-adapter-only-supports-object-content-part"))
   if (part.type === "text") return textPart(part)
   if (part.type === "file") return mediaPart(part)
   if (part.type === "reasoning")

@@ -1,3 +1,5 @@
+import { t } from "../i18n/t"
+import { useLanguage } from "../context/language"
 import { SyntaxStyle, RGBA, type TerminalColors } from "@opentui/core"
 import aura from "./assets/aura.json" with { type: "json" }
 import ayu from "./assets/ayu.json" with { type: "json" }
@@ -239,6 +241,7 @@ export function upsertTheme(name: string, theme: unknown) {
 }
 
 export function resolveTheme(theme: ThemeJson, mode: "dark" | "light") {
+  const { t } = useLanguage()
   const defs = theme.defs ?? {}
   function resolveColor(c: ColorValue, chain: string[] = []): RGBA {
     if (c instanceof RGBA) return c
@@ -253,7 +256,7 @@ export function resolveTheme(theme: ThemeJson, mode: "dark" | "light") {
 
       const next = defs[c] ?? theme.theme[c as ThemeColor]
       if (next === undefined) {
-        throw new Error(`Color reference "${c}" not found in defs or theme`)
+        throw new Error(t("tui.theme.color_reference_not_found", { c }))
       }
       return resolveColor(next, [...chain, c])
     }

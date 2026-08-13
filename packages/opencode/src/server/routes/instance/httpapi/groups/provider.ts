@@ -8,6 +8,7 @@ import { InstanceContextMiddleware } from "../middleware/instance-context"
 import { WorkspaceRoutingMiddleware, WorkspaceRoutingQuery } from "../middleware/workspace-routing"
 import { described } from "./metadata"
 import { ProviderV2 } from "@opencode-ai/core/provider"
+import { t } from "@/i18n"
 
 const root = "/provider"
 
@@ -41,8 +42,8 @@ export const ProviderApi = HttpApi.make("provider")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "provider.list",
-            summary: "List providers",
-            description: "Get a list of all available AI providers, including both available and connected ones.",
+            summary: t("instance.provider.provider_list.summary"),
+            description: t("instance.provider.provider_list.description"),
           }),
         ),
         HttpApiEndpoint.get("auth", `${root}/auth`, {
@@ -51,8 +52,8 @@ export const ProviderApi = HttpApi.make("provider")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "provider.auth",
-            summary: "Get provider auth methods",
-            description: "Retrieve available authentication methods for all AI providers.",
+            summary: t("instance.provider.provider_auth.summary"),
+            description: t("instance.provider.provider_auth.description"),
           }),
         ),
         HttpApiEndpoint.post("authorize", `${root}/:providerID/oauth/authorize`, {
@@ -64,8 +65,8 @@ export const ProviderApi = HttpApi.make("provider")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "provider.oauth.authorize",
-            summary: "Start OAuth authorization",
-            description: "Start the OAuth authorization flow for a provider.",
+            summary: t("instance.provider.provider_oauth_authorize.summary"),
+            description: t("instance.provider.provider_oauth_authorize.description"),
           }),
         ),
         HttpApiEndpoint.post("callback", `${root}/:providerID/oauth/callback`, {
@@ -77,15 +78,15 @@ export const ProviderApi = HttpApi.make("provider")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "provider.oauth.callback",
-            summary: "Handle OAuth callback",
-            description: "Handle the OAuth callback from a provider after user authorization.",
+            summary: t("instance.provider.provider_oauth_callback.summary"),
+            description: t("instance.provider.provider_oauth_callback.description"),
           }),
         ),
       )
       .annotateMerge(
         OpenApi.annotations({
           title: "provider",
-          description: "Experimental HttpApi provider routes.",
+          description: t("instance.provider.provider_0.description"),
         }),
       )
       .middleware(InstanceContextMiddleware)
@@ -96,6 +97,6 @@ export const ProviderApi = HttpApi.make("provider")
     OpenApi.annotations({
       title: "opencode experimental HttpApi",
       version: "0.0.1",
-      description: "Experimental HttpApi surface for selected instance routes.",
+      description: t("instance.config.config_1.description"),
     }),
   )

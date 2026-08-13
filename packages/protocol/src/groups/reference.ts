@@ -3,6 +3,7 @@ import { Reference } from "@opencode-ai/schema/reference"
 import { Schema } from "effect"
 import { HttpApiEndpoint, HttpApiGroup, OpenApi } from "effect/unstable/httpapi"
 import { LocationQuery, locationQueryOpenApi } from "./location"
+import { t } from "../i18n"
 
 export const ReferenceGroup = HttpApiGroup.make("server.reference")
   .add(
@@ -14,14 +15,14 @@ export const ReferenceGroup = HttpApiGroup.make("server.reference")
       .annotateMerge(
         OpenApi.annotations({
           identifier: "v2.reference.list",
-          summary: "List references",
-          description: "List references available in the requested location.",
+          summary: t("protocol.reference.reference_list.summary"),
+          description: t("protocol.reference.reference_list.description"),
         }),
       ),
   )
   .annotateMerge(
     OpenApi.annotations({
       title: "reference",
-      description: "Location-scoped project references.",
+      description: t("protocol.reference.reference.description"),
     }),
   )

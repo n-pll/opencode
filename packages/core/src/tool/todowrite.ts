@@ -8,11 +8,12 @@ import { SessionTodo } from "../session/todo"
 import { ToolRegistry } from "./registry"
 import { Tool } from "./tool"
 import { Tools } from "./tools"
+import { t } from "../i18n"
 
 export const name = "todowrite"
 
 export const Input = Schema.Struct({
-  todos: Schema.Array(SessionTodo.Info).annotate({ description: "The updated todo list" }),
+  todos: Schema.Array(SessionTodo.Info).annotate({ description: t("core.config.the_updated_todo_list") }),
 })
 
 export const Output = Schema.Struct({
@@ -48,7 +49,7 @@ const layer = Layer.effectDiscard(
               })
               yield* todos.update({ sessionID: context.sessionID, todos: input.todos })
               return { todos: input.todos }
-            }).pipe(Effect.mapError(() => new ToolFailure({ message: "Unable to update todos" }))),
+            }).pipe(Effect.mapError(() => new ToolFailure({ message: t("core.config.unable_to_update_todos") }))),
         }),
       })
       .pipe(Effect.orDie)

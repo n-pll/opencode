@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { Effect, Stream } from "effect"
 import os from "os"
 import { createWriteStream } from "node:fs"
@@ -256,7 +257,7 @@ function tail(text: string, maxLines: number, maxBytes: number) {
 
 const parse = Effect.fn("ShellTool.parse")(function* (command: string, ps: boolean) {
   const tree = yield* Effect.promise(() => parser().then((p) => (ps ? p.ps : p.bash).parse(command)))
-  if (!tree) throw new Error("Failed to parse command")
+  if (!tree) throw new Error(t("cli.shell.failed-to-parse-command"))
   return tree
 })
 

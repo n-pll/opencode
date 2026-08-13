@@ -1,3 +1,4 @@
+import { t } from "./i18n"
 import { Cause, Effect, Schema } from "effect"
 import { ToolError, toolError } from "./tool-error.js"
 import {
@@ -145,7 +146,7 @@ const runHost = <A, E, R>(effect: Effect.Effect<A, E, R>): Effect.Effect<A, Tool
     Effect.catchCause((cause) => {
       if (Cause.hasInterruptsOnly(cause)) return Effect.interrupt
       const error = Cause.squash(cause)
-      return Effect.fail(error instanceof ToolError ? error : toolError("Tool execution failed", error))
+      return Effect.fail(error instanceof ToolError ? error : toolError(t("codemode.tool_runtime.execution_failed"), error))
     }),
   )
 
@@ -179,7 +180,7 @@ const copyBounded = (
   preserveSandboxValues: boolean,
 ): unknown => {
   if (depth > MAX_VALUE_DEPTH) {
-    throw new ToolRuntimeError("InvalidDataValue", `${label} exceeds the maximum value depth of ${MAX_VALUE_DEPTH}.`)
+    throw new ToolRuntimeError("InvalidDataValue", t("codemode.tool_runtime.exceeds_max_depth", { label, max: MAX_VALUE_DEPTH }))
   }
   if (
     value === null ||
@@ -196,7 +197,7 @@ const copyBounded = (
   }
 
   if (typeof value !== "object") {
-    throw new ToolRuntimeError("InvalidDataValue", `${label} must contain data only.`)
+    throw new ToolRuntimeError("InvalidDataValue", t("codemode.tool_runtime.data_only", { label }))
   }
 
   // An un-awaited promise never crosses a data checkpoint as `{}`; the diagnostic tells the
@@ -204,7 +205,7 @@ const copyBounded = (
   if (value instanceof SandboxPromise) {
     throw new ToolRuntimeError(
       "InvalidDataValue",
-      `${label} contains an un-awaited Promise; await tool calls (e.g. \`const result = await tools.ns.tool(...)\`) before using their results.`,
+      t("codemode.tool_runtime.unawaited_promise", { label }),
     )
   }
 
@@ -267,7 +268,7 @@ const copyBounded = (
   }
 
   if (seen.has(value)) {
-    throw new ToolRuntimeError("InvalidDataValue", `${label} contains a circular value.`)
+    throw new ToolRuntimeError("InvalidDataValue", t("codemode.runtime.102", { label }))
   }
 
   seen.add(value)
@@ -280,13 +281,13 @@ const copyBounded = (
 
   const prototype = Object.getPrototypeOf(value)
   if (prototype !== Object.prototype && prototype !== null) {
-    throw new ToolRuntimeError("InvalidDataValue", `${label} must contain plain objects only.`)
+    throw new ToolRuntimeError("InvalidDataValue", t("codemode.tool_runtime.plain_objects", { label }))
   }
 
   const copied: SafeObject = Object.create(null) as SafeObject
   for (const [key, item] of Object.entries(value)) {
     if (isBlockedMember(key)) {
-      throw new ToolRuntimeError("InvalidDataValue", `${label} contains blocked property '${key}'.`)
+      throw new ToolRuntimeError("InvalidDataValue", t("codemode.tool_runtime.blocked_property", { label, key }))
     }
     copied[key] = copyBounded(item, label, depth + 1, seen, preserveSandboxValues)
   }
@@ -385,7 +386,7 @@ const termForms = (term: string): Array<string> => {
 
 const makeSearchTool = (searchIndex: ReadonlyArray<SearchEntry>): Definition => ({
   _tag: "CodeModeTool",
-  description: "Search available Code Mode tools",
+  description: t("codemode.tool_runtime.search_tools"),
   input: SearchInput,
   output: SearchOutput,
   run: (input) =>
@@ -663,7 +664,7 @@ const namespaceKeys = <R>(tools: HostTools<R>, path: ReadonlyArray<string>): Rea
       isDefinition(value) ||
       !Object.hasOwn(value, segment)
     ) {
-      throw new ToolRuntimeError("UnknownTool", `Unknown tool namespace '${path.join(".")}'.`, [
+      throw new ToolRuntimeError("UnknownTool", t("codemode.tool_runtime.unknown_ns", { ns: path.join(".") }), [
         "Object.keys(tools) lists the available namespaces; tools.$codemode.search({ query }) finds described tools.",
       ])
     }
@@ -683,7 +684,7 @@ const resolve = <R>(tools: HostTools<R>, path: ReadonlyArray<string>): HostTool<
       isDefinition(value) ||
       !Object.hasOwn(value, segment)
     ) {
-      throw new ToolRuntimeError("UnknownTool", `Unknown tool '${path.join(".")}'.`, [
+      throw new ToolRuntimeError("UnknownTool", t("codemode.tool_runtime.unknown_tool", { name: path.join(".") }), [
         "Use tools.$codemode.search({ query }) to find available described tools.",
       ])
     }
@@ -691,7 +692,7 @@ const resolve = <R>(tools: HostTools<R>, path: ReadonlyArray<string>): HostTool<
   }
 
   if (typeof value !== "function" && !isDefinition(value)) {
-    throw new ToolRuntimeError("UnknownTool", `Tool '${path.join(".")}' is not callable.`)
+    throw new ToolRuntimeError("UnknownTool", t("codemode.tool_runtime.not_callable", { name: path.join(".") }))
   }
 
   return value
@@ -728,7 +729,7 @@ export const make = <R>(
       Effect.tap(() => onEnd({ ...call, durationMs: Date.now() - startedAt, outcome: "success" })),
       Effect.tapError((error) => {
         const message =
-          error instanceof ToolError || error instanceof ToolRuntimeError ? error.message : "Tool execution failed"
+          error instanceof ToolError || error instanceof ToolRuntimeError ? error.message : t("codemode.tool_runtime.execution_failed")
         return onEnd({
           ...call,
           durationMs: Date.now() - startedAt,
@@ -742,12 +743,12 @@ export const make = <R>(
   const decodeOutput = (value: unknown, name: string) =>
     Effect.try({
       try: () => copyIn(value, `Result from tool '${name}'`),
-      catch: () => new ToolRuntimeError("InvalidToolOutput", `Invalid output from tool '${name}'.`),
+      catch: () => new ToolRuntimeError("InvalidToolOutput", t("codemode.tool_runtime.invalid_output", { name })),
     })
 
   const recordCall = (call: ToolCall): void => {
     if (maxToolCalls !== undefined && calls.length >= maxToolCalls) {
-      throw new ToolRuntimeError("ToolCallLimitExceeded", `Execution exceeded its tool-call limit of ${maxToolCalls}.`)
+      throw new ToolRuntimeError("ToolCallLimitExceeded", t("codemode.tool_runtime.limit_exceeded", { max: maxToolCalls }))
     }
     calls.push(call)
   }
@@ -770,11 +771,11 @@ export const make = <R>(
         let describedInput: unknown
         if (isDefinition(tool)) {
           if (externalArgs.length !== 1)
-            throw new ToolRuntimeError("InvalidToolInput", `Tool '${name}' expects exactly one input object.`)
+            throw new ToolRuntimeError("InvalidToolInput", t("codemode.tool_runtime.expects_one", { name }))
           describedInput = yield* Effect.try({
             try: () => decodeToolInput(tool, externalArgs[0]),
             catch: (cause) =>
-              new ToolRuntimeError("InvalidToolInput", `Invalid input for tool '${name}': ${String(cause)}`),
+              new ToolRuntimeError("InvalidToolInput", t("codemode.tool_runtime.invalid_input", { name, cause: String(cause) })),
           })
         }
         const input = isDefinition(tool) ? describedInput : externalArgs
@@ -786,7 +787,7 @@ export const make = <R>(
               const raw = yield* runHost(Effect.suspend(() => tool.run(describedInput)))
               const result = yield* Effect.try({
                 try: () => decodeToolOutput(tool, raw),
-                catch: () => new ToolRuntimeError("InvalidToolOutput", `Invalid output from tool '${name}'.`),
+                catch: () => new ToolRuntimeError("InvalidToolOutput", t("codemode.tool_runtime.invalid_output", { name })),
               })
               return yield* decodeOutput(result, name)
             }),

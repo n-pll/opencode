@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { LayerNode } from "@opencode-ai/core/effect/layer-node"
 import type {
   Hooks,
@@ -103,7 +104,7 @@ function getLegacyPlugins(mod: Record<string, unknown>) {
     if (seen.has(entry)) continue
     seen.add(entry)
     const plugin = getServerPlugin(entry)
-    if (!plugin) throw new TypeError("Plugin export is not a function")
+    if (!plugin) throw new TypeError(t("cli.index.plugin-export-is-not-a-function"))
     result.push(plugin)
   }
 

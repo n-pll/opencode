@@ -1,4 +1,5 @@
 import { Schema, SchemaGetter } from "effect"
+import { t } from "@/i18n"
 
 export const QueryBoolean = Schema.Literals(["true", "false"]).pipe(
   Schema.decodeTo(Schema.Boolean, {

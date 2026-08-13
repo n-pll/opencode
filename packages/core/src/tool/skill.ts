@@ -10,12 +10,13 @@ import { PermissionV2 } from "../permission"
 import { ToolRegistry } from "./registry"
 import { Tool } from "./tool"
 import { Tools } from "./tools"
+import { t } from "../i18n"
 
 export const name = "skill"
 const FILE_LIMIT = 10
 
 export const Input = Schema.Struct({
-  name: Schema.String.annotate({ description: "The name of the skill from the available skills list" }),
+  name: Schema.String.annotate({ description: t("core.config.the_name_of_the_skill_from_the_available_skills_list") }),
 })
 
 export const Output = Schema.Struct({

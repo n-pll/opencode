@@ -7,6 +7,7 @@ import { Authorization } from "../middleware/authorization"
 import { InstanceContextMiddleware } from "../middleware/instance-context"
 import { WorkspaceRoutingMiddleware, WorkspaceRoutingQuery } from "../middleware/workspace-routing"
 import { described } from "./metadata"
+import { t } from "@/i18n"
 
 const root = "/sync"
 export const ReplayEvent = Schema.Struct({
@@ -52,8 +53,8 @@ export const SyncApi = HttpApi.make("sync")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "sync.start",
-            summary: "Start workspace sync",
-            description: "Start sync loops for workspaces in the current project that have active sessions.",
+            summary: t("instance.sync.sync_start.summary"),
+            description: t("instance.sync.sync_start.description"),
           }),
         ),
         HttpApiEndpoint.post("replay", SyncPaths.replay, {
@@ -64,8 +65,8 @@ export const SyncApi = HttpApi.make("sync")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "sync.replay",
-            summary: "Replay sync events",
-            description: "Validate and replay a complete sync event history.",
+            summary: t("instance.sync.sync_replay.summary"),
+            description: t("instance.sync.sync_replay.description"),
           }),
         ),
         HttpApiEndpoint.post("steal", SyncPaths.steal, {
@@ -76,8 +77,8 @@ export const SyncApi = HttpApi.make("sync")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "sync.steal",
-            summary: "Steal session into workspace",
-            description: "Update a session to belong to the current workspace through the sync event system.",
+            summary: t("instance.sync.sync_steal.summary"),
+            description: t("instance.sync.sync_steal.description"),
           }),
         ),
         HttpApiEndpoint.post("history", SyncPaths.history, {
@@ -88,7 +89,7 @@ export const SyncApi = HttpApi.make("sync")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "sync.history.list",
-            summary: "List sync events",
+            summary: t("instance.sync.sync_history_list.summary"),
             description:
               "List sync events for all aggregates. Keys are aggregate IDs the client already knows about, values are the last known sequence ID. Events with seq > value are returned for those aggregates. Aggregates not listed in the input get their full history.",
           }),
@@ -97,7 +98,7 @@ export const SyncApi = HttpApi.make("sync")
       .annotateMerge(
         OpenApi.annotations({
           title: "sync",
-          description: "Experimental HttpApi sync routes.",
+          description: t("instance.sync.sync_0.description"),
         }),
       )
       .middleware(InstanceContextMiddleware)
@@ -108,6 +109,6 @@ export const SyncApi = HttpApi.make("sync")
     OpenApi.annotations({
       title: "opencode experimental HttpApi",
       version: "0.0.1",
-      description: "Experimental HttpApi surface for selected instance routes.",
+      description: t("instance.config.config_1.description"),
     }),
   )

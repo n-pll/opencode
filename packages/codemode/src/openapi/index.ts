@@ -17,6 +17,7 @@ import {
   validateBaseUrl,
 } from "./spec.js"
 import type { Operation, Options, Result, Skipped, Tools } from "./types.js"
+import { t } from "../i18n"
 
 export type {
   AuthResolver,

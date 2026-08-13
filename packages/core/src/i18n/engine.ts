@@ -1,32 +1,15 @@
 import path from "node:path"
 import { readFileSync } from "node:fs"
-import { Global } from "../global"
+import { xdgConfig } from "xdg-basedir"
+import {
+  resolveTemplate,
+  translate,
+  type Dictionary,
+  type I18nParams,
+} from "@opencode-ai/schema/i18n/engine"
 
-export type I18nParams = Record<string, string | number | boolean | undefined | null | unknown>
-
-export type Dictionary = Record<string, string>
-
-/**
- * Replace `{{param}}` placeholders in `text` with values from `params`.
- * Missing params resolve to the empty string, matching the ui i18n behavior.
- */
-export function resolveTemplate(text: string, params?: I18nParams) {
-  if (!params) return text
-  return text.replace(/{{\s*([^}]+?)\s*}}/g, (_, rawKey) => {
-    const value = params[String(rawKey)]
-    return value === undefined ? "" : String(value)
-  })
-}
-
-/**
- * Translate `key` using `dict`, falling back to the key itself when missing,
- * then interpolating `params`. The English dictionary is conventionally
- * authoritative for key existence.
- */
-export function translate(en: Dictionary, locale: Dictionary, key: string, params?: I18nParams) {
-  const value = locale[key] ?? en[key] ?? key
-  return resolveTemplate(value, params)
-}
+export { resolveTemplate, translate }
+export type { Dictionary, I18nParams }
 
 /**
  * Resolve the active locale string ("en", "zh", ...) using the precedence:
@@ -93,16 +76,21 @@ export const SUPPORTED_LOCALES: readonly string[] = ["en", "zh"]
  * locale. Returns undefined when no candidate file has a locale field.
  */
 export function peekConfigLocale(): string | undefined {
+  // Config dir mirrors Global.Path.config (xdg config + opencode). Using
+  // xdgConfig directly keeps this module free of the ../global import chain,
+  // which low-level modules (util/flock) also import — a static Global import
+  // here would form a module-load cycle.
+  const configDir = xdgConfig ? path.join(xdgConfig, "opencode") : undefined
   const candidates = [
     process.env["OPENCODE_CONFIG"],
     path.join(process.cwd(), "opencode.jsonc"),
     path.join(process.cwd(), "opencode.json"),
     path.join(process.cwd(), "config.json"),
     path.join(process.cwd(), "ocl.json"),
-    path.join(Global.Path.config, "opencode.jsonc"),
-    path.join(Global.Path.config, "opencode.json"),
-    path.join(Global.Path.config, "config.json"),
-    path.join(Global.Path.config, "ocl.json"),
+    configDir && path.join(configDir, "opencode.jsonc"),
+    configDir && path.join(configDir, "opencode.json"),
+    configDir && path.join(configDir, "config.json"),
+    configDir && path.join(configDir, "ocl.json"),
   ]
   for (const file of candidates) {
     if (!file) continue

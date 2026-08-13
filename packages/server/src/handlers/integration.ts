@@ -4,13 +4,14 @@ import { HttpApiBuilder, HttpApiSchema } from "effect/unstable/httpapi"
 import { Api } from "../api"
 import { InvalidRequestError } from "@opencode-ai/protocol/errors"
 import { response } from "../location"
+import { t } from "../i18n"
 
 const authorize = <A, R>(effect: Effect.Effect<A, Integration.AuthorizationError, R>) =>
   effect.pipe(
     Effect.mapError(
       () =>
         new InvalidRequestError({
-          message: "Authentication failed",
+          message: t("server.error.authentication_failed"),
           kind: "integration_authorization",
         }),
     ),
@@ -80,8 +81,8 @@ export const IntegrationHandler = HttpApiBuilder.group(Api, "server.integration"
                 new InvalidRequestError({
                   message:
                     error._tag === "Integration.CodeRequired"
-                      ? "Authorization code is required"
-                      : "Authentication failed",
+                      ? t("server.error.authorization_code_required")
+                      : t("server.error.authentication_failed"),
                   kind:
                     error._tag === "Integration.CodeRequired"
                       ? "integration_code_required"

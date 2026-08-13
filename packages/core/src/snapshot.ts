@@ -11,6 +11,7 @@ import { Global } from "./global"
 import { Location } from "./location"
 import { AbsolutePath, RelativePath } from "./schema"
 import { Hash } from "./util/hash"
+import { t } from "./i18n"
 
 export const ID = Schema.String.pipe(Schema.brand("Snapshot.ID"))
 export type ID = typeof ID.Type
@@ -100,12 +101,12 @@ const layer = Layer.effect(
     const scope = Effect.fnUntraced(function* () {
       const relative = path.relative(worktree, location.directory)
       if (relative.startsWith("..") || path.isAbsolute(relative))
-        return yield* new Error({ operation: "capture", message: "Location is outside the project" })
+        return yield* new Error({ operation: "capture", message: t("core.config.location_is_outside_the_project") })
       return RelativePath.make(relative.replaceAll("\\", "/") || ".")
     })
 
     const repository = Effect.fnUntraced(function* () {
-      if (!source) return yield* new Error({ operation: "capture", message: "Project is not a Git repository" })
+      if (!source) return yield* new Error({ operation: "capture", message: t("core.config.project_is_not_a_git_repository") })
       if (yield* fs.existsSafe(path.join(gitDirectory, "HEAD")))
         return new Git.Repository({
           worktree,
@@ -187,7 +188,7 @@ const layer = Layer.effect(
     })
 
     const preview = Effect.fn("Snapshot.preview")(function* (input: PreviewInput) {
-      if (!(yield* enabled())) return yield* new Error({ operation: "preview", message: "Snapshots are disabled" })
+      if (!(yield* enabled())) return yield* new Error({ operation: "preview", message: t("core.config.snapshots_are_disabled") })
       const repo = yield* repository().pipe(Effect.mapError((cause) => failure("preview", cause)))
       const files = yield* plan("preview", input)
       const current = yield* git.tree
@@ -209,7 +210,7 @@ const layer = Layer.effect(
     })
 
     const restore = Effect.fn("Snapshot.restore")(function* (input: RestoreInput) {
-      if (!(yield* enabled())) return yield* new Error({ operation: "restore", message: "Snapshots are disabled" })
+      if (!(yield* enabled())) return yield* new Error({ operation: "restore", message: t("core.config.snapshots_are_disabled") })
       const repo = yield* repository().pipe(Effect.mapError((cause) => failure("restore", cause)))
       yield* git.tree
         .restore({ repository: repo, files: yield* plan("restore", input) })

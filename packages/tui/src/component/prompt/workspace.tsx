@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/language"
 import { createEffect, createMemo, createSignal, onCleanup } from "solid-js"
 import { useDialog } from "../../ui/dialog"
 import { useSDK } from "../../context/sdk"
@@ -14,6 +15,7 @@ import {
 import type { WorkspaceStatus } from "../workspace-label"
 
 export function usePromptWorkspace(sessionID?: string) {
+  const { t } = useLanguage()
   const dialog = useDialog()
   const sdk = useSDK()
   const project = useProject()
@@ -32,14 +34,14 @@ export function usePromptWorkspace(sessionID?: string) {
     } catch (err) {
       setSelection(undefined)
       setCreating(false)
-      toast.show({ title: "Creating workspace failed", message: errorMessage(err), variant: "error" })
+      toast.show({ title: t("tui.workspace.creating-workspace-failed"), message: errorMessage(err), variant: "error" })
       return
     }
     if (result.error || !result.data) {
       setSelection(undefined)
       setCreating(false)
       toast.show({
-        title: "Creating workspace failed",
+        title: t("tui.workspace.creating-workspace-failed"),
         message: errorMessage(result.error ?? "no response"),
         variant: "error",
       })

@@ -1,4 +1,5 @@
 import { Effect, Schema } from "effect"
+import { t } from "./i18n"
 
 /**
  * JSON Schema subset accepted for render-only tool schemas.

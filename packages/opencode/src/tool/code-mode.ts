@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import * as Tool from "./tool"
 import { CallToolResultSchema, type CallToolResult } from "@modelcontextprotocol/sdk/types.js"
 import { Cause, Effect, Schema } from "effect"
@@ -15,7 +16,7 @@ const DESCRIPTION = "Run a confined orchestration script with access to connecte
 
 export const Parameters = Schema.Struct({
   code: Schema.String.annotate({
-    description: "Script body executed by the confined interpreter.",
+    description: t("cli.code_mode.script-body-executed-by-the-confined-interpreter"),
   }),
 })
 
@@ -59,7 +60,7 @@ export function describeCatalog(mcpTools: Record<string, MCP.McpTool>, servers: 
   return CodeMode.make({
     tools: toolTree(
       [...groupByServer(mcpTools, servers).values()].flat(),
-      () => () => Effect.fail(toolError("Tool preview is not executable.")),
+      () => () => Effect.fail(toolError(t("cli.code_mode.tool-preview-is-not-executable"))),
     ),
   }).instructions()
 }
@@ -201,7 +202,7 @@ export const CodeModeTool = Tool.define(
           return {
             title: CODE_MODE_TOOL,
             metadata: { toolCalls: [], error: true },
-            output: "Execution cancelled.",
+            output: t("cli.code_mode.execution-cancelled"),
           } satisfies Tool.ExecuteResult<Metadata>
         }
         const agent = yield* agents.get(ctx.agent)
@@ -267,7 +268,7 @@ export const CodeModeTool = Tool.define(
         })
         const cancelled = (): CodeMode.Result => ({
           ok: false,
-          error: { kind: "ExecutionFailure", message: "Execution cancelled." },
+          error: { kind: "ExecutionFailure", message: t("cli.code_mode.execution-cancelled") },
           toolCalls: calls.map((call) => ({ name: call.tool })),
         })
 
@@ -283,7 +284,7 @@ export const CodeModeTool = Tool.define(
             return {
               title: CODE_MODE_TOOL,
               metadata: { toolCalls: calls, error: true },
-              output: "Execution cancelled.",
+              output: t("cli.code_mode.execution-cancelled"),
             } satisfies Tool.ExecuteResult<Metadata>
           }
           const hints = (result.error.suggestions ?? []).filter((hint) => !result.error.message.includes(hint))

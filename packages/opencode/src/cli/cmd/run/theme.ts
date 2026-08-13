@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 // Theme resolution for direct interactive mode.
 //
 // Derives scrollback and footer colors from the terminal's actual palette.
@@ -301,7 +302,7 @@ export function resolveTheme(theme: ThemeJson, pick: "dark" | "light"): TuiTheme
 
     const next = defs[value] ?? theme.theme[value as ThemeColor]
     if (next === undefined) {
-      throw new Error(`Color reference "${value}" not found in defs or theme`)
+      throw new Error(t("cli.theme.color_reference_not_found", { value }))
     }
 
     return resolveColor(next, [...chain, value])

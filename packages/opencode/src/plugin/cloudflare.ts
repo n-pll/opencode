@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import type { Hooks, PluginInput } from "@opencode-ai/plugin"
 
 export async function CloudflareWorkersAuthPlugin(_input: PluginInput): Promise<Hooks> {
@@ -6,7 +7,7 @@ export async function CloudflareWorkersAuthPlugin(_input: PluginInput): Promise<
         {
           type: "text" as const,
           key: "accountId",
-          message: "Enter your Cloudflare Account ID",
+          message: t("cli.cloudflare.enter-your-cloudflare-account-id"),
           placeholder: "e.g. 1234567890abcdef1234567890abcdef",
         },
       ]
@@ -33,7 +34,7 @@ export async function CloudflareAIGatewayAuthPlugin(_input: PluginInput): Promis
           {
             type: "text" as const,
             key: "accountId",
-            message: "Enter your Cloudflare Account ID",
+            message: t("cli.cloudflare.enter-your-cloudflare-account-id"),
             placeholder: "e.g. 1234567890abcdef1234567890abcdef",
           },
         ]
@@ -43,7 +44,7 @@ export async function CloudflareAIGatewayAuthPlugin(_input: PluginInput): Promis
           {
             type: "text" as const,
             key: "gatewayId",
-            message: "Enter your Cloudflare AI Gateway ID",
+            message: t("cli.cloudflare.enter-your-cloudflare-ai-gateway-id"),
             placeholder: "e.g. my-gateway",
           },
         ]
@@ -56,7 +57,7 @@ export async function CloudflareAIGatewayAuthPlugin(_input: PluginInput): Promis
       methods: [
         {
           type: "api",
-          label: "Gateway API token",
+          label: t("cli.cloudflare.gateway-api-token"),
           prompts,
         },
       ],

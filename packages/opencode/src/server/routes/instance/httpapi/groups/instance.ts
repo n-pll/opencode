@@ -14,6 +14,7 @@ import {
   WorkspaceRoutingQueryFields,
 } from "../middleware/workspace-routing"
 import { described } from "./metadata"
+import { t } from "@/i18n"
 
 const PathInfo = Schema.Struct({
   home: Schema.String,
@@ -65,8 +66,8 @@ export const InstanceApi = HttpApi.make("instance")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "instance.dispose",
-            summary: "Dispose instance",
-            description: "Clean up and dispose the current OpenCode instance, releasing all resources.",
+            summary: t("instance.global.global_dispose.summary"),
+            description: t("instance.instance.instance_dispose.description"),
           }),
         ),
         HttpApiEndpoint.get("path", InstancePaths.path, {
@@ -75,9 +76,9 @@ export const InstanceApi = HttpApi.make("instance")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "path.get",
-            summary: "Get paths",
+            summary: t("instance.instance.path_get.summary"),
             description:
-              "Retrieve the current working directory and related path information for the OpenCode instance.",
+              t("cli.instance.retrieve-the-current-working-directory-and-related-path-info"),
           }),
         ),
         HttpApiEndpoint.get("vcs", InstancePaths.vcs, {
@@ -86,7 +87,7 @@ export const InstanceApi = HttpApi.make("instance")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "vcs.get",
-            summary: "Get VCS info",
+            summary: t("instance.instance.vcs_get.summary"),
             description:
               "Retrieve version control system (VCS) information for the current project, such as git branch.",
           }),
@@ -97,8 +98,8 @@ export const InstanceApi = HttpApi.make("instance")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "vcs.status",
-            summary: "Get VCS status",
-            description: "Retrieve changed files in the current working tree without patches.",
+            summary: t("instance.instance.vcs_status.summary"),
+            description: t("instance.instance.vcs_status.description"),
           }),
         ),
         HttpApiEndpoint.get("vcsDiff", InstancePaths.vcsDiff, {
@@ -107,8 +108,8 @@ export const InstanceApi = HttpApi.make("instance")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "vcs.diff",
-            summary: "Get VCS diff",
-            description: "Retrieve the current git diff for the working tree or against the default branch.",
+            summary: t("instance.instance.vcs_diff.summary"),
+            description: t("instance.instance.vcs_diff.description"),
           }),
         ),
         HttpApiEndpoint.get("vcsDiffRaw", InstancePaths.vcsDiffRaw, {
@@ -120,8 +121,8 @@ export const InstanceApi = HttpApi.make("instance")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "vcs.diff.raw",
-            summary: "Get raw VCS diff",
-            description: "Retrieve a raw patch for current uncommitted changes.",
+            summary: t("instance.instance.vcs_diff_raw.summary"),
+            description: t("instance.instance.vcs_diff_raw.description"),
           }),
         ),
         HttpApiEndpoint.post("vcsApply", InstancePaths.vcsApply, {
@@ -132,8 +133,8 @@ export const InstanceApi = HttpApi.make("instance")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "vcs.apply",
-            summary: "Apply VCS patch",
-            description: "Apply a raw patch to the current working tree.",
+            summary: t("instance.instance.vcs_apply.summary"),
+            description: t("instance.instance.vcs_apply.description"),
           }),
         ),
         HttpApiEndpoint.get("command", InstancePaths.command, {
@@ -142,8 +143,8 @@ export const InstanceApi = HttpApi.make("instance")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "command.list",
-            summary: "List commands",
-            description: "Get a list of all available commands in the OpenCode system.",
+            summary: t("instance.instance.command_list.summary"),
+            description: t("instance.instance.command_list.description"),
           }),
         ),
         HttpApiEndpoint.get("agent", InstancePaths.agent, {
@@ -152,8 +153,8 @@ export const InstanceApi = HttpApi.make("instance")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "app.agents",
-            summary: "List agents",
-            description: "Get a list of all available AI agents in the OpenCode system.",
+            summary: t("instance.instance.app_agents.summary"),
+            description: t("instance.instance.app_agents.description"),
           }),
         ),
         HttpApiEndpoint.get("skill", InstancePaths.skill, {
@@ -162,8 +163,8 @@ export const InstanceApi = HttpApi.make("instance")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "app.skills",
-            summary: "List skills",
-            description: "Get a list of all available skills in the OpenCode system.",
+            summary: t("instance.instance.app_skills.summary"),
+            description: t("instance.instance.app_skills.description"),
           }),
         ),
         HttpApiEndpoint.get("lsp", InstancePaths.lsp, {
@@ -172,8 +173,8 @@ export const InstanceApi = HttpApi.make("instance")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "lsp.status",
-            summary: "Get LSP status",
-            description: "Get LSP server status",
+            summary: t("instance.instance.lsp_status.summary"),
+            description: t("instance.instance.lsp_status.description"),
           }),
         ),
         HttpApiEndpoint.get("formatter", InstancePaths.formatter, {
@@ -182,15 +183,15 @@ export const InstanceApi = HttpApi.make("instance")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "formatter.status",
-            summary: "Get formatter status",
-            description: "Get formatter status",
+            summary: t("instance.instance.formatter_status.summary"),
+            description: t("instance.instance.formatter_status.summary"),
           }),
         ),
       )
       .annotateMerge(
         OpenApi.annotations({
           title: "instance",
-          description: "Experimental HttpApi instance read routes.",
+          description: t("instance.instance.instance_0.description"),
         }),
       )
       .middleware(InstanceContextMiddleware)
@@ -201,6 +202,6 @@ export const InstanceApi = HttpApi.make("instance")
     OpenApi.annotations({
       title: "opencode experimental HttpApi",
       version: "0.0.1",
-      description: "Experimental HttpApi surface for selected instance routes.",
+      description: t("instance.config.config_1.description"),
     }),
   )

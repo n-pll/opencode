@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { LayerNode } from "@opencode-ai/core/effect/layer-node"
 import os from "os"
 import { ConfigV1 } from "@opencode-ai/core/v1/config/config"
@@ -44,7 +45,7 @@ function wrapSSE(res: Response, ms: number, ctl: AbortController) {
     async pull(ctrl) {
       const part = await new Promise<Awaited<ReturnType<typeof reader.read>>>((resolve, reject) => {
         const id = setTimeout(() => {
-          const err = new ProviderError.ResponseStreamError("SSE read timed out")
+          const err = new ProviderError.ResponseStreamError(t("cli.provider.sse-read-timed-out"))
           ctl.abort(err)
           void reader.cancel(err)
           reject(err)

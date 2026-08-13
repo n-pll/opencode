@@ -1,3 +1,4 @@
+import { t } from "../../i18n"
 import {
   APICallError,
   InvalidResponseDataError,
@@ -541,14 +542,14 @@ export class OpenAICompatibleChatLanguageModel implements LanguageModelV3 {
                   if (toolCallDelta.id == null) {
                     throw new InvalidResponseDataError({
                       data: toolCallDelta,
-                      message: `Expected 'id' to be a string.`,
+                      message: t("core.copilot.expected_id_string"),
                     })
                   }
 
                   if (toolCallDelta.function?.name == null) {
                     throw new InvalidResponseDataError({
                       data: toolCallDelta,
-                      message: `Expected 'function.name' to be a string.`,
+                      message: t("core.copilot.expected_function_name_string"),
                     })
                   }
 

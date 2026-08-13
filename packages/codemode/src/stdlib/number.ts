@@ -8,7 +8,7 @@ export const invokeNumberMethod = (value: number, name: string, args: Array<unkn
   const optNum = (index: number): number | undefined => {
     const arg = args[index]
     if (arg === undefined) return undefined
-    if (typeof arg !== "number") throw new InterpreterRuntimeError(`Number.${name} expects a number argument.`, node)
+    if (typeof arg !== "number") throw new InterpreterRuntimeError(t("codemode.number.0", { name }), node)
     return arg
   }
   let result: unknown
@@ -27,13 +27,13 @@ export const invokeNumberMethod = (value: number, name: string, args: Array<unkn
     case "toString": {
       const radix = optNum(0)
       if (radix !== undefined && (radix < 2 || radix > 36)) {
-        throw new InterpreterRuntimeError("Number.toString radix must be between 2 and 36.", node)
+        throw new InterpreterRuntimeError(t("codemode.number.1"), node)
       }
       result = value.toString(radix)
       break
     }
     default:
-      throw new InterpreterRuntimeError(`Number method '${name}' is not available in CodeMode.`, node)
+      throw new InterpreterRuntimeError(t("codemode.number.2", { name }), node)
   }
   return boundedData(result, `Number.${name} result`)
 }
@@ -52,15 +52,16 @@ export const invokeNumberStatic = (name: string, args: Array<unknown>, node: Ast
     case "parseInt": {
       const radix = args[1]
       if (radix !== undefined && typeof radix !== "number") {
-        throw new InterpreterRuntimeError("Number.parseInt expects a numeric radix.", node)
+        throw new InterpreterRuntimeError(t("codemode.number.3"), node)
       }
       return parseInt(coerceToString(value), radix)
     }
     case "parseFloat":
       return parseFloat(coerceToString(value))
     default:
-      throw new InterpreterRuntimeError(`Number.${name} is not available in CodeMode.`, node)
+      throw new InterpreterRuntimeError(t("codemode.number.4", { name }), node)
   }
 }
 import { type AstNode, InterpreterRuntimeError } from "../interpreter/model.js"
 import { boundedData, coerceToString } from "./value.js"
+import { t } from "../i18n"

@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { LayerNode } from "@opencode-ai/core/effect/layer-node"
 import { PermissionV1 } from "@opencode-ai/core/v1/permission"
 import path from "path"
@@ -1095,7 +1096,7 @@ const layer = Layer.effect(
 
           const { user: lastUser, assistant: lastAssistant, finished: lastFinished, tasks } = MessageV2.latest(msgs)
 
-          if (!lastUser) throw new Error("No user message found in stream. This should never happen.")
+          if (!lastUser) throw new Error(t("cli.prompt.no-user-message-found-in-stream-this-should-never-happen"))
 
           const lastAssistantMsg = msgs.findLast(
             (msg) => msg.info.role === "assistant" && msg.info.id === lastAssistant?.id,
@@ -1300,7 +1301,7 @@ const layer = Layer.effect(
               // partial text that was cut off by the provider's filter.
               if (handle.message.finish === "content-filter") {
                 handle.message.error = new SessionV1.ContentFilterError({
-                  message: "The response was blocked by the provider's content filter",
+                  message: t("cli.prompt.the-response-was-blocked-by-the-provider-s-content-filter"),
                 }).toObject()
                 yield* sessions.updateMessage(handle.message)
                 yield* events.publish(Session.Event.Error, { sessionID, error: handle.message.error })
@@ -1308,7 +1309,7 @@ const layer = Layer.effect(
               }
               if (format.type === "json_schema") {
                 handle.message.error = new SessionV1.StructuredOutputError({
-                  message: "Model did not produce structured output",
+                  message: t("cli.prompt.model-did-not-produce-structured-output"),
                   retries: 0,
                 }).toObject()
                 yield* sessions.updateMessage(handle.message)
@@ -1577,7 +1578,7 @@ export function createStructuredOutputTool(input: {
       input.onSuccess(args)
       return {
         output: "Structured output captured successfully.",
-        title: "Structured Output",
+        title: t("cli.prompt.structured-output"),
         metadata: { valid: true },
       }
     },

@@ -1,5 +1,6 @@
 import { AwsClient } from "aws4fetch"
 import { lazy } from "@opencode-ai/core/util/lazy"
+import { t } from "../../i18n"
 
 export namespace Storage {
   export interface Adapter {
@@ -87,7 +88,7 @@ export namespace Storage {
     const type = process.env.OPENCODE_STORAGE_ADAPTER
     if (type === "r2") return r2()
     if (type === "s3") return s3()
-    throw new Error("No storage adapter configured")
+    throw new Error(t("enterprise.error.no_storage_adapter"))
   })
 
   function resolve(key: string[]) {

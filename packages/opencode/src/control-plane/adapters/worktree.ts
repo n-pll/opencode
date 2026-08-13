@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { Effect, Schema } from "effect"
 import { InstanceRef, WorkspaceRef } from "@/effect/instance-ref"
 import { type WorkspaceAdapter, type WorkspaceAdapterContext, WorkspaceInfo } from "../types"
@@ -15,7 +16,7 @@ async function loadWorktree() {
 }
 
 function requireInstance(context: WorkspaceAdapterContext | undefined) {
-  if (!context?.instance) throw new Error("Worktree adapter requires an instance context")
+  if (!context?.instance) throw new Error(t("cli.worktree.worktree-adapter-requires-an-instance-context"))
   return context.instance
 }
 
@@ -27,7 +28,7 @@ const provideContext = <A, E, R>(effect: Effect.Effect<A, E, R>, context: Worksp
 
 export const WorktreeAdapter: WorkspaceAdapter = {
   name: "Worktree",
-  description: "Create a git worktree",
+  description: t("cli.worktree.create-a-git-worktree"),
   async configure(info, context) {
     const { AppRuntime, Worktree } = await loadWorktree()
     const next = await AppRuntime.runPromise(

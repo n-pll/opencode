@@ -6,6 +6,7 @@ import { ascending } from "../identifier"
 import { statics } from "../schema"
 import { SessionID } from "../session-id"
 import { SessionV1 } from "./session"
+import { t } from "../i18n"
 
 export const ID = Schema.String.check(Schema.isStartsWith("que")).pipe(
   Schema.brand("QuestionID"),
@@ -13,20 +14,20 @@ export const ID = Schema.String.check(Schema.isStartsWith("que")).pipe(
 )
 
 export const Option = Schema.Struct({
-  label: Schema.String.annotate({ description: "Display text (1-5 words, concise)" }),
-  description: Schema.String.annotate({ description: "Explanation of choice" }),
+  label: Schema.String.annotate({ description: t("schema.question.option.label") }),
+  description: Schema.String.annotate({ description: t("schema.question.option.description") }),
 }).annotate({ identifier: "QuestionOption" })
 
 const base = {
-  question: Schema.String.annotate({ description: "Complete question" }),
-  header: Schema.String.annotate({ description: "Very short label (max 30 chars)" }),
-  options: Schema.Array(Option).annotate({ description: "Available choices" }),
-  multiple: Schema.optional(Schema.Boolean).annotate({ description: "Allow selecting multiple choices" }),
+  question: Schema.String.annotate({ description: t("schema.question.info.question") }),
+  header: Schema.String.annotate({ description: t("schema.question.info.header") }),
+  options: Schema.Array(Option).annotate({ description: t("schema.question.info.options") }),
+  multiple: Schema.optional(Schema.Boolean).annotate({ description: t("schema.question.info.multiple") }),
 }
 
 export const Info = Schema.Struct({
   ...base,
-  custom: Schema.optional(Schema.Boolean).annotate({ description: "Allow typing a custom answer (default: true)" }),
+  custom: Schema.optional(Schema.Boolean).annotate({ description: t("schema.question.info.custom") }),
 }).annotate({ identifier: "QuestionInfo" })
 export const Prompt = Schema.Struct(base).annotate({ identifier: "QuestionPrompt" })
 export const Tool = Schema.Struct({ messageID: SessionV1.MessageID, callID: Schema.String }).annotate({
@@ -35,13 +36,13 @@ export const Tool = Schema.Struct({ messageID: SessionV1.MessageID, callID: Sche
 export const Request = Schema.Struct({
   id: ID,
   sessionID: SessionID,
-  questions: Schema.Array(Info).annotate({ description: "Questions to ask" }),
+  questions: Schema.Array(Info).annotate({ description: t("schema.question.info.questions") }),
   tool: Schema.optional(Tool),
 }).annotate({ identifier: "QuestionRequest" })
 export const Answer = Schema.Array(Schema.String).annotate({ identifier: "QuestionAnswer" })
 export const Reply = Schema.Struct({
   answers: Schema.Array(Answer).annotate({
-    description: "User answers in order of questions (each answer is an array of selected labels)",
+    description: t("schema.question.info.answers"),
   }),
 }).annotate({ identifier: "QuestionReply" })
 export const Replied = Schema.Struct({

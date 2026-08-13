@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { LayerNode } from "@opencode-ai/core/effect/layer-node"
 import { httpClient } from "@opencode-ai/core/effect/app-node-platform"
 import { Context, Effect, FiberMap, Iterable, Layer, Schema, Stream } from "effect"
@@ -837,7 +838,7 @@ const layer = Layer.effect(
           signal?.aborted
             ? Effect.fail(
                 new SyncAbortedError({
-                  message: signal.reason instanceof Error ? signal.reason.message : "Request aborted",
+                  message: signal.reason instanceof Error ? signal.reason.message : t("cli.workspace.request-aborted"),
                   cause: signal.reason,
                 }),
               )

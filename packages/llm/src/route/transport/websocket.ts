@@ -3,6 +3,7 @@ import { Headers } from "effect/unstable/http"
 import { LLMError, TransportReason } from "../../schema"
 import * as HttpTransport from "./http"
 import type { Transport } from "./index"
+import { t } from "../../i18n"
 
 export interface WebSocketRequest {
   readonly url: string
@@ -116,7 +117,7 @@ const webSocketUrl = (value: string) =>
       throw new Error(`Unsupported WebSocket URL protocol ${url.protocol}`)
     },
     catch: (error) =>
-      transportError("prepare", error instanceof Error ? error.message : "Invalid WebSocket URL", {
+      transportError("prepare", error instanceof Error ? error.message : t("llm.error.invalid_ws_url"), {
         url: value,
         kind: "websocket",
       }),
@@ -127,7 +128,7 @@ export const open = (input: WebSocketRequest) =>
     try: () =>
       new (globalThis.WebSocket as unknown as WebSocketConstructorWithHeaders)(input.url, { headers: input.headers }),
     catch: (error) =>
-      transportError("open", error instanceof Error ? error.message : "Failed to construct WebSocket", {
+      transportError("open", error instanceof Error ? error.message : t("llm.error.ws_construct_failed"), {
         url: input.url,
         kind: "open",
       }),
@@ -186,7 +187,7 @@ export const fromWebSocket = (
         Effect.try({
           try: () => ws.send(message),
           catch: (error) =>
-            transportError("sendText", error instanceof Error ? error.message : "Failed to send WebSocket message", {
+            transportError("sendText", error instanceof Error ? error.message : t("llm.error.ws_send_failed"), {
               url: input.url,
               kind: "write",
             }),

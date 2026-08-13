@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import type { NamedError } from "@opencode-ai/core/util/error"
 import { SessionV1 } from "@opencode-ai/core/v1/session"
 import { Cause, Clock, Duration, Effect, Schedule } from "effect"
@@ -101,7 +102,7 @@ export function retryable(error: Err, provider: string) {
         action: {
           reason: "free_tier_limit",
           provider,
-          title: "Free limit reached",
+          title: t("cli.retry.free-limit-reached"),
           message: "Subscribe to OpenCode Go for reliable access to the best open-source models, starting at $5/month.",
           label: "subscribe",
           link: GO_UPSELL_URL,
@@ -134,21 +135,21 @@ export function retryable(error: Err, provider: string) {
         action: {
           reason: "account_rate_limit",
           provider,
-          title: "Go limit reached",
+          title: t("cli.retry.go-limit-reached"),
           message,
           label: "open settings",
           link,
         },
       }
     }
-    return { message: error.data.message.includes("Overloaded") ? "Provider is overloaded" : error.data.message }
+    return { message: error.data.message.includes("Overloaded") ? t("cli.retry.provider-is-overloaded") : error.data.message }
   }
 
   const message = isRecord(error.data) ? error.data.message : undefined
   if (typeof message !== "string") return undefined
   const lower = message.toLowerCase()
-  if (lower.includes("too_many_requests")) return { message: "Too Many Requests" }
-  if (lower.includes("exhausted") || lower.includes("unavailable")) return { message: "Provider is overloaded" }
+  if (lower.includes("too_many_requests")) return { message: t("cli.retry.too-many-requests") }
+  if (lower.includes("exhausted") || lower.includes("unavailable")) return { message: t("cli.retry.provider-is-overloaded") }
   if (matchesRetryableMessage(message)) return { message }
   return undefined
 }

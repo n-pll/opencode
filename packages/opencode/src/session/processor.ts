@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { LayerNode } from "@opencode-ai/core/effect/layer-node"
 import { PermissionV1 } from "@opencode-ai/core/v1/permission"
 import { Image } from "@/image/image"
@@ -585,7 +586,7 @@ const layer = Layer.effect(
             state: {
               ...part.state,
               status: "error",
-              error: "Tool execution aborted",
+              error: t("cli.processor.tool-execution-aborted"),
               metadata: { ...metadata, interrupted: true },
               time: { start: "time" in part.state ? part.state.time.start : end, end },
             },

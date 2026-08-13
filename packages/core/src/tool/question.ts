@@ -8,6 +8,7 @@ import { QuestionV2 } from "../question"
 import { ToolRegistry } from "./registry"
 import { Tool } from "./tool"
 import { Tools } from "./tools"
+import { t } from "../i18n"
 
 export const name = "question"
 
@@ -23,7 +24,7 @@ Usage notes:
 - If you recommend a specific option, make that the first option in the list and add "(Recommended)" at the end of the label`
 
 export const Input = Schema.Struct({
-  questions: Schema.Array(QuestionV2.Prompt).annotate({ description: "Questions to ask" }),
+  questions: Schema.Array(QuestionV2.Prompt).annotate({ description: t("core.config.questions_to_ask") }),
 })
 
 export const Output = Schema.Struct({

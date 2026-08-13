@@ -7,6 +7,7 @@ import "@/server/event"
 import { Schema } from "effect"
 import { HttpApi, HttpApiEndpoint, HttpApiError, HttpApiGroup, HttpApiSchema, OpenApi } from "effect/unstable/httpapi"
 import { described } from "./metadata"
+import { t } from "@/i18n"
 
 const GlobalHealth = Schema.Struct({
   healthy: Schema.Literal(true),
@@ -78,8 +79,8 @@ export const GlobalApi = HttpApi.make("global").add(
       }).annotateMerge(
         OpenApi.annotations({
           identifier: "global.health",
-          summary: "Get health",
-          description: "Get health information about the OpenCode server.",
+          summary: t("instance.global.global_health.summary"),
+          description: t("instance.global.global_health.description"),
         }),
       ),
       HttpApiEndpoint.get("event", GlobalPaths.event, {
@@ -87,8 +88,8 @@ export const GlobalApi = HttpApi.make("global").add(
       }).annotateMerge(
         OpenApi.annotations({
           identifier: "global.event",
-          summary: "Get global events",
-          description: "Subscribe to global events from the OpenCode system using server-sent events.",
+          summary: t("instance.global.global_event.summary"),
+          description: t("instance.global.global_event.description"),
         }),
       ),
       HttpApiEndpoint.get("configGet", GlobalPaths.config, {
@@ -96,8 +97,8 @@ export const GlobalApi = HttpApi.make("global").add(
       }).annotateMerge(
         OpenApi.annotations({
           identifier: "global.config.get",
-          summary: "Get global configuration",
-          description: "Retrieve the current global OpenCode configuration settings and preferences.",
+          summary: t("instance.global.global_config_get.summary"),
+          description: t("instance.global.global_config_get.description"),
         }),
       ),
       HttpApiEndpoint.patch("configUpdate", GlobalPaths.config, {
@@ -107,8 +108,8 @@ export const GlobalApi = HttpApi.make("global").add(
       }).annotateMerge(
         OpenApi.annotations({
           identifier: "global.config.update",
-          summary: "Update global configuration",
-          description: "Update global OpenCode configuration settings and preferences.",
+          summary: t("instance.global.global_config_update.summary"),
+          description: t("instance.global.global_config_update.description"),
         }),
       ),
       HttpApiEndpoint.post("dispose", GlobalPaths.dispose, {
@@ -116,8 +117,8 @@ export const GlobalApi = HttpApi.make("global").add(
       }).annotateMerge(
         OpenApi.annotations({
           identifier: "global.dispose",
-          summary: "Dispose instance",
-          description: "Clean up and dispose all OpenCode instances, releasing all resources.",
+          summary: t("instance.global.global_dispose.summary"),
+          description: t("instance.global.global_dispose.description"),
         }),
       ),
       HttpApiEndpoint.post("upgrade", GlobalPaths.upgrade, {
@@ -127,10 +128,10 @@ export const GlobalApi = HttpApi.make("global").add(
       }).annotateMerge(
         OpenApi.annotations({
           identifier: "global.upgrade",
-          summary: "Upgrade opencode",
-          description: "Upgrade opencode to the specified version or latest if not specified.",
+          summary: t("instance.global.global_upgrade.summary"),
+          description: t("instance.global.global_upgrade.description"),
         }),
       ),
     )
-    .annotateMerge(OpenApi.annotations({ title: "global", description: "Global server routes." })),
+    .annotateMerge(OpenApi.annotations({ title: "global", description: t("instance.global.global_1.description") })),
 )

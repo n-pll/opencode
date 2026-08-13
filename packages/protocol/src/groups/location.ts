@@ -1,6 +1,7 @@
 import { Location } from "@opencode-ai/schema/location"
 import { Schema } from "effect"
 import { HttpApiEndpoint, HttpApiGroup, OpenApi } from "effect/unstable/httpapi"
+import { t } from "../i18n"
 
 export const LocationQuery = Schema.Struct({
   location: Schema.optional(
@@ -35,8 +36,8 @@ export const LocationGroup = HttpApiGroup.make("server.location").add(
     .annotateMerge(
       OpenApi.annotations({
         identifier: "v2.location.get",
-        summary: "Get location",
-        description: "Resolve the requested location or the server default location.",
+        summary: t("protocol.location.location_get.summary"),
+        description: t("protocol.location.location_get.description"),
       }),
     ),
 )

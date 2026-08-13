@@ -1,10 +1,11 @@
+import { t } from "@/i18n"
 import { Effect, Schema } from "effect"
 import * as Tool from "./tool"
 import { Question } from "../question"
 import DESCRIPTION from "./question.txt"
 
 export const Parameters = Schema.Struct({
-  questions: Schema.mutable(Schema.Array(Question.Prompt)).annotate({ description: "Questions to ask" }),
+  questions: Schema.mutable(Schema.Array(Question.Prompt)).annotate({ description: t("cli.question.questions-to-ask") }),
 })
 
 type Metadata = {

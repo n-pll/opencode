@@ -8,6 +8,7 @@ import { Authorization } from "../middleware/authorization"
 import { InstanceContextMiddleware } from "../middleware/instance-context"
 import { WorkspaceRoutingMiddleware, WorkspaceRoutingQuery } from "../middleware/workspace-routing"
 import { described } from "./metadata"
+import { t } from "@/i18n"
 
 const root = "/experimental/workspace"
 export const CreatePayload = Schema.Struct(Struct.omit(Workspace.CreateInput.fields, ["projectID"]))
@@ -56,8 +57,8 @@ export const WorkspaceApi = HttpApi.make("workspace")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "experimental.workspace.adapter.list",
-            summary: "List workspace adapters",
-            description: "List all available workspace adapters for the current project.",
+            summary: t("instance.workspace.experimental_workspace_adapter_list.summary"),
+            description: t("instance.workspace.experimental_workspace_adapter_list.description"),
           }),
         ),
         HttpApiEndpoint.get("list", WorkspacePaths.list, {
@@ -66,8 +67,8 @@ export const WorkspaceApi = HttpApi.make("workspace")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "experimental.workspace.list",
-            summary: "List workspaces",
-            description: "List all workspaces.",
+            summary: t("instance.workspace.experimental_workspace_list.summary"),
+            description: t("instance.workspace.experimental_workspace_list.description"),
           }),
         ),
         HttpApiEndpoint.post("create", WorkspacePaths.list, {
@@ -78,8 +79,8 @@ export const WorkspaceApi = HttpApi.make("workspace")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "experimental.workspace.create",
-            summary: "Create workspace",
-            description: "Create a workspace for the current project.",
+            summary: t("instance.workspace.experimental_workspace_create.summary"),
+            description: t("instance.workspace.experimental_workspace_create.description"),
           }),
         ),
         HttpApiEndpoint.post("syncList", WorkspacePaths.syncList, {
@@ -88,8 +89,8 @@ export const WorkspaceApi = HttpApi.make("workspace")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "experimental.workspace.syncList",
-            summary: "Sync workspace list",
-            description: "Register missing workspaces returned by workspace adapters.",
+            summary: t("instance.workspace.experimental_workspace_syncList.summary"),
+            description: t("instance.workspace.experimental_workspace_syncList.description"),
           }),
         ),
         HttpApiEndpoint.get("status", WorkspacePaths.status, {
@@ -98,8 +99,8 @@ export const WorkspaceApi = HttpApi.make("workspace")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "experimental.workspace.status",
-            summary: "Workspace status",
-            description: "Get connection status for workspaces in the current project.",
+            summary: t("instance.workspace.experimental_workspace_status.summary"),
+            description: t("instance.workspace.experimental_workspace_status.description"),
           }),
         ),
         HttpApiEndpoint.delete("remove", WorkspacePaths.remove, {
@@ -110,8 +111,8 @@ export const WorkspaceApi = HttpApi.make("workspace")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "experimental.workspace.remove",
-            summary: "Remove workspace",
-            description: "Remove an existing workspace.",
+            summary: t("instance.workspace.experimental_workspace_remove.summary"),
+            description: t("instance.workspace.experimental_workspace_remove.description"),
           }),
         ),
         HttpApiEndpoint.post("warp", WorkspacePaths.warp, {
@@ -122,12 +123,12 @@ export const WorkspaceApi = HttpApi.make("workspace")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "experimental.workspace.warp",
-            summary: "Warp session into workspace",
-            description: "Move a session's sync history into the target workspace, or detach it to the local project.",
+            summary: t("instance.workspace.experimental_workspace_warp.summary"),
+            description: t("instance.workspace.experimental_workspace_warp.description"),
           }),
         ),
       )
-      .annotateMerge(OpenApi.annotations({ title: "workspace", description: "Experimental HttpApi workspace routes." }))
+      .annotateMerge(OpenApi.annotations({ title: "workspace", description: t("instance.workspace.workspace_0.description") }))
       .middleware(InstanceContextMiddleware)
       .middleware(WorkspaceRoutingMiddleware)
       .middleware(Authorization),
@@ -136,6 +137,6 @@ export const WorkspaceApi = HttpApi.make("workspace")
     OpenApi.annotations({
       title: "opencode experimental HttpApi",
       version: "0.0.1",
-      description: "Experimental HttpApi surface for selected instance routes.",
+      description: t("instance.config.config_1.description"),
     }),
   )

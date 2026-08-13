@@ -1,5 +1,6 @@
 import { Schema } from "effect"
 import { OpenApi } from "effect/unstable/httpapi"
+import { t } from "@/i18n"
 
 export function described<S extends Schema.Top>(schema: S, description: string): S {
   return schema.annotate({ description }) as S

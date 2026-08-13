@@ -12,16 +12,17 @@ import { ReadToolFileSystem } from "./read-filesystem"
 import { ToolRegistry } from "./registry"
 import { Tool } from "./tool"
 import { Tools } from "./tools"
+import { t } from "../i18n"
 
 export const name = "read"
 const SUPPORTED_IMAGE_MIMES = new Set(["image/jpeg", "image/png", "image/gif", "image/webp"])
 const LocationInput = Schema.Struct({
   path: Schema.String,
   offset: ReadToolFileSystem.PageInput.fields.offset.annotate({
-    description: "The 1-based directory entry or text line offset to start reading from",
+    description: t("core.config.the_1_based_directory_entry_or_text_line_offset_to_start_rea"),
   }),
   limit: ReadToolFileSystem.PageInput.fields.limit.annotate({
-    description: "The maximum number of directory entries or text lines to read",
+    description: t("core.config.the_maximum_number_of_directory_entries_or_text_lines_to_rea"),
   }),
 })
 const Input = LocationInput

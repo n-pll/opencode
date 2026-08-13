@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/language"
 import type { BoxRenderable, TextareaRenderable, ScrollBoxRenderable } from "@opentui/core"
 import { pathToFileURL } from "bun"
 import fuzzysort from "fuzzysort"
@@ -84,6 +85,7 @@ export function Autocomplete(props: {
   agentStyleId: number
   promptPartTypeId: () => number
 }) {
+  const { t } = useLanguage()
   const editor = useEditorContext()
   const sdk = useSDK()
   const sync = useSync()
@@ -584,7 +586,7 @@ export function Autocomplete(props: {
     commands: [
       {
         name: "prompt.autocomplete.prev",
-        title: "Previous autocomplete item",
+        title: t("tui.autocomplete.previous-autocomplete-item"),
         category: "Autocomplete",
         run() {
           setStore("input", "keyboard")
@@ -593,7 +595,7 @@ export function Autocomplete(props: {
       },
       {
         name: "prompt.autocomplete.next",
-        title: "Next autocomplete item",
+        title: t("tui.autocomplete.next-autocomplete-item"),
         category: "Autocomplete",
         run() {
           setStore("input", "keyboard")
@@ -602,7 +604,7 @@ export function Autocomplete(props: {
       },
       {
         name: "prompt.autocomplete.hide",
-        title: "Hide autocomplete",
+        title: t("tui.autocomplete.hide-autocomplete"),
         category: "Autocomplete",
         run() {
           hide()
@@ -610,7 +612,7 @@ export function Autocomplete(props: {
       },
       {
         name: "prompt.autocomplete.select",
-        title: "Select autocomplete item",
+        title: t("tui.autocomplete.select-autocomplete-item"),
         category: "Autocomplete",
         run() {
           select()
@@ -618,7 +620,7 @@ export function Autocomplete(props: {
       },
       {
         name: "prompt.autocomplete.complete",
-        title: "Complete autocomplete item",
+        title: t("tui.autocomplete.complete-autocomplete-item"),
         category: "Autocomplete",
         run() {
           const selected = options()[store.selected]

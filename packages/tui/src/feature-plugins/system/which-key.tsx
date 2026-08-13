@@ -306,7 +306,7 @@ function WhichKeyPanel(props: {
     commands: [
       {
         name: command.groupPrevious,
-        title: "Previous key binding group",
+        title: t("tui.which_key.previous-key-binding-group"),
         desc: "Show the previous which-key group",
         category: "System",
         run() {
@@ -315,7 +315,7 @@ function WhichKeyPanel(props: {
       },
       {
         name: command.groupNext,
-        title: "Next key binding group",
+        title: t("tui.which_key.next-key-binding-group"),
         desc: "Show the next which-key group",
         category: "System",
         run() {
@@ -324,7 +324,7 @@ function WhichKeyPanel(props: {
       },
       {
         name: command.scrollUp,
-        title: "Scroll key bindings up",
+        title: t("tui.which_key.scroll-key-bindings-up"),
         desc: "Scroll the which-key panel up",
         category: "System",
         run() {
@@ -333,7 +333,7 @@ function WhichKeyPanel(props: {
       },
       {
         name: command.scrollDown,
-        title: "Scroll key bindings down",
+        title: t("tui.which_key.scroll-key-bindings-down"),
         desc: "Scroll the which-key panel down",
         category: "System",
         run() {
@@ -342,7 +342,7 @@ function WhichKeyPanel(props: {
       },
       {
         name: command.pageUp,
-        title: "Page key bindings up",
+        title: t("tui.which_key.page-key-bindings-up"),
         desc: "Page the which-key panel up",
         category: "System",
         run() {
@@ -351,7 +351,7 @@ function WhichKeyPanel(props: {
       },
       {
         name: command.pageDown,
-        title: "Page key bindings down",
+        title: t("tui.which_key.page-key-bindings-down"),
         desc: "Page the which-key panel down",
         category: "System",
         run() {
@@ -360,7 +360,7 @@ function WhichKeyPanel(props: {
       },
       {
         name: command.home,
-        title: "First key binding",
+        title: t("tui.which_key.first-key-binding"),
         desc: "Jump to the first which-key binding",
         category: "System",
         run() {
@@ -369,7 +369,7 @@ function WhichKeyPanel(props: {
       },
       {
         name: command.end,
-        title: "Last key binding",
+        title: t("tui.which_key.last-key-binding"),
         desc: "Jump to the last which-key binding",
         category: "System",
         run() {
@@ -547,6 +547,7 @@ function WhichKeyPanel(props: {
 }
 
 const tui: TuiPlugin = async (api) => {
+  const { t } = useLanguage()
   const [pinned, setPinned] = createSignal(false)
   const [mode, setMode] = createSignal(layout(api.kv.get(KV_LAYOUT, "dock")))
   const [pendingPreview, setPendingPreview] = createSignal(api.kv.get(KV_PENDING_PREVIEW, false))
@@ -556,7 +557,7 @@ const tui: TuiPlugin = async (api) => {
     commands: [
       {
         name: command.toggle,
-        title: "Show key bindings",
+        title: t("tui.which_key.show-key-bindings"),
         desc: "Toggle which-key overlay",
         category: "System",
         run() {
@@ -565,7 +566,7 @@ const tui: TuiPlugin = async (api) => {
       },
       {
         name: command.toggleLayout,
-        title: "Toggle key bindings layout",
+        title: t("tui.which_key.toggle-key-bindings-layout"),
         desc: "Switch which-key between dock and overlay mode",
         category: "System",
         run() {
@@ -578,7 +579,7 @@ const tui: TuiPlugin = async (api) => {
       },
       {
         name: command.togglePending,
-        title: "Toggle pending key preview",
+        title: t("tui.which_key.toggle-pending-key-preview"),
         desc: "Automatically show which-key for pending key sequences in overlay mode",
         category: "System",
         run() {

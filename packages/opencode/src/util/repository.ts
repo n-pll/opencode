@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import path from "path"
 import { fileURLToPath } from "url"
 import { Schema } from "effect"
@@ -194,7 +195,7 @@ export function parseRemoteRepositoryReference(input: string) {
   if (!isRemoteRepositoryReference(reference)) {
     throw new UnsupportedLocalRepositoryError({
       repository: input,
-      message: "Local file repositories are not supported",
+      message: t("cli.repository.local-file-repositories-are-not-supported"),
     })
   }
   return reference

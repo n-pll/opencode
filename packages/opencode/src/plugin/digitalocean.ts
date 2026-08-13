@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import type { Hooks, PluginInput } from "@opencode-ai/plugin"
 import type { Model } from "@opencode-ai/sdk/v2"
 import { InstallationVersion } from "@opencode-ai/core/installation/version"
@@ -102,7 +103,7 @@ async function startOAuthServer(): Promise<void> {
           return
         }
         if (body.state !== pendingOAuth.state) {
-          pendingOAuth.reject(new Error("Invalid state - potential CSRF attack"))
+          pendingOAuth.reject(new Error(t("cli.digitalocean.invalid-state-potential-csrf-attack")))
           pendingOAuth = undefined
           res.writeHead(400, { "Content-Type": "application/json" })
           res.end(JSON.stringify({ error: "invalid_state" }))
@@ -145,7 +146,7 @@ function waitForOAuthCallback(state: string): Promise<ImplicitTokenPayload> {
       () => {
         if (pendingOAuth) {
           pendingOAuth = undefined
-          reject(new Error("OAuth callback timeout - authorization took too long"))
+          reject(new Error(t("cli.digitalocean.oauth-callback-timeout-authorization-took-too-long")))
         }
       },
       5 * 60 * 1000,
@@ -273,7 +274,7 @@ export async function DigitalOceanAuthPlugin(input: PluginInput): Promise<Hooks>
       methods: [
         {
           type: "oauth",
-          label: "Login with DigitalOcean",
+          label: t("cli.digitalocean.login-with-digitalocean"),
           async authorize() {
             await startOAuthServer()
             const state = generateState()
@@ -317,7 +318,7 @@ export async function DigitalOceanAuthPlugin(input: PluginInput): Promise<Hooks>
         },
         {
           type: "api",
-          label: "Paste Model Access Key",
+          label: t("cli.digitalocean.paste-model-access-key"),
         },
       ],
     },

@@ -66,7 +66,7 @@ export function providerOptions(list: { id: string; name: string }[]): ProviderO
           openai: t("tui.dialog.provider.desc.openai"),
           "opencode-go": t("tui.dialog.provider.desc.opencode_go"),
         }[provider.id],
-        category: provider.id in PROVIDER_PRIORITY ? t("tui.dialog.provider.category.popular") : t("tui.dialog.provider.category.providers"),
+        category: provider.id in PROVIDER_PRIORITY ? "Popular" : "Providers",
       })),
     ),
     {
@@ -74,7 +74,7 @@ export function providerOptions(list: { id: string; name: string }[]): ProviderO
       title: t("tui.dialog.provider.other.title"),
       value: CUSTOM_PROVIDER_OPTION_VALUE,
       description: t("tui.dialog.provider.other.desc"),
-      category: t("tui.dialog.provider.category.providers"),
+      category: "Providers",
     },
   ]
 }

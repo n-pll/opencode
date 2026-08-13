@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { Effect, Schema } from "effect"
 import { HttpClient, HttpClientRequest } from "effect/unstable/http"
 import { Parser } from "htmlparser2"
@@ -11,14 +12,14 @@ const DEFAULT_TIMEOUT = 30 * 1000 // 30 seconds
 const MAX_TIMEOUT = 120 * 1000 // 2 minutes
 
 export const Parameters = Schema.Struct({
-  url: Schema.String.annotate({ description: "The URL to fetch content from" }),
+  url: Schema.String.annotate({ description: t("cli.webfetch.the-url-to-fetch-content-from") }),
   format: Schema.Literals(["text", "markdown", "html"])
     .annotate({
       description: "The format to return the content in (text, markdown, or html). Defaults to markdown.",
       default: "markdown",
     })
     .pipe(Schema.withDecodingDefault(Effect.succeed("markdown" as const))),
-  timeout: Schema.optional(Schema.Number).annotate({ description: "Optional timeout in seconds (max 120)" }),
+  timeout: Schema.optional(Schema.Number).annotate({ description: t("cli.webfetch.optional-timeout-in-seconds-max-120") }),
 })
 
 export const WebFetchTool = Tool.define(
@@ -89,18 +90,18 @@ export const WebFetchTool = Tool.define(
                   ),
                 ),
             ),
-            Effect.timeoutOrElse({ duration: timeout, orElse: () => Effect.die(new Error("Request timed out")) }),
+            Effect.timeoutOrElse({ duration: timeout, orElse: () => Effect.die(new Error(t("cli.webfetch.request-timed-out"))) }),
           )
 
           // Check content length
           const contentLength = response.headers["content-length"]
           if (contentLength && parseInt(contentLength) > MAX_RESPONSE_SIZE) {
-            throw new Error("Response too large (exceeds 5MB limit)")
+            throw new Error(t("cli.webfetch.response-too-large-exceeds-5mb-limit"))
           }
 
           const arrayBuffer = yield* response.arrayBuffer
           if (arrayBuffer.byteLength > MAX_RESPONSE_SIZE) {
-            throw new Error("Response too large (exceeds 5MB limit)")
+            throw new Error(t("cli.webfetch.response-too-large-exceeds-5mb-limit"))
           }
 
           const contentType = response.headers["content-type"] || ""

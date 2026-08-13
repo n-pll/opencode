@@ -16,6 +16,7 @@ import { ConfigPluginV1 } from "./plugin"
 import { ConfigProviderV1 } from "./provider"
 import { ConfigServerV1 } from "./server"
 import { ConfigSkillsV1 } from "./skills"
+import { t } from "../../i18n"
 
 export type Layout = ConfigLayoutV1.Layout
 
@@ -31,19 +32,19 @@ const LogLevelRef = Schema.Literals(["DEBUG", "INFO", "WARN", "ERROR"]).annotate
 
 export const Info = Schema.Struct({
   $schema: Schema.optional(Schema.String).annotate({
-    description: "JSON schema reference for configuration validation",
+    description: t("core.config.json_schema_reference_for_configuration_validation"),
   }),
-  shell: Schema.optional(Schema.String).annotate({ description: "Default shell to use for terminal and bash tool" }),
+  shell: Schema.optional(Schema.String).annotate({ description: t("core.config.default_shell_to_use_for_terminal_and_bash_tool") }),
   logLevel: Schema.optional(LogLevelRef).annotate({ description: "Log level" }),
   server: Schema.optional(ConfigServerV1.Server).annotate({
-    description: "Server configuration for opencode serve and web commands",
+    description: t("core.config.server_configuration_for_opencode_serve_and_web_commands"),
   }),
   command: Schema.optional(Schema.Record(Schema.String, ConfigCommandV1.Info)).annotate({
     description: "Command configuration, see https://opencode.ai/docs/commands",
   }),
-  skills: Schema.optional(ConfigSkillsV1.Info).annotate({ description: "Additional skill folder paths" }),
+  skills: Schema.optional(ConfigSkillsV1.Info).annotate({ description: t("core.config.additional_skill_folder_paths") }),
   references: Schema.optional(ConfigReference.Info).annotate({
-    description: "Named git or local directory references",
+    description: t("core.config.named_git_or_local_directory_references"),
   }),
   reference: Schema.optional(ConfigReference.Info).annotate({
     description: "@deprecated Use 'references' field instead. Named git or local directory references",
@@ -66,7 +67,7 @@ export const Info = Schema.Struct({
       "Automatically update to the latest version. Set to true to auto-update, false to disable, or 'notify' to show update notifications",
   }),
   disabled_providers: Schema.optional(Schema.mutable(Schema.Array(Schema.String))).annotate({
-    description: "Disable providers that are loaded automatically",
+    description: t("core.config.disable_providers_that_are_loaded_automatically"),
   }),
   enabled_providers: Schema.optional(Schema.mutable(Schema.Array(Schema.String))).annotate({
     description: "When set, ONLY these providers will be enabled. All other providers will be ignored",
@@ -75,17 +76,17 @@ export const Info = Schema.Struct({
     description: "Model to use in the format of provider/model, eg anthropic/claude-2",
   }),
   small_model: Schema.optional(Schema.String).annotate({
-    description: "Small model to use for tasks like title generation in the format of provider/model",
+    description: t("core.config.small_model_to_use_for_tasks_like_title_generation_in_the_fo"),
   }),
   default_agent: Schema.optional(Schema.String).annotate({
     description:
-      "Default agent to use when none is specified. Must be a primary agent. Falls back to 'build' if not set or if the specified agent is invalid.",
+      t("core.config.default-agent-to-use-when-none-is-specified-must-be-a-primar"),
   }),
   subagent_depth: Schema.optional(NonNegativeInt).annotate({
     description: "Maximum subagent nesting depth. Defaults to 1, which prevents subagents from launching subagents.",
   }),
   username: Schema.optional(Schema.String).annotate({
-    description: "Custom username to display in conversations instead of system username",
+    description: t("core.config.custom_username_to_display_in_conversations_instead_of_syste"),
   }),
   locale: Schema.optional(Schema.String).annotate({
     description:
@@ -112,11 +113,11 @@ export const Info = Schema.Struct({
     ),
   ).annotate({ description: "Agent configuration, see https://opencode.ai/docs/agents" }),
   provider: Schema.optional(Schema.Record(Schema.String, ConfigProviderV1.Info)).annotate({
-    description: "Custom provider configurations and model overrides",
+    description: t("core.config.custom_provider_configurations_and_model_overrides"),
   }),
   mcp: Schema.optional(
     Schema.Record(Schema.String, Schema.Union([ConfigMCPV1.Info, Schema.Struct({ enabled: Schema.Boolean })])),
-  ).annotate({ description: "MCP (Model Context Protocol) server configurations" }),
+  ).annotate({ description: t("core.config.mcp_model_context_protocol_server_configurations") }),
   formatter: Schema.optional(ConfigFormatterV1.Info).annotate({
     description:
       "Enable or configure formatters. Omit or set to false to disable, true to enable built-ins, or an object to enable built-ins with overrides.",
@@ -126,7 +127,7 @@ export const Info = Schema.Struct({
       "Enable or configure LSP servers. Omit or set to false to disable, true to enable built-ins, or an object to enable built-ins with overrides.",
   }),
   instructions: Schema.optional(Schema.mutable(Schema.Array(Schema.String))).annotate({
-    description: "Additional instruction files or patterns to include",
+    description: t("core.config.additional_instruction_files_or_patterns_to_include"),
   }),
   layout: Schema.optional(ConfigLayoutV1.Layout).annotate({ description: "@deprecated Always uses stretch layout." }),
   permission: Schema.optional(ConfigPermissionV1.Info),
@@ -135,7 +136,7 @@ export const Info = Schema.Struct({
     description: "Attachment processing configuration, including image size limits and resizing behavior",
   }),
   enterprise: Schema.optional(
-    Schema.Struct({ url: Schema.optional(Schema.String).annotate({ description: "Enterprise URL" }) }),
+    Schema.Struct({ url: Schema.optional(Schema.String).annotate({ description: t("core.config.enterprise_url") }) }),
   ),
   tool_output: Schema.optional(
     Schema.Struct({
@@ -163,28 +164,28 @@ export const Info = Schema.Struct({
           "Number of recent user turns, including their following assistant/tool responses, to keep verbatim during compaction (default: 2)",
       }),
       preserve_recent_tokens: Schema.optional(NonNegativeInt).annotate({
-        description: "Maximum number of tokens from recent turns to preserve verbatim after compaction",
+        description: t("core.config.maximum_number_of_tokens_from_recent_turns_to_preserve_verba"),
       }),
       reserved: Schema.optional(NonNegativeInt).annotate({
-        description: "Token buffer for compaction. Leaves enough window to avoid overflow during compaction.",
+        description: t("core.config.token_buffer_for_compaction_leaves_enough_window_to_avoid_ov"),
       }),
     }),
   ),
   experimental: Schema.optional(
     Schema.Struct({
       disable_paste_summary: Schema.optional(Schema.Boolean),
-      batch_tool: Schema.optional(Schema.Boolean).annotate({ description: "Enable the batch tool" }),
+      batch_tool: Schema.optional(Schema.Boolean).annotate({ description: t("core.config.enable_the_batch_tool") }),
       openTelemetry: Schema.optional(Schema.Boolean).annotate({
         description: "Enable OpenTelemetry spans for AI SDK calls (using the 'experimental_telemetry' flag)",
       }),
       primary_tools: Schema.optional(Schema.mutable(Schema.Array(Schema.String))).annotate({
-        description: "Tools that should only be available to primary agents.",
+        description: t("core.config.tools_that_should_only_be_available_to_primary_agents"),
       }),
       continue_loop_on_deny: Schema.optional(Schema.Boolean).annotate({
-        description: "Continue the agent loop when a tool call is denied",
+        description: t("core.config.continue_the_agent_loop_when_a_tool_call_is_denied"),
       }),
       mcp_timeout: Schema.optional(PositiveInt).annotate({
-        description: "Timeout in milliseconds for model context protocol (MCP) requests",
+        description: t("core.config.timeout_in_milliseconds_for_model_context_protocol_mcp_reque"),
       }),
       policies: Schema.optional(Schema.mutable(Schema.Array(ConfigExperimental.Policy))).annotate({
         description: "Policy statements applied to supported resources, such as provider access",

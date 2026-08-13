@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import path from "node:path"
 import { pathToFileURL } from "node:url"
 import { LayerNode } from "@opencode-ai/core/effect/layer-node"
@@ -243,7 +244,7 @@ const layer = Layer.effect(
       if (!url) {
         return {
           client: undefined as MCPClient | undefined,
-          status: { status: "failed" as const, error: `Invalid MCP URL for "${key}"` },
+          status: { status: "failed" as const, error: t("cli.mcp.invalid_mcp_url", { key }) },
         }
       }
       let authProvider: McpOAuthProvider | undefined
@@ -298,11 +299,11 @@ const layer = Layer.effect(
               if (lastError.message.includes("registration") || lastError.message.includes("client_id")) {
                 lastStatus = {
                   status: "needs_client_registration" as const,
-                  error: "Server does not support dynamic client registration. Please provide clientId in config.",
+                  error: t("cli.index.server-does-not-support-dynamic-client-registration-please-p"),
                 }
                 return events
                   .publish(TuiEvent.ToastShow, {
-                    title: "MCP Authentication Required",
+                    title: t("cli.index.mcp-authentication-required"),
                     message: `Server "${key}" requires a pre-registered client ID. Add clientId to your config.`,
                     variant: "warning",
                     duration: 8000,
@@ -313,7 +314,7 @@ const layer = Layer.effect(
                 lastStatus = { status: "needs_auth" as const }
                 return events
                   .publish(TuiEvent.ToastShow, {
-                    title: "MCP Authentication Required",
+                    title: t("cli.index.mcp-authentication-required"),
                     message: `Server "${key}" requires authentication. Run: opencode mcp auth ${key}`,
                     variant: "warning",
                     duration: 8000,
@@ -333,7 +334,7 @@ const layer = Layer.effect(
 
       return {
         client: undefined as MCPClient | undefined,
-        status: (lastStatus ?? { status: "failed", error: "Unknown error" }) as Status,
+        status: (lastStatus ?? { status: "failed", error: t("cli.index.unknown-error") }) as Status,
       }
     })
 
@@ -390,7 +391,7 @@ const layer = Layer.effect(
         return yield* Effect.gen(function* () {
           const listed = mcpClient.getServerCapabilities()?.tools ? yield* McpCatalog.defs(mcpClient, mcp.timeout) : []
           if (!listed) {
-            return yield* Effect.fail(new Error("Failed to get tools"))
+            return yield* Effect.fail(new Error(t("cli.index.failed-to-get-tools")))
           }
           return {
             mcpClient,
@@ -445,7 +446,7 @@ const layer = Layer.effect(
         delete s.clients[name]
         delete s.defs[name]
         delete s.instructions[name]
-        s.status[name] = { status: "failed", error: "Connection closed" }
+        s.status[name] = { status: "failed", error: t("cli.index.connection-closed") }
         bridge.fork(
           Effect.logWarning("MCP connection closed", { server: name }).pipe(
             Effect.andThen(events.publish(ToolsChanged, { server: name })),
@@ -808,7 +809,7 @@ const layer = Layer.effect(
       if (mcpConfig.type !== "remote") throw new Error(`MCP server ${mcpName} is not a remote server`)
       if (mcpConfig.oauth === false) throw new Error(`MCP server ${mcpName} has OAuth explicitly disabled`)
       const url = remoteURL(mcpConfig.url)
-      if (!url) throw new Error(`Invalid MCP URL for "${mcpName}"`)
+      if (!url) throw new Error(t("cli.mcp.invalid_mcp_url", { key: mcpName }))
 
       // OAuth config is optional - if not provided, we'll use auto-discovery
       const oauthConfig = typeof mcpConfig.oauth === "object" ? mcpConfig.oauth : undefined
@@ -887,7 +888,7 @@ const layer = Layer.effect(
           : undefined
         if (!client || !listed) {
           yield* Effect.tryPromise(() => client?.close() ?? Promise.resolve()).pipe(Effect.ignore)
-          return { status: "failed", error: "Failed to get tools" } satisfies Status
+          return { status: "failed", error: t("cli.index.failed-to-get-tools") } satisfies Status
         }
 
         const s = yield* InstanceState.get(state)
@@ -909,7 +910,7 @@ const layer = Layer.effect(
       const storedState = yield* auth.getOAuthState(mcpName)
       if (storedState !== result.oauthState) {
         yield* auth.clearOAuthState(mcpName)
-        throw new Error("OAuth state mismatch - potential CSRF attack")
+        throw new Error(t("cli.index.oauth-state-mismatch-potential-csrf-attack"))
       }
       yield* auth.clearOAuthState(mcpName)
       return yield* finishAuth(mcpName, code)

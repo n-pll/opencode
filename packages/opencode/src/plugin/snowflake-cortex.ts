@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import type { Hooks, PluginInput } from "@opencode-ai/plugin"
 import { OAUTH_DUMMY_KEY } from "../auth"
 import { InstallationVersion } from "@opencode-ai/core/installation/version"
@@ -65,7 +66,7 @@ async function generatePKCE(): Promise<PkceCodes> {
 }
 
 function callbackUrl() {
-  if (!oauthServerPort) throw new Error("Snowflake OAuth callback server is not running")
+  if (!oauthServerPort) throw new Error(t("cli.snowflake_cortex.snowflake-oauth-callback-server-is-not-running"))
   return `http://${OAUTH_CALLBACK_HOST}:${oauthServerPort}${OAUTH_CALLBACK_PATH}`
 }
 
@@ -216,7 +217,7 @@ async function startOAuthServer() {
     oauthServer!.listen(0, OAUTH_CALLBACK_HOST, () => {
       const address = oauthServer!.address()
       if (!address || typeof address === "string") {
-        reject(new Error("Unable to resolve Snowflake OAuth callback port"))
+        reject(new Error(t("cli.snowflake_cortex.unable-to-resolve-snowflake-oauth-callback-port")))
         return
       }
       oauthServerPort = address.port
@@ -235,7 +236,7 @@ function stopOAuthServer() {
 
 function waitForOAuthCallback(account: string, pkce: PkceCodes, state: string): Promise<TokenResponse> {
   if (pendingOAuth) {
-    pendingOAuth.reject(new Error("Superseded by a newer Snowflake authorize request"))
+    pendingOAuth.reject(new Error(t("cli.snowflake_cortex.superseded-by-a-newer-snowflake-authorize-request")))
     pendingOAuth = undefined
   }
 
@@ -244,7 +245,7 @@ function waitForOAuthCallback(account: string, pkce: PkceCodes, state: string): 
       if (!pendingOAuth) return
       pendingOAuth = undefined
       stopOAuthServer()
-      reject(new Error("Snowflake OAuth callback timeout - authorization took too long"))
+      reject(new Error(t("cli.snowflake_cortex.snowflake-oauth-callback-timeout-authorization-took-too-long")))
     }, OAUTH_TIMEOUT_MS)
 
     pendingOAuth = {
@@ -268,14 +269,14 @@ export async function SnowflakeCortexAuthPlugin(_input: PluginInput): Promise<Ho
     {
       type: "text" as const,
       key: "account",
-      message: "Snowflake Account Identifier",
+      message: t("cli.snowflake_cortex.snowflake-account-identifier"),
       placeholder: "myorg-myaccount",
       validate: (value: string) => (value && value.trim().length > 0 ? undefined : "Required"),
     },
     {
       type: "text" as const,
       key: "role",
-      message: "Snowflake Role (optional)",
+      message: t("cli.snowflake_cortex.snowflake-role-optional"),
       placeholder: "PUBLIC",
     },
   ]
@@ -329,7 +330,7 @@ export async function SnowflakeCortexAuthPlugin(_input: PluginInput): Promise<Ho
               accountId?: string
             }
 
-            if (!currentOauth.accountId) throw new Error("Snowflake OAuth auth is missing accountId")
+            if (!currentOauth.accountId) throw new Error(t("cli.snowflake_cortex.snowflake-oauth-auth-is-missing-accountid"))
             const accountId = currentOauth.accountId
 
             const refresh = async () => {
@@ -458,11 +459,11 @@ export async function SnowflakeCortexAuthPlugin(_input: PluginInput): Promise<Ho
       methods: [
         {
           type: "oauth",
-          label: "Login with Snowflake (External Browser)",
+          label: t("cli.snowflake_cortex.login-with-snowflake-external-browser"),
           prompts,
           async authorize(inputs = {}) {
             const account = normalizeAccount(inputs.account || "")
-            if (!account) throw new Error("Snowflake account is required")
+            if (!account) throw new Error(t("cli.snowflake_cortex.snowflake-account-is-required"))
 
             await startOAuthServer()
             const pkce = await generatePKCE()
@@ -498,7 +499,7 @@ export async function SnowflakeCortexAuthPlugin(_input: PluginInput): Promise<Ho
         },
         {
           type: "api",
-          label: "Paste PAT or bearer token manually",
+          label: t("cli.snowflake_cortex.paste-pat-or-bearer-token-manually"),
           prompts: prompts.filter((item) => item.key === "account"),
         },
       ],

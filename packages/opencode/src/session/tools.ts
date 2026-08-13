@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { Agent } from "@/agent/agent"
 import { SessionV1 } from "@opencode-ai/core/v1/session"
 import { Provider } from "@/provider/provider"
@@ -304,7 +305,7 @@ export const resolve = Effect.fn("SessionTools.resolve")(function* (input: {
 
     tools[MCP_RESOURCE_TOOLS.read] = tool({
       description:
-        "Read a specific resource from an MCP server using the server name and resource URI. The URI is an MCP identifier and does not need to be a file URL.",
+        t("cli.tools.read-a-specific-resource-from-an-mcp-server-using-the-server"),
       inputSchema: jsonSchema(
         ProviderTransform.schema(input.model, {
           type: "object",

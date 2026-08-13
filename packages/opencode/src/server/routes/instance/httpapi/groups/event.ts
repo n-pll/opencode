@@ -3,6 +3,7 @@ import { HttpApi, HttpApiEndpoint, HttpApiGroup, HttpApiSchema, OpenApi } from "
 import { Authorization } from "../middleware/authorization"
 import { InstanceContextMiddleware } from "../middleware/instance-context"
 import { WorkspaceRoutingMiddleware, WorkspaceRoutingQuery } from "../middleware/workspace-routing"
+import { t } from "@/i18n"
 
 export const EventPaths = {
   event: "/event",
@@ -17,13 +18,13 @@ export const EventApi = HttpApi.make("event").add(
       }).annotateMerge(
         OpenApi.annotations({
           identifier: "event.subscribe",
-          summary: "Subscribe to events",
-          description: "Get events",
+          summary: t("instance.event.event_subscribe.summary"),
+          description: t("instance.event.event_subscribe.description"),
         }),
       ),
     )
     .middleware(InstanceContextMiddleware)
     .middleware(WorkspaceRoutingMiddleware)
     .middleware(Authorization)
-    .annotateMerge(OpenApi.annotations({ title: "event", description: "Instance event stream route." })),
+    .annotateMerge(OpenApi.annotations({ title: "event", description: t("instance.event.event_0.description") })),
 )

@@ -1,4 +1,5 @@
 import type { Effect, Fiber } from "effect"
+import { t } from "./i18n"
 
 export class SandboxPromise {
   interrupted = false

@@ -1,3 +1,4 @@
+import { t } from "../i18n"
 export * as Tool from "./tool"
 
 import { ToolDefinition, ToolFailure, ToolOutput, type ToolCall } from "@opencode-ai/llm"
@@ -151,7 +152,7 @@ export const settle = (tool: AnyTool, call: ToolCall, context: Context) => runti
 
 function runtimeOf(tool: AnyTool) {
   const runtime = runtimes.get(tool)
-  if (!runtime) throw new TypeError("Invalid Core Tool value")
+  if (!runtime) throw new TypeError(t("core.tool.invalid-core-tool-value"))
   return runtime
 }
 

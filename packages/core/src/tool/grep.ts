@@ -13,21 +13,22 @@ import { RelativePath } from "../schema"
 import { ToolRegistry } from "./registry"
 import { Tool } from "./tool"
 import { Tools } from "./tools"
+import { t } from "../i18n"
 
 export const name = "grep"
 
 export const Input = Schema.Struct({
   pattern: FileSystem.GrepInput.fields.pattern.annotate({
-    description: "Regex pattern to search for in file contents",
+    description: t("core.config.regex_pattern_to_search_for_in_file_contents"),
   }),
   path: RelativePath.pipe(Schema.optional).annotate({
-    description: "Relative directory to search. Defaults to the active Location.",
+    description: t("core.config.relative_directory_to_search_defaults_to_the_active_location"),
   }),
   include: FileSystem.GrepInput.fields.include.annotate({
     description: 'File glob to include in the search (for example, "*.js" or "*.{ts,tsx}")',
   }),
   limit: FileSystem.GrepInput.fields.limit.annotate({
-    description: "Maximum matches to return",
+    description: t("core.config.maximum_matches_to_return"),
   }),
 })
 

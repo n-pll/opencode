@@ -4,6 +4,7 @@ import { HttpApi, HttpApiEndpoint, HttpApiGroup, OpenApi } from "effect/unstable
 import { Authorization } from "../middleware/authorization"
 import { InstanceContextMiddleware } from "../middleware/instance-context"
 import { WorkspaceRoutingMiddleware, WorkspaceRoutingQuery } from "../middleware/workspace-routing"
+import { t } from "@/i18n"
 
 export const GenerateNamePayload = Schema.Struct({
   context: Schema.optional(Schema.String),
@@ -20,12 +21,12 @@ export const ProjectCopyApi = HttpApi.make("projectCopyName").add(
       }).annotateMerge(
         OpenApi.annotations({
           identifier: "experimental.projectCopy.generateName",
-          summary: "Generate project copy name",
-          description: "Generate a short name for a project copy from task context.",
+          summary: t("instance.project-copy.experimental_projectCopy_generateName.summary"),
+          description: t("instance.project-copy.experimental_projectCopy_generateName.description"),
         }),
       ),
     )
-    .annotateMerge(OpenApi.annotations({ title: "projectCopy", description: "Project copy naming routes." }))
+    .annotateMerge(OpenApi.annotations({ title: "projectCopy", description: t("instance.project-copy.project-copy_0.description") }))
     .middleware(InstanceContextMiddleware)
     .middleware(WorkspaceRoutingMiddleware)
     .middleware(Authorization),

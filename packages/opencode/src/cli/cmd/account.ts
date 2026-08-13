@@ -1,3 +1,4 @@
+import { t } from "../../i18n"
 import { cmd } from "./cmd"
 import { Duration, Effect, Match, Option } from "effect"
 import { UI } from "../ui"
@@ -6,7 +7,6 @@ import { AccountID, OrgID, PollExpired, type PollResult, type AccountError } fro
 import { effectCmd } from "../effect-cmd"
 import * as Prompt from "../effect/prompt"
 import open from "open"
-import { t } from "@/i18n"
 
 const openBrowser = (url: string) => Effect.promise(() => open(url).catch(() => undefined))
 
@@ -168,7 +168,7 @@ const orgsEffect = Effect.fn("orgs")(function* () {
 const openEffect = Effect.fn("open")(function* () {
   const service = yield* Account.Service
   const active = yield* service.active()
-  if (Option.isNone(active)) return yield* println("No active account")
+  if (Option.isNone(active)) return yield* println(t("cli.account.no-active-account"))
 
   const url = active.value.url
   yield* openBrowser(url)

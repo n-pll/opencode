@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { Schema } from "effect"
 import DESCRIPTION from "./shell.txt"
 import { PositiveInt } from "@opencode-ai/core/schema"
@@ -14,10 +15,10 @@ export type Limits = {
 
 export function parameterSchema() {
   return Schema.Struct({
-    command: Schema.String.annotate({ description: "The command to execute" }),
-    timeout: Schema.optional(PositiveInt).annotate({ description: "Optional timeout in milliseconds" }),
+    command: Schema.String.annotate({ description: t("cli.prompt.the-command-to-execute") }),
+    timeout: Schema.optional(PositiveInt).annotate({ description: t("cli.prompt.optional-timeout-in-milliseconds") }),
     workdir: Schema.optional(Schema.String).annotate({
-      description: `The working directory to run the command in. Defaults to the current directory. Use this instead of 'cd' commands.`,
+      description: t("cli.prompt.workdir_description"),
     }),
   })
 }

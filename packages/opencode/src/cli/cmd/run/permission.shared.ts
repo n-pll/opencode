@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 // Pure state machine for the permission UI.
 //
 // Lives outside the JSX component so it can be tested independently. The
@@ -111,7 +112,7 @@ export function permissionInfo(request: PermissionRequest): PermissionInfo {
   if (request.permission === "doom_loop") {
     return {
       icon: "⟳",
-      title: "Continue after repeated failures",
+      title: t("cli.permission_shared.continue-after-repeated-failures"),
       lines: ["This keeps the session running despite repeated failures."],
     }
   }

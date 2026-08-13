@@ -12,6 +12,7 @@ import { collectBoundedResponseBody } from "./http-body"
 import { ToolRegistry } from "./registry"
 import { Tool } from "./tool"
 import { Tools } from "./tools"
+import { t } from "../i18n"
 
 export const name = "webfetch"
 export const MAX_RESPONSE_BYTES = 5 * 1024 * 1024
@@ -25,9 +26,9 @@ Use a more targeted tool when one is available. This tool is read-only. Large te
 const Timeout = Schema.Number.check(Schema.isGreaterThan(0), Schema.isLessThanOrEqualTo(MAX_TIMEOUT_SECONDS))
 
 export const Input = Schema.Struct({
-  url: Schema.String.annotate({ description: "The HTTP or HTTPS URL to fetch content from" }),
+  url: Schema.String.annotate({ description: t("core.config.the_http_or_https_url_to_fetch_content_from") }),
   format: Schema.Literals(["text", "markdown", "html"])
-    .annotate({ description: "The format to return the content in. Defaults to markdown." })
+    .annotate({ description: t("core.config.the_format_to_return_the_content_in_defaults_to_markdown") })
     .pipe(Schema.withDecodingDefault(Effect.succeed("markdown" as const))),
   timeout: Timeout.pipe(Schema.optional).annotate({
     description: `Optional timeout in seconds (maximum: ${MAX_TIMEOUT_SECONDS})`,
@@ -159,7 +160,7 @@ const layer = Layer.effectDiscard(
               }).pipe(
                 Effect.timeoutOrElse({
                   duration: Duration.seconds(input.timeout ?? DEFAULT_TIMEOUT_SECONDS),
-                  orElse: () => Effect.fail(new Error("Request timed out")),
+                  orElse: () => Effect.fail(new Error(t("core.webfetch.request-timed-out"))),
                 }),
               )
               const content = new TextDecoder().decode(body)

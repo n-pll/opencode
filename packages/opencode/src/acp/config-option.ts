@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import type { SessionConfigOption } from "@agentclientprotocol/sdk"
 
 export const DEFAULT_VARIANT_VALUE = "default"
@@ -58,7 +59,7 @@ export function buildEffortSelectOption(input: {
   return {
     id: "effort",
     name: "Effort",
-    description: "Available effort levels for this model",
+    description: t("cli.config_option.available-effort-levels-for-this-model"),
     category: "thought_level",
     type: "select",
     currentValue: selectVariant(input.currentVariant, input.variants),

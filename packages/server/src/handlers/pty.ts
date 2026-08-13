@@ -16,6 +16,7 @@ import {
 } from "@opencode-ai/protocol/groups/pty"
 import { response } from "../location"
 import { PtyEnvironment } from "../pty-environment"
+import { t } from "../i18n"
 
 const ticketScope = Effect.gen(function* () {
   const location = yield* Location.Service
@@ -122,7 +123,7 @@ export const PtyHandler = HttpApiBuilder.group(Api, "server.pty", (handlers) =>
             request.headers[PTY_CONNECT_TOKEN_HEADER] !== PTY_CONNECT_TOKEN_HEADER_VALUE ||
             !isAllowedRequestOrigin(request.headers.origin, request.headers.host, cors)
           )
-            return yield* new ForbiddenError({ message: "Invalid PTY connect token request" })
+            return yield* new ForbiddenError({ message: t("server.error.invalid_pty_token") })
           const pty = yield* Pty.Service
           yield* pty.get(ctx.params.ptyID).pipe(
             Effect.catchTag(

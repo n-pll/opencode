@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { LayerNode } from "@opencode-ai/core/effect/layer-node"
 import { Effect, Layer, Context, Schema, Scope } from "effect"
 import { formatPatch, structuredPatch } from "diff"
@@ -401,14 +402,14 @@ const layer: Layer.Layer<Service, never, Git.Service | EventV2Bridge.Service> = 
         const ctx = yield* InstanceState.context
         if (ctx.project.vcs !== "git") {
           return yield* new PatchApplyError({
-            message: "Patch can't be applied because the project is not git-based",
+            message: t("cli.vcs.patch-can-t-be-applied-because-the-project-is-not-git-based"),
             reason: "non-git",
           })
         }
         const applied = yield* git.applyPatch(ctx.directory, input.patch)
         if (applied.exitCode !== 0) {
           return yield* new PatchApplyError({
-            message: "Patch can't be applied",
+            message: t("cli.vcs.patch-can-t-be-applied"),
             reason: "not-clean",
           })
         }

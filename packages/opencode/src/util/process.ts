@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { type ChildProcess } from "child_process"
 import type { Stream } from "node:stream"
 import launch from "cross-spawn"
@@ -57,7 +58,7 @@ export class RunFailedError extends Error {
 export type Child = ChildProcess & { exited: Promise<number> }
 
 export function spawn(cmd: string[], opts: Options = {}): Child {
-  if (cmd.length === 0) throw new Error("Command is required")
+  if (cmd.length === 0) throw new Error(t("cli.process.command-is-required"))
   opts.abort?.throwIfAborted()
 
   const proc = launch(cmd[0], cmd.slice(1), {
@@ -124,7 +125,7 @@ export async function run(cmd: string[], opts: RunOptions = {}): Promise<Result>
     stderr: "pipe",
   })
 
-  if (!proc.stdout || !proc.stderr) throw new Error("Process output not available")
+  if (!proc.stdout || !proc.stderr) throw new Error(t("cli.process.process-output-not-available"))
 
   const out = await Promise.all([proc.exited, buffer(proc.stdout), buffer(proc.stderr)])
     .then(([code, stdout, stderr]) => ({

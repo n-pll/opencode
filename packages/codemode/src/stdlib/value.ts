@@ -66,7 +66,7 @@ export const invokeCoercion = (ref: CoercionFunction, args: Array<unknown>, node
   if (ref.name === "parseInt") {
     const radix = args[1]
     if (radix !== undefined && typeof radix !== "number") {
-      throw new InterpreterRuntimeError("parseInt expects a numeric radix.", node)
+      throw new InterpreterRuntimeError(t("codemode.value.0"), node)
     }
     return parseInt(coerceToString(value), radix)
   }
@@ -75,6 +75,7 @@ export const invokeCoercion = (ref: CoercionFunction, args: Array<unknown>, node
 }
 import { type AstNode, CoercionFunction, InterpreterRuntimeError } from "../interpreter/model.js"
 import { copyIn, type SafeObject } from "../tool-runtime.js"
+import { t } from "../i18n"
 import {
   isSandboxValue,
   SandboxDate,

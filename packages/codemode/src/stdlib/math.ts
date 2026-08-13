@@ -20,9 +20,9 @@ export const mathMethods = new Set([
 ])
 
 export const invokeMathMethod = (name: string, args: Array<unknown>, node: AstNode): number => {
-  if (!mathMethods.has(name)) throw new InterpreterRuntimeError(`Math.${name} is not available in CodeMode.`, node)
+  if (!mathMethods.has(name)) throw new InterpreterRuntimeError(t("codemode.math.0", { name }), node)
   const nums = args.map((arg) => {
-    if (typeof arg !== "number") throw new InterpreterRuntimeError(`Math.${name} expects number arguments.`, node)
+    if (typeof arg !== "number") throw new InterpreterRuntimeError(t("codemode.math.1", { name }), node)
     return arg
   })
   const [a = Number.NaN, b = Number.NaN] = nums
@@ -60,6 +60,7 @@ export const invokeMathMethod = (name: string, args: Array<unknown>, node: AstNo
     case "exp":
       return Math.exp(a)
   }
-  throw new InterpreterRuntimeError(`Math.${name} is not available in CodeMode.`, node)
+  throw new InterpreterRuntimeError(t("codemode.math.0", { name }), node)
 }
 import { type AstNode, InterpreterRuntimeError } from "../interpreter/model.js"
+import { t } from "../i18n"

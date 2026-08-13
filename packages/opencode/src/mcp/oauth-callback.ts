@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { createConnection } from "net"
 import { createServer } from "http"
 import { OauthCallbackPage } from "@opencode-ai/core/oauth/page"
@@ -137,7 +138,7 @@ export function waitForCallback(oauthState: string, mcpName?: string): Promise<s
       if (pendingAuths.has(oauthState)) {
         pendingAuths.delete(oauthState)
         if (mcpName) mcpNameToState.delete(mcpName)
-        reject(new Error("OAuth callback timeout - authorization took too long"))
+        reject(new Error(t("cli.oauth_callback.oauth-callback-timeout-authorization-took-too-long")))
         stopIfIdle()
       }
     }, CALLBACK_TIMEOUT_MS)
@@ -181,7 +182,7 @@ export async function stop(): Promise<void> {
 
   for (const [_name, pending] of pendingAuths) {
     clearTimeout(pending.timeout)
-    pending.reject(new Error("OAuth callback server stopped"))
+    pending.reject(new Error(t("cli.oauth_callback.oauth-callback-server-stopped")))
   }
   pendingAuths.clear()
   mcpNameToState.clear()

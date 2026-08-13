@@ -23,6 +23,7 @@ import { clientOnly } from "@solidjs/start"
 import { Meta, Title } from "@solidjs/meta"
 import { Base64 } from "js-base64"
 import { getRequestEvent } from "solid-js/web"
+import { t } from "../../../i18n"
 
 const ClientOnlyWorkerPoolProvider = clientOnly(() =>
   import("@opencode-ai/session-ui/pierre/worker").then((m) => ({
@@ -47,7 +48,7 @@ class SessionDataMissingError extends NamedError {
   }
 
   schema(): never {
-    throw new Error("SessionDataMissingError does not expose a schema")
+    throw new Error(t("enterprise.error.session_data_missing_schema"))
   }
 
   toObject() {
@@ -129,7 +130,7 @@ export default function () {
 
   const params = useParams()
   const data = createAsync(async () => {
-    if (!params.shareID) throw new Error("Missing shareID")
+    if (!params.shareID) throw new Error(t("enterprise.error.missing_shareID"))
     return getData(params.shareID)
   })
 

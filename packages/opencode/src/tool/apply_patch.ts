@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import * as path from "path"
 import { Effect, Schema } from "effect"
 import * as Tool from "./tool"
@@ -16,7 +17,7 @@ import { Format } from "../format"
 import * as Bom from "@/util/bom"
 
 export const Parameters = Schema.Struct({
-  patchText: Schema.String.annotate({ description: "The full patch text that describes all changes to be made" }),
+  patchText: Schema.String.annotate({ description: t("cli.apply_patch.the-full-patch-text-that-describes-all-changes-to-be-made") }),
 })
 
 export const ApplyPatchTool = Tool.define(

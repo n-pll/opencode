@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { WorkspaceV2 } from "@opencode-ai/core/workspace"
 import type { Target } from "@/control-plane/types"
 import { Workspace } from "@/control-plane/workspace"
@@ -195,7 +196,7 @@ function routeWorkspace<E>(
       Effect.succeed(
         HttpServerResponse.jsonUnsafe(
           new InvalidRequestError({
-            message: "Invalid workspace query parameter",
+            message: t("cli.workspace_routing.invalid-workspace-query-parameter"),
             kind: "Query",
             field: "workspace",
           }),

@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 // Top-level orchestrator for `opencode --mini`.
 //
 // Wires the boot sequence, lifecycle (renderer + footer), stream transport,
@@ -105,7 +106,7 @@ function createSessionResolver(fn?: CreateSession) {
   return async (ctx: BootContext, input: CreateSessionInput): Promise<ResolvedSession> => {
     const created = await fn(ctx.sdk, input)
     if (!created.id) {
-      throw new Error("Failed to create session")
+      throw new Error(t("cli.runtime.failed-to-create-session"))
     }
 
     return {
@@ -755,7 +756,7 @@ export async function runInteractiveLocalMode(input: RunLocalInput): Promise<voi
 
       session = Promise.all([input.resolveAgent(), input.session(sdk)]).then(([agent, next]) => {
         if (!next?.id) {
-          throw new Error("Session not found")
+          throw new Error(t("cli.runtime.session-not-found"))
         }
 
         void input.share(sdk, next.id).catch(() => {})

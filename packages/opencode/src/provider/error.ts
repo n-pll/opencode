@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { APICallError } from "ai"
 import { STATUS_CODES } from "http"
 import { iife } from "@/util/iife"
@@ -111,13 +112,13 @@ export function parseStreamError(input: unknown): ParsedStreamError | undefined 
     case "context_length_exceeded":
       return {
         type: "context_overflow",
-        message: "Input exceeds context window of this model",
+        message: t("cli.error.input-exceeds-context-window-of-this-model"),
         responseBody,
       }
     case "insufficient_quota":
       return {
         type: "api_error",
-        message: "Quota exceeded. Check your plan and billing details.",
+        message: t("cli.error.quota-exceeded-check-your-plan-and-billing-details"),
         isRetryable: false,
         responseBody,
       }
@@ -131,7 +132,7 @@ export function parseStreamError(input: unknown): ParsedStreamError | undefined 
     case "invalid_prompt":
       return {
         type: "api_error",
-        message: typeof body?.error?.message === "string" ? body?.error?.message : "Invalid prompt.",
+        message: typeof body?.error?.message === "string" ? body?.error?.message : t("cli.error.invalid-prompt"),
         isRetryable: false,
         responseBody,
       }
@@ -139,7 +140,7 @@ export function parseStreamError(input: unknown): ParsedStreamError | undefined 
     case "server_error":
       return {
         type: "api_error",
-        message: typeof body?.error?.message === "string" ? body?.error?.message : "Server error.",
+        message: typeof body?.error?.message === "string" ? body?.error?.message : t("cli.error.server-error"),
         isRetryable: true,
         responseBody,
       }

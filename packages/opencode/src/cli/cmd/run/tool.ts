@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 // Per-tool display rules shared across `opencode run` output paths.
 //
 // Each known tool (bash, edit, write, task, etc.) has a ToolRule that controls
@@ -969,7 +970,7 @@ function permBash(p: ToolPermissionProps<typeof BashTool>): ToolPermissionInfo {
   const cmd = p.input.command || ""
   return {
     icon: "#",
-    title: "Shell command",
+    title: t("cli.tool.shell-command"),
     lines: cmd ? [`$ ${cmd}`] : p.patterns.map((item) => `- ${item}`),
   }
 }

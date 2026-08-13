@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { LayerNode } from "@opencode-ai/core/effect/layer-node"
 import { httpClient } from "@opencode-ai/core/effect/app-node-platform"
 import type * as SDK from "@opencode-ai/sdk/v2"
@@ -213,7 +214,7 @@ const layer = Layer.effect(
 
       const token = yield* account.token(active.value.id)
       if (Option.isNone(token)) {
-        throw new Error("No active account token available for sharing")
+        throw new Error(t("cli.share_next.no-active-account-token-available-for-sharing"))
       }
 
       headers.authorization = `Bearer ${token.value}`

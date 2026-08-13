@@ -1,6 +1,7 @@
 import path from "path"
 import { fileURLToPath } from "url"
 import { Schema } from "effect"
+import { t } from "./i18n"
 
 type BaseReference = {
   readonly host: string
@@ -96,7 +97,7 @@ export function parseRemote(input: string): RemoteReference {
   if (!isRemote(reference)) {
     throw new UnsupportedLocalRepositoryError({
       repository: input,
-      message: "Local file repositories are not supported",
+      message: t("core.config.local_file_repositories_are_not_supported"),
     })
   }
   return reference

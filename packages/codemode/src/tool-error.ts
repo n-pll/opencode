@@ -1,4 +1,5 @@
 import { Schema } from "effect"
+import { t } from "./i18n"
 
 /** Safe operational refusal from a standard tool pack, reported as `ToolFailure`. */
 export class ToolError extends Schema.TaggedErrorClass<ToolError>()("ToolError", {

@@ -7,6 +7,7 @@ import { Authorization } from "../middleware/authorization"
 import { InstanceContextMiddleware } from "../middleware/instance-context"
 import { WorkspaceRoutingMiddleware, WorkspaceRoutingQuery } from "../middleware/workspace-routing"
 import { described } from "./metadata"
+import { t } from "@/i18n"
 
 const root = "/project"
 const UpdatePayload = Schema.Struct({
@@ -25,8 +26,8 @@ export const ProjectApi = HttpApi.make("project")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "project.list",
-            summary: "List all projects",
-            description: "Get a list of projects that have been opened with OpenCode.",
+            summary: t("instance.project.project_list.summary"),
+            description: t("instance.project.project_list.description"),
           }),
         ),
         HttpApiEndpoint.get("current", `${root}/current`, {
@@ -35,8 +36,8 @@ export const ProjectApi = HttpApi.make("project")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "project.current",
-            summary: "Get current project",
-            description: "Retrieve the currently active project that OpenCode is working with.",
+            summary: t("instance.project.project_current.summary"),
+            description: t("instance.project.project_current.description"),
           }),
         ),
         HttpApiEndpoint.post("initGit", `${root}/git/init`, {
@@ -45,8 +46,8 @@ export const ProjectApi = HttpApi.make("project")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "project.initGit",
-            summary: "Initialize git repository",
-            description: "Create a git repository for the current project and return the refreshed project info.",
+            summary: t("instance.project.project_initGit.summary"),
+            description: t("instance.project.project_initGit.description"),
           }),
         ),
         HttpApiEndpoint.patch("update", `${root}/:projectID`, {
@@ -58,8 +59,8 @@ export const ProjectApi = HttpApi.make("project")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "project.update",
-            summary: "Update project",
-            description: "Update project properties such as name, icon, and commands.",
+            summary: t("instance.project.project_update.summary"),
+            description: t("instance.project.project_update.description"),
           }),
         ),
         HttpApiEndpoint.get("directories", `${root}/:projectID/directories`, {
@@ -69,15 +70,15 @@ export const ProjectApi = HttpApi.make("project")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "project.directories",
-            summary: "List project directories",
-            description: "List known local absolute directories for a project.",
+            summary: t("instance.project.project_directories.summary"),
+            description: t("instance.project.project_directories.description"),
           }),
         ),
       )
       .annotateMerge(
         OpenApi.annotations({
           title: "project",
-          description: "Experimental HttpApi project routes.",
+          description: t("instance.project.project_0.description"),
         }),
       )
       .middleware(InstanceContextMiddleware)
@@ -88,6 +89,6 @@ export const ProjectApi = HttpApi.make("project")
     OpenApi.annotations({
       title: "opencode experimental HttpApi",
       version: "0.0.1",
-      description: "Experimental HttpApi surface for selected instance routes.",
+      description: t("instance.config.config_1.description"),
     }),
   )

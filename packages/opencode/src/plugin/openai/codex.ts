@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import type { Hooks, PluginInput } from "@opencode-ai/plugin"
 import { InstallationVersion } from "@opencode-ai/core/installation/version"
 import { OAUTH_DUMMY_KEY } from "../../auth"
@@ -205,10 +206,10 @@ async function startOAuthServer(): Promise<{ port: number; redirectUri: string }
     }
 
     if (url.pathname === "/cancel") {
-      pendingOAuth?.reject(new Error("Login cancelled"))
+      pendingOAuth?.reject(new Error(t("cli.codex.login-cancelled")))
       pendingOAuth = undefined
       res.writeHead(200)
-      res.end("Login cancelled")
+      res.end(t("cli.codex.login-cancelled"))
       return
     }
 
@@ -239,7 +240,7 @@ function waitForOAuthCallback(pkce: PkceCodes, state: string): Promise<TokenResp
       () => {
         if (pendingOAuth) {
           pendingOAuth = undefined
-          reject(new Error("OAuth callback timeout - authorization took too long"))
+          reject(new Error(t("cli.codex.oauth-callback-timeout-authorization-took-too-long")))
         }
       },
       5 * 60 * 1000,
@@ -428,7 +429,7 @@ export async function CodexAuthPlugin(input: PluginInput, options: CodexAuthPlug
       },
       methods: [
         {
-          label: "ChatGPT Pro/Plus (browser)",
+          label: t("cli.codex.chatgpt-pro-plus-browser"),
           type: "oauth",
           authorize: async () => {
             const { redirectUri } = await startOAuthServer()
@@ -458,7 +459,7 @@ export async function CodexAuthPlugin(input: PluginInput, options: CodexAuthPlug
           },
         },
         {
-          label: "ChatGPT Pro/Plus (headless)",
+          label: t("cli.codex.chatgpt-pro-plus-headless"),
           type: "oauth",
           authorize: async () => {
             const deviceResponse = await fetch(`${ISSUER}/api/accounts/deviceauth/usercode`, {
@@ -470,7 +471,7 @@ export async function CodexAuthPlugin(input: PluginInput, options: CodexAuthPlug
               body: JSON.stringify({ client_id: CLIENT_ID }),
             })
 
-            if (!deviceResponse.ok) throw new Error("Failed to initiate device authorization")
+            if (!deviceResponse.ok) throw new Error(t("cli.codex.failed-to-initiate-device-authorization"))
 
             const deviceData = (await deviceResponse.json()) as {
               device_auth_id: string
@@ -541,7 +542,7 @@ export async function CodexAuthPlugin(input: PluginInput, options: CodexAuthPlug
           },
         },
         {
-          label: "Manually enter API Key",
+          label: t("cli.codex.manually-enter-api-key"),
           type: "api",
         },
       ],

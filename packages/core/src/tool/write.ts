@@ -15,6 +15,7 @@ import { PermissionV2 } from "../permission"
 import { ToolRegistry } from "./registry"
 import { Tool } from "./tool"
 import { Tools } from "./tools"
+import { t } from "../i18n"
 
 export const name = "write"
 
@@ -24,7 +25,7 @@ export const Input = Schema.Struct({
     description:
       "File path to write. Relative paths resolve within the active Location. Absolute paths inside that Location are accepted; external absolute paths require external_directory approval.",
   }),
-  content: Schema.String.annotate({ description: "Content to write to the file" }),
+  content: Schema.String.annotate({ description: t("core.config.content_to_write_to_the_file") }),
 })
 
 export const Output = Schema.Struct({

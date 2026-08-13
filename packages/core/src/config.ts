@@ -25,24 +25,25 @@ import { ConfigToolOutput } from "./config/tool-output"
 import { ConfigWatcher } from "./config/watcher"
 import { ConfigV1 } from "./v1/config/config"
 import { ConfigMigrateV1 } from "./v1/config/migrate"
+import { t } from "./i18n"
 
 export class Info extends Schema.Class<Info>("Config.Info")({
   $schema: Schema.optional(Schema.String).annotate({
-    description: "JSON schema reference for configuration validation",
+    description: t("core.config.json_schema_reference_for_configuration_validation"),
   }),
   shell: Schema.String.pipe(Schema.optional).annotate({
-    description: "Default shell to use for terminal and shell tool execution",
+    description: t("core.config.default_shell_to_use_for_terminal_and_shell_tool_execution"),
   }),
   model: Schema.String.pipe(Schema.optional).annotate({
-    description: "Default model to use when no session or agent model is selected",
+    description: t("core.config.default_model_to_use_when_no_session_or_agent_model_is_selec"),
   }),
   default_agent: Schema.String.pipe(Schema.optional).annotate({
-    description: "Default primary agent to use when no session agent is selected",
+    description: t("core.config.default_primary_agent_to_use_when_no_session_agent_is_select"),
   }),
   autoupdate: Schema.Union([Schema.Boolean, Schema.Literal("notify")])
     .pipe(Schema.optional)
     .annotate({
-      description: "Automatically update or notify when a new version is available",
+      description: t("core.config.automatically_update_or_notify_when_a_new_version_is_availab"),
     }),
   share: Schema.Literals(["manual", "auto", "disabled"]).pipe(Schema.optional).annotate({
     description: "Control whether sessions may be shared manually, automatically, or not at all",
@@ -52,55 +53,55 @@ export class Info extends Schema.Class<Info>("Config.Info")({
   })
     .pipe(Schema.optional)
     .annotate({
-      description: "Enterprise sharing service configuration",
+      description: t("core.config.enterprise_sharing_service_configuration"),
     }),
   username: Schema.String.pipe(Schema.optional).annotate({
-    description: "Username displayed in conversations and used for telemetry identity",
+    description: t("core.config.username_displayed_in_conversations_and_used_for_telemetry_i"),
   }),
   permissions: Permission.Ruleset.pipe(Schema.optional).annotate({
-    description: "Ordered tool permission rules applied to agent tool use",
+    description: t("core.config.ordered_tool_permission_rules_applied_to_agent_tool_use"),
   }),
   agents: Schema.Record(Schema.String, ConfigAgent.Info).pipe(Schema.optional).annotate({
-    description: "Named built-in agent overrides and custom agent definitions",
+    description: t("core.config.named_built_in_agent_overrides_and_custom_agent_definitions"),
   }),
   snapshots: Schema.Boolean.pipe(Schema.optional).annotate({
-    description: "Enable snapshots used for undo and revert behavior",
+    description: t("core.config.enable_snapshots_used_for_undo_and_revert_behavior"),
   }),
   watcher: ConfigWatcher.Info.pipe(Schema.optional).annotate({
-    description: "Filesystem watcher configuration",
+    description: t("core.config.filesystem_watcher_configuration"),
   }),
   formatter: ConfigFormatter.Info.pipe(Schema.optional).annotate({
-    description: "Enable built-in formatters or configure formatter overrides",
+    description: t("core.config.enable_built_in_formatters_or_configure_formatter_overrides"),
   }),
   lsp: ConfigLSP.Info.pipe(Schema.optional).annotate({
-    description: "Enable built-in language servers or configure server overrides",
+    description: t("core.config.enable_built_in_language_servers_or_configure_server_overrid"),
   }),
   attachments: ConfigAttachments.Info.pipe(Schema.optional).annotate({
-    description: "Attachment processing configuration",
+    description: t("core.config.attachment_processing_configuration"),
   }),
   tool_output: ConfigToolOutput.Info.pipe(Schema.optional).annotate({
-    description: "Tool output truncation thresholds",
+    description: t("core.config.tool_output_truncation_thresholds"),
   }),
   mcp: ConfigMCP.Info.pipe(Schema.optional).annotate({
-    description: "MCP server configuration",
+    description: t("core.config.mcp_server_configuration"),
   }),
   compaction: ConfigCompaction.Info.pipe(Schema.optional).annotate({
-    description: "Conversation compaction behavior",
+    description: t("core.config.conversation_compaction_behavior"),
   }),
   skills: Schema.String.pipe(Schema.Array, Schema.optional).annotate({
-    description: "Additional paths or URLs to discover skills from",
+    description: t("core.config.additional_paths_or_urls_to_discover_skills_from"),
   }),
   commands: Schema.Record(Schema.String, ConfigCommand.Info).pipe(Schema.optional).annotate({
-    description: "Named slash command definitions",
+    description: t("core.config.named_slash_command_definitions"),
   }),
   instructions: Schema.String.pipe(Schema.Array, Schema.optional).annotate({
-    description: "Additional paths or URLs supplying ambient instructions",
+    description: t("core.config.additional_paths_or_urls_supplying_ambient_instructions"),
   }),
   references: ConfigReference.Info.pipe(Schema.optional).annotate({
-    description: "Named local directories or Git repositories available as external context",
+    description: t("core.config.named_local_directories_or_git_repositories_available_as_ext"),
   }),
   plugins: ConfigPlugin.Plugins.pipe(Schema.optional).annotate({
-    description: "Ordered external plugin packages to load",
+    description: t("core.config.ordered_external_plugin_packages_to_load"),
   }),
   experimental: ConfigExperimental.Experimental.pipe(Schema.optional),
   providers: Schema.Record(Schema.String, ConfigProvider.Info).pipe(Schema.optional),

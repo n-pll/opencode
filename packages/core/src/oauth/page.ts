@@ -1,3 +1,4 @@
+import { t } from "../i18n"
 // Branded HTML pages for local OAuth callback servers.
 //
 // These are served by the loopback HTTP servers that finish an OAuth exchange
@@ -60,10 +61,10 @@ export interface BootstrapOptions {
 // to the success or error state in place.
 export function bootstrap(options: BootstrapOptions) {
   return renderDocument({
-    title: "Finishing sign-in",
+    title: t("core.page.finishing-sign-in"),
     body: renderCard({
       status: "pending",
-      headline: "Finishing sign-in",
+      headline: t("core.page.finishing-sign-in"),
       message: options.provider
         ? `Completing your ${escapeHtml(options.provider)} authorization.`
         : "Completing authorization.",

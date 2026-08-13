@@ -11,6 +11,7 @@ import {
   WorkspaceRoutingQueryFields,
 } from "../middleware/workspace-routing"
 import { described } from "./metadata"
+import { t } from "@/i18n"
 
 export const FileQuery = Schema.Struct({
   ...WorkspaceRoutingQueryFields,
@@ -111,8 +112,8 @@ export const FileApi = HttpApi.make("file")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "find.text",
-            summary: "Find text",
-            description: "Search for text patterns across files in the project using ripgrep.",
+            summary: t("instance.file.find_text.summary"),
+            description: t("instance.file.find_text.description"),
           }),
         ),
         HttpApiEndpoint.get("findFile", FilePaths.findFile, {
@@ -121,8 +122,8 @@ export const FileApi = HttpApi.make("file")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "find.files",
-            summary: "Find files",
-            description: "Search for files or directories by name or pattern in the project directory.",
+            summary: t("instance.file.find_files.summary"),
+            description: t("instance.file.find_files.description"),
           }),
         ),
         HttpApiEndpoint.get("findSymbol", FilePaths.findSymbol, {
@@ -131,8 +132,8 @@ export const FileApi = HttpApi.make("file")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "find.symbols",
-            summary: "Find symbols",
-            description: "Search for workspace symbols like functions, classes, and variables using LSP.",
+            summary: t("instance.file.find_symbols.summary"),
+            description: t("instance.file.find_symbols.description"),
           }),
         ),
         HttpApiEndpoint.get("list", FilePaths.list, {
@@ -141,8 +142,8 @@ export const FileApi = HttpApi.make("file")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "file.list",
-            summary: "List files",
-            description: "List files and directories in a specified path.",
+            summary: t("instance.file.file_list.summary"),
+            description: t("instance.file.file_list.description"),
           }),
         ),
         HttpApiEndpoint.get("content", FilePaths.content, {
@@ -151,8 +152,8 @@ export const FileApi = HttpApi.make("file")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "file.read",
-            summary: "Read file",
-            description: "Read the content of a specified file.",
+            summary: t("instance.file.file_read.summary"),
+            description: t("instance.file.file_read.description"),
           }),
         ),
         HttpApiEndpoint.get("status", FilePaths.status, {
@@ -161,15 +162,15 @@ export const FileApi = HttpApi.make("file")
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "file.status",
-            summary: "Get file status",
-            description: "Get the git status of all files in the project.",
+            summary: t("instance.file.file_status.summary"),
+            description: t("instance.file.file_status.description"),
           }),
         ),
       )
       .annotateMerge(
         OpenApi.annotations({
           title: "file",
-          description: "Experimental HttpApi file routes.",
+          description: t("instance.file.file_0.description"),
         }),
       )
       .middleware(InstanceContextMiddleware)
@@ -180,6 +181,6 @@ export const FileApi = HttpApi.make("file")
     OpenApi.annotations({
       title: "opencode experimental HttpApi",
       version: "0.0.1",
-      description: "Experimental HttpApi surface for selected instance routes.",
+      description: t("instance.config.config_1.description"),
     }),
   )

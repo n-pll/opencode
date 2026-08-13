@@ -979,7 +979,7 @@ type MiniCommandInput = {
 }
 
 export async function runMini(input: MiniCommandInput) {
-  if (!RunCommand.handler) throw new Error("Mini command handler is unavailable")
+  if (!RunCommand.handler) throw new Error(t("cli.run.mini-command-handler-is-unavailable"))
   await RunCommand.handler({
     $0: "opencode",
     _: ["mini"],

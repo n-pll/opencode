@@ -12,6 +12,7 @@ import {
   UnknownError,
 } from "@opencode-ai/protocol/errors"
 import { AbsolutePath } from "@opencode-ai/core/schema"
+import { t } from "../i18n"
 
 const DefaultSessionsLimit = 50
 const DefaultSessionHistoryLimit = 50
@@ -27,7 +28,7 @@ export const SessionHandler = HttpApiBuilder.group(Api, "server.session", (handl
           const query =
             ctx.query.cursor !== undefined
               ? yield* SessionsCursor.parse(ctx.query.cursor).pipe(
-                  Effect.mapError(() => new InvalidCursorError({ message: "Invalid cursor" })),
+                  Effect.mapError(() => new InvalidCursorError({ message: t("server.error.invalid_cursor") })),
                 )
               : ctx.query
           const sessions = yield* session.list({
@@ -245,7 +246,7 @@ export const SessionHandler = HttpApiBuilder.group(Api, "server.session", (handl
                   Effect.andThen(
                     Effect.fail(
                       new UnknownError({
-                        message: "Unexpected server error. Check server logs for details.",
+                        message: t("server.error.unexpected"),
                         ref,
                       }),
                     ),
@@ -274,7 +275,7 @@ export const SessionHandler = HttpApiBuilder.group(Api, "server.session", (handl
                 Effect.andThen(
                   Effect.fail(
                     new UnknownError({
-                      message: "Unexpected server error. Check server logs for details.",
+                      message: t("server.error.unexpected"),
                       ref,
                     }),
                   ),
@@ -320,7 +321,7 @@ export const SessionHandler = HttpApiBuilder.group(Api, "server.session", (handl
                   Effect.annotateLogs({ ref, sessionID: error.sessionID, messageID: error.messageID }),
                   Effect.andThen(
                     Effect.fail(
-                      new UnknownError({ message: "Unexpected server error. Check server logs for details.", ref }),
+                      new UnknownError({ message: t("server.error.unexpected"), ref }),
                     ),
                   ),
                 )

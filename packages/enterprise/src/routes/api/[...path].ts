@@ -7,6 +7,7 @@ import { cors } from "hono/cors"
 import { Share } from "~/core/share"
 import { Resource } from "sst"
 import { timingSafeEqual } from "node:crypto"
+import { t } from "../../../i18n"
 
 const app = new Hono()
 
@@ -18,9 +19,9 @@ app
     openAPIRouteHandler(app, {
       documentation: {
         info: {
-          title: "Opencode Enterprise API",
+          title: t("enterprise.api.title"),
           version: "1.0.0",
-          description: "Opencode Enterprise API endpoints",
+          description: t("enterprise.api.title_endpoints"),
         },
         openapi: "3.1.1",
       },
@@ -29,7 +30,7 @@ app
   .post(
     "/share",
     describeRoute({
-      description: "Create a share",
+      description: t("enterprise.api.create_share"),
       operationId: "share.create",
       responses: {
         200: {
@@ -66,7 +67,7 @@ app
   .post(
     "/share/:shareID/sync",
     describeRoute({
-      description: "Sync share data",
+      description: t("enterprise.api.sync_share"),
       operationId: "share.sync",
       responses: {
         200: {
@@ -94,7 +95,7 @@ app
   .get(
     "/share/:shareID/data",
     describeRoute({
-      description: "Get share data",
+      description: t("enterprise.api.get_share"),
       operationId: "share.data",
       responses: {
         200: {
@@ -117,7 +118,7 @@ app
   .delete(
     "/share/:shareID",
     describeRoute({
-      description: "Remove a share",
+      description: t("enterprise.api.remove_share"),
       operationId: "share.remove",
       responses: {
         200: {
@@ -145,12 +146,12 @@ app
     const actual = Buffer.from(authorization ?? "")
     const secret = Buffer.from(expected)
     if (actual.length !== secret.length || !timingSafeEqual(actual, secret))
-      return c.json({ error: "Unauthorized" }, 401)
+      return c.json({ error: t("enterprise.error.unauthorized") }, 401)
 
     const body = z.object({ shareID: z.string().min(1) }).safeParse(await c.req.json().catch(() => undefined))
-    if (!body.success) return c.json({ error: "Invalid request", issues: body.error.issues }, 400)
+    if (!body.success) return c.json({ error: t("enterprise.error.invalid_request"), issues: body.error.issues }, 400)
     return Share.removeAdmin({ id: body.data.shareID })
-      .then(() => c.json({ success: true, message: "Share removed" }))
+      .then(() => c.json({ success: true, message: t("enterprise.api.share_removed") }))
       .catch((error) => c.json({ error: error instanceof Error ? error.message : String(error) }, 400))
   })
 

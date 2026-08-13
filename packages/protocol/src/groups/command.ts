@@ -3,6 +3,7 @@ import { Location } from "@opencode-ai/schema/location"
 import { Schema } from "effect"
 import { HttpApiEndpoint, HttpApiGroup, OpenApi } from "effect/unstable/httpapi"
 import { LocationQuery, locationQueryOpenApi } from "./location"
+import { t } from "../i18n"
 
 export const CommandGroup = HttpApiGroup.make("server.command")
   .add(
@@ -14,14 +15,14 @@ export const CommandGroup = HttpApiGroup.make("server.command")
       .annotateMerge(
         OpenApi.annotations({
           identifier: "v2.command.list",
-          summary: "List commands",
-          description: "Retrieve currently registered commands.",
+          summary: t("protocol.command.command_list.summary"),
+          description: t("protocol.command.command_list.description"),
         }),
       ),
   )
   .annotateMerge(
     OpenApi.annotations({
       title: "commands",
-      description: "Experimental command routes.",
+      description: t("protocol.command.commands.description"),
     }),
   )

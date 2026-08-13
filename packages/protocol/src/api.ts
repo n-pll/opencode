@@ -21,6 +21,7 @@ import { LocationGroup } from "./groups/location"
 import { IntegrationGroup } from "./groups/integration"
 import { CredentialGroup } from "./groups/credential"
 import { ProjectCopyGroup } from "./groups/project-copy"
+import { t } from "./i18n"
 
 // Protocol owns middleware placement, while Server injects concrete keys so Core service identities stay downstream.
 const makeApiFromGroup = <
@@ -57,7 +58,7 @@ const makeApiFromGroup = <
       OpenApi.annotations({
         title: "opencode HttpApi",
         version: "0.0.1",
-        description: "Experimental HttpApi surface for selected instance routes.",
+        description: t("protocol.api.surface_description"),
       }),
     )
     .middleware(Authorization)

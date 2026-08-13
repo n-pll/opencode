@@ -2,6 +2,7 @@ export * as ConfigAttachmentV1 from "./attachment"
 
 import { Schema } from "effect"
 import { PositiveInt } from "../../schema"
+import { t } from "../../i18n"
 
 export const Image = Schema.Struct({
   auto_resize: Schema.optional(Schema.Boolean).annotate({
@@ -20,6 +21,6 @@ export const Image = Schema.Struct({
 export type Image = Schema.Schema.Type<typeof Image>
 
 export const Info = Schema.Struct({
-  image: Schema.optional(Image).annotate({ description: "Image attachment configuration" }),
+  image: Schema.optional(Image).annotate({ description: t("core.config.image_attachment_configuration") }),
 }).annotate({ identifier: "AttachmentConfig" })
 export type Info = Schema.Schema.Type<typeof Info>

@@ -3,6 +3,7 @@ import { HttpClient, HttpClientRequest, HttpClientResponse, type HttpMethod } fr
 import { ToolError, toolError } from "../tool-error.js"
 import { isRecord, own } from "./spec.js"
 import type { AppliedAuth, Credential, Plan, SecurityScheme } from "./types.js"
+import { t } from "../i18n"
 
 const decodeJson = Schema.decodeUnknownOption(Schema.UnknownFromJsonString)
 const maxErrorBodyChars = 1_024

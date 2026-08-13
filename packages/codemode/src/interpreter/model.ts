@@ -1,5 +1,6 @@
 import type { SafeObject } from "../tool-runtime.js"
 import type { SandboxURL } from "../values.js"
+import { t } from "../i18n"
 
 export type SourcePosition = {
   line: number
@@ -147,7 +148,7 @@ export class InterpreterRuntimeError extends Error {
 
 export const unsupportedSyntax = (kind: string, node: AstNode): InterpreterRuntimeError =>
   new InterpreterRuntimeError(
-    `Syntax '${kind}' is not supported in CodeMode. ${supportedSyntaxMessage}`,
+    t("codemode.model.0", { kind, supportedSyntaxMessage }),
     node,
     "UnsupportedSyntax",
     [supportedSyntaxMessage],
@@ -158,26 +159,26 @@ export const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 export const asNode = (value: unknown, context: string): AstNode => {
   if (!isRecord(value) || typeof value.type !== "string") {
-    throw new InterpreterRuntimeError(`Invalid AST node while reading ${context}.`)
+    throw new InterpreterRuntimeError(t("codemode.model.1", { context }))
   }
   return value as AstNode
 }
 
 export const getArray = (node: AstNode, key: string): Array<unknown> => {
   const value = node[key]
-  if (!Array.isArray(value)) throw new InterpreterRuntimeError(`Expected '${key}' to be an array.`, node)
+  if (!Array.isArray(value)) throw new InterpreterRuntimeError(t("codemode.model.2", { key }), node)
   return value
 }
 
 export const getString = (node: AstNode, key: string): string => {
   const value = node[key]
-  if (typeof value !== "string") throw new InterpreterRuntimeError(`Expected '${key}' to be a string.`, node)
+  if (typeof value !== "string") throw new InterpreterRuntimeError(t("codemode.model.3", { key }), node)
   return value
 }
 
 export const getBoolean = (node: AstNode, key: string): boolean => {
   const value = node[key]
-  if (typeof value !== "boolean") throw new InterpreterRuntimeError(`Expected '${key}' to be a boolean.`, node)
+  if (typeof value !== "boolean") throw new InterpreterRuntimeError(t("codemode.model.4", { key }), node)
   return value
 }
 

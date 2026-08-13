@@ -5,6 +5,7 @@ import { Schema } from "effect"
 import { HttpApiEndpoint, HttpApiGroup, HttpApiSchema, OpenApi } from "effect/unstable/httpapi"
 import { ForbiddenError, PtyNotFoundError } from "../errors"
 import { LocationQuery, locationQueryOpenApi } from "./location"
+import { t } from "../i18n"
 
 export const PTY_CONNECT_TICKET_QUERY = "ticket"
 export const PTY_CONNECT_TOKEN_HEADER = "x-opencode-ticket"
@@ -28,8 +29,8 @@ export const PtyGroup = HttpApiGroup.make("server.pty")
       .annotateMerge(
         OpenApi.annotations({
           identifier: "v2.pty.list",
-          summary: "List PTY sessions",
-          description: "List PTY sessions for a location, including exited sessions retained until removal.",
+          summary: t("protocol.pty.pty_list.summary"),
+          description: t("protocol.pty.pty_list.description"),
         }),
       ),
   )
@@ -43,8 +44,8 @@ export const PtyGroup = HttpApiGroup.make("server.pty")
       .annotateMerge(
         OpenApi.annotations({
           identifier: "v2.pty.create",
-          summary: "Create PTY session",
-          description: "Create a pseudo-terminal session for a location.",
+          summary: t("protocol.pty.pty_create.summary"),
+          description: t("protocol.pty.pty_create.description"),
         }),
       ),
   )
@@ -59,8 +60,8 @@ export const PtyGroup = HttpApiGroup.make("server.pty")
       .annotateMerge(
         OpenApi.annotations({
           identifier: "v2.pty.get",
-          summary: "Get PTY session",
-          description: "Get one PTY session, including its exit code once exited.",
+          summary: t("protocol.pty.pty_get.summary"),
+          description: t("protocol.pty.pty_get.description"),
         }),
       ),
   )
@@ -76,8 +77,8 @@ export const PtyGroup = HttpApiGroup.make("server.pty")
       .annotateMerge(
         OpenApi.annotations({
           identifier: "v2.pty.update",
-          summary: "Update PTY session",
-          description: "Update the title or viewport size of one PTY session.",
+          summary: t("protocol.pty.pty_update.summary"),
+          description: t("protocol.pty.pty_update.description"),
         }),
       ),
   )
@@ -92,8 +93,8 @@ export const PtyGroup = HttpApiGroup.make("server.pty")
       .annotateMerge(
         OpenApi.annotations({
           identifier: "v2.pty.remove",
-          summary: "Remove PTY session",
-          description: "Terminate and remove one PTY session.",
+          summary: t("protocol.pty.pty_remove.summary"),
+          description: t("protocol.pty.pty_remove.description"),
         }),
       ),
   )
@@ -108,8 +109,8 @@ export const PtyGroup = HttpApiGroup.make("server.pty")
       .annotateMerge(
         OpenApi.annotations({
           identifier: "v2.pty.connectToken",
-          summary: "Create PTY WebSocket token",
-          description: "Create a short-lived single-use ticket for opening a PTY WebSocket connection.",
+          summary: t("protocol.pty.pty_connectToken.summary"),
+          description: t("protocol.pty.pty_connectToken.description"),
         }),
       ),
   )
@@ -123,8 +124,8 @@ export const PtyGroup = HttpApiGroup.make("server.pty")
     }).annotateMerge(
       OpenApi.annotations({
         identifier: "v2.pty.connect",
-        summary: "Connect to PTY session",
-        description: "Establish a WebSocket connection streaming PTY output and accepting terminal input.",
+        summary: t("protocol.pty.pty_connect.summary"),
+        description: t("protocol.pty.pty_connect.description"),
         transform: (operation) => ({
           ...operation,
           "x-websocket": true,
@@ -140,4 +141,4 @@ export const PtyGroup = HttpApiGroup.make("server.pty")
       }),
     ),
   )
-  .annotateMerge(OpenApi.annotations({ title: "pty", description: "Experimental location-scoped PTY routes." }))
+  .annotateMerge(OpenApi.annotations({ title: "pty", description: t("protocol.pty.pty.description") }))

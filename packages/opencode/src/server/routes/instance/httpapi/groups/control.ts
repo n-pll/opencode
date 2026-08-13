@@ -4,6 +4,7 @@ import { Schema } from "effect"
 import { HttpApi, HttpApiEndpoint, HttpApiError, HttpApiGroup, OpenApi } from "effect/unstable/httpapi"
 import { described } from "./metadata"
 import { ProviderV2 } from "@opencode-ai/core/provider"
+import { t } from "@/i18n"
 
 const AuthParams = Schema.Struct({
   providerID: ProviderV2.ID,
@@ -15,16 +16,16 @@ const LogQuery = Schema.Struct({
 })
 
 export const LogInput = Schema.Struct({
-  service: Schema.String.annotate({ description: "Service name for the log entry" }),
+  service: Schema.String.annotate({ description: t("instance.control.control_0.description") }),
   level: Schema.Union([
     Schema.Literal("debug"),
     Schema.Literal("info"),
     Schema.Literal("error"),
     Schema.Literal("warn"),
-  ]).annotate({ description: "Log level" }),
-  message: Schema.String.annotate({ description: "Log message" }),
+  ]).annotate({ description: t("instance.control.control_1.description") }),
+  message: Schema.String.annotate({ description: t("instance.control.control_2.description") }),
   extra: Schema.optional(Schema.Record(Schema.String, Schema.Unknown)).annotate({
-    description: "Additional metadata for the log entry",
+    description: t("instance.control.control_3.description"),
   }),
 })
 
@@ -44,8 +45,8 @@ export const ControlApi = HttpApi.make("control").add(
       }).annotateMerge(
         OpenApi.annotations({
           identifier: "auth.set",
-          summary: "Set auth credentials",
-          description: "Set authentication credentials",
+          summary: t("instance.control.auth_set.summary"),
+          description: t("instance.control.auth_set.description"),
         }),
       ),
       HttpApiEndpoint.delete("authRemove", ControlPaths.auth, {
@@ -55,8 +56,8 @@ export const ControlApi = HttpApi.make("control").add(
       }).annotateMerge(
         OpenApi.annotations({
           identifier: "auth.remove",
-          summary: "Remove auth credentials",
-          description: "Remove authentication credentials",
+          summary: t("instance.control.auth_remove.summary"),
+          description: t("instance.control.auth_remove.description"),
         }),
       ),
       HttpApiEndpoint.post("log", ControlPaths.log, {
@@ -67,10 +68,10 @@ export const ControlApi = HttpApi.make("control").add(
       }).annotateMerge(
         OpenApi.annotations({
           identifier: "app.log",
-          summary: "Write log",
-          description: "Write a log entry to the server logs with specified level and metadata.",
+          summary: t("instance.control.app_log.summary"),
+          description: t("instance.control.app_log.description"),
         }),
       ),
     )
-    .annotateMerge(OpenApi.annotations({ title: "control", description: "Control plane routes." })),
+    .annotateMerge(OpenApi.annotations({ title: "control", description: t("instance.control.control_4.description") })),
 )
