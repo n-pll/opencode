@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { LayerNode } from "@opencode-ai/core/effect/layer-node"
 import { SessionV1 } from "@opencode-ai/core/v1/session"
 import { ConfigV1 } from "@opencode-ai/core/v1/config/config"
@@ -325,7 +326,7 @@ const layer = Layer.effect(
     }) {
       const parent = input.messages.findLast((m) => m.info.id === input.parentID)
       if (!parent || parent.info.role !== "user") {
-        throw new Error(`Compaction parent must be a user message: ${input.parentID}`)
+        throw new Error(t("cli.compaction.compaction-parent-must-be-a-user-message", { parentID: input.parentID }))
       }
       const userMessage = parent.info
       const compactionPart = parent.parts.find((part): part is SessionV1.CompactionPart => part.type === "compaction")

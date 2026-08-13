@@ -9,4 +9,5 @@ export const dict: Record<string, string> = {
   "function.error.upgrade_required": "Error: Upgrade header is required",
   "function.error.share_id_required": "Error: Share ID is required",
   "function.error.invalid_or_expired_token": "Invalid or expired token",
+  "function.api.": "{{message}} [{{threadId}}]",
 }

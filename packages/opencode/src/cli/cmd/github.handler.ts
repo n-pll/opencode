@@ -932,7 +932,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
             console.error(t("cli.github.run.error.agent", { error: err }))
             if (err.name === "ContextOverflowError") throw new Error(formatPromptTooLargeError(files))
             const message = "message" in err.data ? err.data.message : ""
-            throw new Error(`${err.name}: ${message}`)
+            throw new Error(t("cli.github_handler.", { name: err.name, message: message }))
           }
 
           const text = extractResponseText(result.parts)
@@ -962,7 +962,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
             console.error(t("cli.github.run.error.summary-agent", { error: err }))
             if (err.name === "ContextOverflowError") throw new Error(formatPromptTooLargeError(files))
             const message = "message" in err.data ? err.data.message : ""
-            throw new Error(`${err.name}: ${message}`)
+            throw new Error(t("cli.github_handler.", { name: err.name, message: message }))
           }
 
           const summaryText = extractResponseText(summary.parts)

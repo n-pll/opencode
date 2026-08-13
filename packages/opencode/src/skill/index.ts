@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { LayerNode } from "@opencode-ai/core/effect/layer-node"
 import path from "path"
 import { Effect, Layer, Context, Schema } from "effect"
@@ -109,7 +110,7 @@ const add = Effect.fnUntraced(function* (state: State, match: string, events: Ev
   }).pipe(
     Effect.catch(
       Effect.fnUntraced(function* (err) {
-        const message = FrontmatterError.isInstance(err) ? err.data.message : `Failed to parse skill ${match}`
+        const message = FrontmatterError.isInstance(err) ? err.data.message : t("cli.index.failed-to-parse-skill", { match: match })
         const { Session } = yield* Effect.promise(() => import("@/session/session"))
         yield* events.publish(Session.Event.Error, { error: new NamedError.Unknown({ message }).toObject() })
         yield* Effect.logError("failed to load skill", { skill: match, error: err })
@@ -158,7 +159,7 @@ const scan = Effect.fnUntraced(function* (
   }).pipe(
     Effect.catch((error) => {
       if (!opts?.scope) return Effect.die(error)
-      return Effect.logError(`failed to scan ${opts.scope} skills`, { dir: root, error: error }).pipe(
+      return Effect.logError(t("cli.index.failed-to-scan-skills", { scope: opts.scope }), { dir: root, error: error }).pipe(
         Effect.as([] as string[]),
       )
     }),

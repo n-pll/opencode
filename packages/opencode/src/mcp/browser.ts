@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { LayerNode } from "@opencode-ai/core/effect/layer-node"
 import { Context, Effect, Layer } from "effect"
 import open from "open"
@@ -25,7 +26,7 @@ const layer = Layer.succeed(
         subprocess.on("exit", (code) => {
           if (code === null || code === 0) return
           clearTimeout(timer)
-          resume(Effect.fail(new Error(`Browser open failed with exit code ${code}`)))
+          resume(Effect.fail(new Error(t("cli.browser.browser-open-failed-with-exit-code", { code: code }))))
         })
       })
     }),

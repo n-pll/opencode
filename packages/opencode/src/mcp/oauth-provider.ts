@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import type { OAuthClientProvider } from "@modelcontextprotocol/sdk/client/auth.js"
 import type {
   OAuthClientMetadata,
@@ -135,7 +136,7 @@ export class McpOAuthProvider implements OAuthClientProvider {
   async codeVerifier(): Promise<string> {
     const entry = await Effect.runPromise(this.auth.get(this.mcpName))
     if (!entry?.codeVerifier) {
-      throw new Error(`No code verifier saved for MCP server: ${this.mcpName}`)
+      throw new Error(t("cli.oauth_provider.no-code-verifier-saved-for-mcp-server", { mcpName: this.mcpName }))
     }
     return entry.codeVerifier
   }

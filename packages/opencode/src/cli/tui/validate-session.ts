@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { createOpencodeClient } from "@opencode-ai/sdk/v2"
 import { SessionID } from "@/session/schema"
 import { Schema } from "effect"

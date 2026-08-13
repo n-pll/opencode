@@ -1,3 +1,4 @@
+import { t } from "../i18n"
 import { Config, Effect, Redacted } from "effect"
 import { Headers } from "effect/unstable/http"
 import { AuthenticationReason, InvalidRequestReason, LLMError, type LLMRequest } from "../schema"
@@ -142,7 +143,7 @@ const toLLMError = (error: AuthError): LLMError => {
       reason:
         error instanceof MissingCredentialError
           ? new AuthenticationReason({ message: error.message, kind: "missing" })
-          : new InvalidRequestReason({ message: `Failed to resolve auth config: ${error.message}` }),
+          : new InvalidRequestReason({ message: t("llm.auth.failed-to-resolve-auth-config", { message: error.message }) }),
     })
   }
   return error

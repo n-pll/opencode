@@ -353,7 +353,7 @@ function computeReplacements(
     if (chunk.change_context) {
       const contextIdx = seekSequence(originalLines, [chunk.change_context], lineIndex)
       if (contextIdx === -1) {
-        throw new Error(`Failed to find context '${chunk.change_context}' in ${filePath}`)
+        throw new Error(t("cli.index.failed-to-find-context-in", { change_context: chunk.change_context, filePath: filePath }))
       }
       lineIndex = contextIdx + 1
     }
@@ -386,7 +386,7 @@ function computeReplacements(
       replacements.push([found, pattern.length, newSlice])
       lineIndex = found + pattern.length
     } else {
-      throw new Error(`Failed to find expected lines in ${filePath}:\n${chunk.old_lines.join("\n")}`)
+      throw new Error(t("cli.index.failed-to-find-expected-lines-in-n", { filePath: filePath, p0: chunk.old_lines.join("\n") }))
     }
   }
 
@@ -619,7 +619,7 @@ export const maybeParseApplyPatchVerified = Effect.fn("Patch.maybeParseApplyPatc
             if (content === undefined) {
               return {
                 type: MaybeApplyPatchVerified.CorrectnessError,
-                error: new Error(`Failed to read file for deletion: ${deletePath}`),
+                error: new Error(t("cli.index.failed-to-read-file-for-deletion", { deletePath: deletePath })),
               } satisfies MaybeApplyPatchVerifiedResult
             }
             changes.set(resolvedPath, {
@@ -635,7 +635,7 @@ export const maybeParseApplyPatchVerified = Effect.fn("Patch.maybeParseApplyPatc
               .readFileString(updatePath)
               .pipe(
                 Effect.catch((cause) =>
-                  Effect.succeed(new Error(`Failed to read file ${updatePath}: ${cause}`, { cause })),
+                  Effect.succeed(new Error(t("cli.index.failed-to-read-file", { updatePath: updatePath, cause: cause }), { cause })),
                 ),
               )
             if (originalText instanceof Error) {

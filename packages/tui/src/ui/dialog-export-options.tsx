@@ -1,3 +1,4 @@
+import { useLanguage } from "../context/language"
 import { TextareaRenderable, TextAttributes } from "@opentui/core"
 import { useTheme } from "../context/theme"
 import { useDialog, type DialogContext } from "./dialog"
@@ -23,6 +24,7 @@ export type DialogExportOptionsProps = {
 }
 
 export function DialogExportOptions(props: DialogExportOptionsProps) {
+  const { t } = useLanguage()
   const dialog = useDialog()
   const { theme } = useTheme()
   const tuiConfig = useTuiConfig()
@@ -113,7 +115,7 @@ export function DialogExportOptions(props: DialogExportOptionsProps) {
             val.traits = { status: "FILENAME" }
           }}
           initialValue={props.defaultFilename}
-          placeholder="Enter filename"
+          placeholder={t("tui.dialog_export_options.enter-filename")}
           placeholderColor={theme.textMuted}
           textColor={theme.text}
           focusedTextColor={theme.text}

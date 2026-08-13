@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/language"
 import { createMemo } from "solid-js"
 import { useSync } from "../../context/sync"
 import { DialogSelect } from "../../ui/dialog-select"
@@ -12,6 +13,7 @@ export function DialogMessage(props: {
   sessionID: string
   setPrompt?: (prompt: PromptInfo) => void
 }) {
+  const { t } = useLanguage()
   const sync = useSync()
   const sdk = useSDK()
   const message = createMemo(() => sync.data.message[props.sessionID]?.find((x) => x.id === props.messageID))
@@ -20,7 +22,7 @@ export function DialogMessage(props: {
 
   return (
     <DialogSelect
-      title="Message Actions"
+      title={t("tui.dialog_message.message-actions")}
       options={[
         {
           title: "Revert",

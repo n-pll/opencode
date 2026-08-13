@@ -86,7 +86,7 @@ const layer = Layer.effectDiscard(
                   source,
                 })
                 return yield* files.writeTextPreservingBom({ target, content: input.content })
-              }).pipe(Effect.mapError(() => new ToolFailure({ message: `Unable to write ${input.path}` }))),
+              }).pipe(Effect.mapError(() => new ToolFailure({ message: t("core.write.unable-to-write", { path: input.path }) }))),
           }),
           "edit",
         ),

@@ -131,7 +131,7 @@ export const TaskTool = Tool.define(
 
       const next = yield* agent.get(params.subagent_type)
       if (!next) {
-        return yield* Effect.fail(new Error(`Unknown agent type: ${params.subagent_type} is not a valid agent type`))
+        return yield* Effect.fail(new Error(t("cli.task.unknown-agent-type-is-not-a-valid-agent-type", { subagent_type: params.subagent_type })))
       }
 
       const session = params.task_id

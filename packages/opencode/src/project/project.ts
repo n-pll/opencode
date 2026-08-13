@@ -417,7 +417,7 @@ const layer = Layer.effect(
 
     const addSandbox = Effect.fn("Project.addSandbox")(function* (id: ProjectV2.ID, directory: string) {
       const row = yield* db.select().from(ProjectTable).where(eq(ProjectTable.id, id)).get().pipe(Effect.orDie)
-      if (!row) throw new Error(`Project not found: ${id}`)
+      if (!row) throw new Error(t("cli.project.project-not-found.2", { id: id }))
       const sandbox = AbsolutePath.make(directory)
       const sboxes = [...row.sandboxes]
       if (!sboxes.includes(sandbox)) sboxes.push(sandbox)
@@ -428,13 +428,13 @@ const layer = Layer.effect(
         .returning()
         .get()
         .pipe(Effect.orDie)
-      if (!result) throw new Error(`Project not found: ${id}`)
+      if (!result) throw new Error(t("cli.project.project-not-found.2", { id: id }))
       yield* emitUpdated(fromRow(result))
     })
 
     const removeSandbox = Effect.fn("Project.removeSandbox")(function* (id: ProjectV2.ID, directory: string) {
       const row = yield* db.select().from(ProjectTable).where(eq(ProjectTable.id, id)).get().pipe(Effect.orDie)
-      if (!row) throw new Error(`Project not found: ${id}`)
+      if (!row) throw new Error(t("cli.project.project-not-found.2", { id: id }))
       const sandbox = AbsolutePath.make(directory)
       const sboxes = row.sandboxes.filter((s) => s !== sandbox)
       const result = yield* db
@@ -444,7 +444,7 @@ const layer = Layer.effect(
         .returning()
         .get()
         .pipe(Effect.orDie)
-      if (!result) throw new Error(`Project not found: ${id}`)
+      if (!result) throw new Error(t("cli.project.project-not-found.2", { id: id }))
       yield* emitUpdated(fromRow(result))
     })
 

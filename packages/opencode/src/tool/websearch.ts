@@ -115,7 +115,7 @@ export const WebSearchTool = Tool.define(
             parallel: flags.enableParallel,
           })
           const title = webSearchProviderLabel(provider)
-          yield* ctx.metadata({ title: `${title} "${params.query}"`, metadata: { provider } })
+          yield* ctx.metadata({ title: t("cli.websearch.", { title: title, query: params.query }), metadata: { provider } })
 
           yield* ctx.ask({
             permission: "websearch",
@@ -135,7 +135,7 @@ export const WebSearchTool = Tool.define(
 
           return {
             output: result ?? "No search results found. Please try a different query.",
-            title: `${title}: ${params.query}`,
+            title: t("cli.websearch..2", { title: title, query: params.query }),
             metadata: { provider },
           }
         }).pipe(Effect.orDie),

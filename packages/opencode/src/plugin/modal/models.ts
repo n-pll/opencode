@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import type { Model } from "@opencode-ai/sdk/v2"
 import { Schema } from "effect"
 
@@ -54,7 +55,7 @@ export async function get(baseURL: string, apiKey: string, existing: Record<stri
     },
     signal: AbortSignal.timeout(3_000),
   }).then(async (res) => {
-    if (!res.ok) throw new Error(`Failed to fetch Modal models: ${res.status}`)
+    if (!res.ok) throw new Error(t("cli.models.failed-to-fetch-modal-models", { status: res.status }))
     return decode(await res.json())
   })
 

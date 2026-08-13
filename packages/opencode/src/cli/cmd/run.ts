@@ -119,7 +119,7 @@ async function toolError(part: ToolPart) {
   } catch {
     inline({
       icon: "✗",
-      title: `${part.tool} failed`,
+      title: t("cli.run.failed", { tool: part.tool }),
     })
   }
 }

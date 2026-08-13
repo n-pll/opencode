@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import {
   checkPluginCompatibility,
   createPluginEntry,
@@ -98,7 +99,7 @@ export namespace PluginLoader {
     } catch (error) {
       return { ok: false, stage: "install", error }
     }
-    if (!target) return { ok: false, stage: "install", error: new Error(`Plugin ${plan.spec} target is empty`) }
+    if (!target) return { ok: false, stage: "install", error: new Error(t("cli.loader.plugin-target-is-empty", { spec: plan.spec })) }
 
     // Then inspect the target for the requested server/tui entrypoint.
     let base
@@ -116,7 +117,7 @@ export namespace PluginLoader {
           source: base.source,
           target: base.target,
           pkg: base.pkg,
-          message: `Plugin ${plan.spec} does not expose a ${kind} entrypoint`,
+          message: t("cli.loader.plugin-does-not-expose-a-entrypoint", { spec: plan.spec, kind: kind }),
         },
       }
 
@@ -140,7 +141,7 @@ export namespace PluginLoader {
     } catch (error) {
       return { ok: false, error }
     }
-    if (!mod) return { ok: false, error: new Error(`Plugin ${row.spec} module is empty`) }
+    if (!mod) return { ok: false, error: new Error(t("cli.loader.plugin-module-is-empty", { spec: row.spec })) }
     return { ok: true, value: { ...row, mod } }
   }
 

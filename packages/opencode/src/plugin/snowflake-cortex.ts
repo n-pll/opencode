@@ -178,7 +178,7 @@ async function startOAuthServer() {
 
     // CSRF guard: validate state before processing any callback
     if (!pendingOAuth || state !== pendingOAuth.state) {
-      const message = "Invalid state - potential CSRF attack"
+      const message = t("cli.digitalocean.invalid-state-potential-csrf-attack")
       pendingOAuth?.reject(new Error(message))
       pendingOAuth = undefined
       res.writeHead(400, { "Content-Type": "text/html" })
@@ -198,7 +198,7 @@ async function startOAuthServer() {
     }
 
     if (!code) {
-      const message = "Missing authorization code"
+      const message = t("cli.snowflake_cortex.missing-authorization-code")
       current.reject(new Error(message))
       res.writeHead(400, { "Content-Type": "text/html" })
       res.end(OauthCallbackPage.error(message, { provider: "Snowflake" }))

@@ -614,7 +614,7 @@ export const ShellTool = Tool.define(
                 ? yield* resolvePath(params.workdir, instanceCtx.directory, shell)
                 : instanceCtx.directory
               if (params.timeout !== undefined && params.timeout < 0) {
-                throw new Error(`Invalid timeout value: ${params.timeout}. Timeout must be a positive number.`)
+                throw new Error(t("cli.shell.invalid-timeout-value-timeout-must-be-a-positive-number", { timeout: params.timeout }))
               }
               const timeout = params.timeout ?? defaultTimeoutMs
               const ps = Shell.ps(shell)

@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { PermissionV1 } from "@opencode-ai/core/v1/permission"
 import { Permission } from "@/permission"
 import { Effect } from "effect"
@@ -28,7 +29,7 @@ export const permissionHandlers = HttpApiBuilder.group(InstanceHttpApi, "permiss
             Effect.fail(
               new PermissionNotFoundError({
                 requestID: String(error.requestID),
-                message: `Permission request not found: ${error.requestID}`,
+                message: t("cli.permission.permission-request-not-found", { requestID: error.requestID }),
               }),
             ),
           ),

@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { PermissionV1 } from "@opencode-ai/core/v1/permission"
 import { Agent } from "@/agent/agent"
 import { SessionV1 } from "@opencode-ai/core/v1/session"
@@ -369,7 +370,7 @@ export const sessionHandlers = HttpApiBuilder.group(InstanceHttpApi, "session", 
           Effect.fail(
             new PermissionNotFoundError({
               requestID: String(error.requestID),
-              message: `Permission request not found: ${error.requestID}`,
+              message: t("cli.session.permission-request-not-found", { requestID: error.requestID }),
             }),
           ),
         ),

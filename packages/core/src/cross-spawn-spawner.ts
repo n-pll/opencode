@@ -189,7 +189,7 @@ export const make = Effect.gen(function* () {
           if (node && "write" in node) {
             sink = NodeSink.fromWritable({
               evaluate: () => node,
-              onError: (err) => toPlatformError(`fromWritable(fd${x.fd})`, toError(err), command),
+              onError: (err) => toPlatformError(t("core.cross_spawn_spawner.fromwritable-fd", { fd: x.fd }), toError(err), command),
               endOnDone: true,
             })
           }
@@ -205,7 +205,7 @@ export const make = Effect.gen(function* () {
             node.pipe(tap)
             stream = NodeStream.fromReadable({
               evaluate: () => tap,
-              onError: (err) => toPlatformError(`fromReadable(fd${x.fd})`, toError(err), command),
+              onError: (err) => toPlatformError(t("core.cross_spawn_spawner.fromreadable-fd", { fd: x.fd }), toError(err), command),
             })
           }
           if (x.config.sink) stream = Stream.transduce(stream, x.config.sink)
@@ -420,7 +420,7 @@ export const make = Effect.gen(function* () {
               return Effect.fail(
                 toPlatformError(
                   "exitCode",
-                  new Error(`Process interrupted due to receipt of signal: '${signal}'`),
+                  new Error(t("core.cross_spawn_spawner.process-interrupted-due-to-receipt-of-signal", { signal: signal })),
                   command,
                 ),
               )

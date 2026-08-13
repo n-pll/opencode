@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { LayerNode } from "@opencode-ai/core/effect/layer-node"
 import path from "path"
 import { Global } from "@opencode-ai/core/global"
@@ -243,7 +244,7 @@ const layer = Layer.effect(
     )
 
     const fail = (target: string): Effect.Effect<never, NotFoundError> =>
-      Effect.fail(new NotFoundError({ message: `Resource not found: ${target}` }))
+      Effect.fail(new NotFoundError({ message: t("cli.storage.resource-not-found", { target: target }) }))
 
     const wrap = <A>(target: string, body: Effect.Effect<A, FSUtil.Error>) =>
       body.pipe(Effect.catchIf(missing, () => fail(target)))

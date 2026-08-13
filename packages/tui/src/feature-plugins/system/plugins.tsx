@@ -52,7 +52,7 @@ function Install(props: { api: TuiPluginApi }) {
       title={t("tui.plugins.install-plugin")}
       placeholder="npm package name"
       busy={busy()}
-      busyText="Installing plugin..."
+      busyText={t("tui.plugins.installing-plugin")}
       description={() => (
         <box flexDirection="row" gap={1}>
           <text fg={props.api.theme.current.textMuted}>scope:</text>
@@ -119,7 +119,7 @@ function Install(props: { api: TuiPluginApi }) {
 
               props.api.ui.toast({
                 variant: "success",
-                message: `Loaded ${mod} in current session.`,
+                message: t("tui.plugins.loaded-in-current-session", { mod: mod }),
               })
               show(props.api)
             })
@@ -151,6 +151,7 @@ function showInstall(api: TuiPluginApi) {
 }
 
 function View(props: { api: TuiPluginApi }) {
+  const { t } = useLanguage()
   const size = useTerminalDimensions()
   const [list, setList] = createSignal(props.api.plugins.list())
   const [cur, setCur] = createSignal<string | undefined>()
@@ -191,7 +192,7 @@ function View(props: { api: TuiPluginApi }) {
         if (!ok) {
           props.api.ui.toast({
             variant: "error",
-            message: `Failed to update plugin ${item.id}`,
+            message: t("tui.plugins.failed-to-update-plugin", { id: item.id }),
           })
         }
         setList(props.api.plugins.list())

@@ -59,12 +59,12 @@ export function parse(patchText: string): ReadonlyArray<Hunk> {
         next++
       }
       const parsed = parseUpdate(lines, next)
-      if (parsed.chunks.length === 0) throw new Error(`Invalid update hunk for ${path}: expected at least one @@ chunk`)
+      if (parsed.chunks.length === 0) throw new Error(t("core.patch.invalid-update-hunk-for-expected-at-least-one-chunk", { path: path }))
       hunks.push({ type: "update", path, movePath, chunks: parsed.chunks })
       index = parsed.next
       continue
     }
-    throw new Error(`Invalid patch line: ${line}`)
+    throw new Error(t("core.patch.invalid-patch-line", { line: line }))
   }
   return hunks
 }
@@ -90,7 +90,7 @@ function parseAdd(lines: ReadonlyArray<string>, start: number) {
   const content: string[] = []
   let index = start
   while (index < lines.length && !lines[index]!.startsWith("***")) {
-    if (!lines[index]!.startsWith("+")) throw new Error(`Invalid add file line: ${lines[index]}`)
+    if (!lines[index]!.startsWith("+")) throw new Error(t("core.patch.invalid-add-file-line", { lines: lines[index] }))
     content.push(lines[index]!.slice(1))
     index++
   }
@@ -102,7 +102,7 @@ function parseUpdate(lines: ReadonlyArray<string>, start: number) {
   let index = start
   while (index < lines.length && !lines[index]!.startsWith("***")) {
     if (!lines[index]!.startsWith("@@")) {
-      throw new Error(`Invalid update file line: ${lines[index]}`)
+      throw new Error(t("core.patch.invalid-update-file-line", { lines: lines[index] }))
     }
     const changeContext = lines[index]!.slice(2).trim() || undefined
     const oldLines: string[] = []
@@ -122,7 +122,7 @@ function parseUpdate(lines: ReadonlyArray<string>, start: number) {
         newLines.push(line.slice(1))
       } else if (line.startsWith("-")) oldLines.push(line.slice(1))
       else if (line.startsWith("+")) newLines.push(line.slice(1))
-      else throw new Error(`Invalid update chunk line: ${line}`)
+      else throw new Error(t("core.patch.invalid-update-chunk-line", { line: line }))
       index++
     }
     chunks.push({ oldLines, newLines, changeContext, endOfFile: endOfFile || undefined })
@@ -136,7 +136,7 @@ function computeReplacements(lines: ReadonlyArray<string>, path: string, chunks:
   for (const chunk of chunks) {
     if (chunk.changeContext) {
       const context = seek(lines, [chunk.changeContext], lineIndex)
-      if (context === -1) throw new Error(`Failed to find context '${chunk.changeContext}' in ${path}`)
+      if (context === -1) throw new Error(t("core.patch.failed-to-find-context-in", { changeContext: chunk.changeContext, path: path }))
       lineIndex = context + 1
     }
     if (chunk.oldLines.length === 0) {
@@ -151,7 +151,7 @@ function computeReplacements(lines: ReadonlyArray<string>, path: string, chunks:
       if (newLines.at(-1) === "") newLines = newLines.slice(0, -1)
       found = seek(lines, oldLines, lineIndex, chunk.endOfFile)
     }
-    if (found === -1) throw new Error(`Failed to find expected lines in ${path}:\n${chunk.oldLines.join("\n")}`)
+    if (found === -1) throw new Error(t("core.patch.failed-to-find-expected-lines-in-n", { path: path, p0: chunk.oldLines.join("\n") }))
     replacements.push([found, oldLines.length, newLines])
     lineIndex = found + oldLines.length
   }

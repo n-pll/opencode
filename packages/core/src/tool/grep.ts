@@ -124,7 +124,7 @@ const layer = Layer.effectDiscard(
                     ),
                   ),
                 )
-            }).pipe(Effect.mapError(() => new ToolFailure({ message: `Unable to grep for ${input.pattern}` }))),
+            }).pipe(Effect.mapError(() => new ToolFailure({ message: t("core.grep.unable-to-grep-for", { pattern: input.pattern }) }))),
         }),
       })
       .pipe(Effect.orDie)

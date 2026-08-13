@@ -600,7 +600,7 @@ const layer: Layer.Layer<
       }
 
       if (status.text.trim()) {
-        return yield* new ResetFailedError({ message: `Worktree reset left local changes:\n${status.text.trim()}` })
+        return yield* new ResetFailedError({ message: t("cli.index.worktree-reset-left-local-changes-n", { p0: status.text.trim() }) })
       }
 
       yield* runStartScripts(worktreePath, { projectID: ctx.project.id }).pipe(

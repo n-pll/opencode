@@ -119,7 +119,7 @@ export function permissionInfo(request: PermissionRequest): PermissionInfo {
 
   return {
     icon: "⚙",
-    title: `Call tool ${request.permission}`,
+    title: t("cli.permission_shared.call-tool", { permission: request.permission }),
     lines: [`Tool: ${request.permission}`],
   }
 }

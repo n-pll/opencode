@@ -51,7 +51,7 @@ export class InvalidDurableEventError extends Schema.TaggedErrorClass<InvalidDur
 const decodeSerializedEvent = (event: SerializedEvent): Payload => {
   const definition = Durable.get(event.type)
   if (!definition?.durable) {
-    throw new InvalidDurableEventError({ type: event.type, message: `Unknown durable event type ${event.type}` })
+    throw new InvalidDurableEventError({ type: event.type, message: t("core.event.unknown-durable-event-type", { type: event.type }) })
   }
   return {
     id: event.id,
@@ -222,7 +222,7 @@ export const layerWith = (options?: LayerOptions) =>
               yield* Effect.die(
                 new InvalidDurableEventError({
                   type: event.type,
-                  message: `Expected string aggregate field ${durable.aggregate}`,
+                  message: t("core.event.expected-string-aggregate-field", { aggregate: durable.aggregate }),
                 }),
               )
             } else {
@@ -230,7 +230,7 @@ export const layerWith = (options?: LayerOptions) =>
                 yield* Effect.die(
                   new InvalidDurableEventError({
                     type: event.type,
-                    message: `Aggregate mismatch: expected ${input.aggregateID}, got ${aggregateID}`,
+                    message: t("core.event.aggregate-mismatch-expected-got", { aggregateID: input.aggregateID, aggregateID0: aggregateID }),
                   }),
                 )
               }
@@ -285,7 +285,7 @@ export const layerWith = (options?: LayerOptions) =>
                             yield* Effect.die(
                               new InvalidDurableEventError({
                                 type: event.type,
-                                message: `Replay diverged at aggregate ${aggregateID} sequence ${input.seq}`,
+                                message: t("core.event.replay-diverged-at-aggregate-sequence", { aggregateID: aggregateID, seq: input.seq }),
                               }),
                             )
                           }
@@ -311,7 +311,7 @@ export const layerWith = (options?: LayerOptions) =>
                             yield* Effect.die(
                               new InvalidDurableEventError({
                                 type: event.type,
-                                message: `Event ${event.id} already exists at aggregate ${stored.aggregateID} sequence ${stored.seq}`,
+                                message: t("core.event.event-already-exists-at-aggregate-sequence", { id: event.id, aggregateID: stored.aggregateID, seq: stored.seq }),
                               }),
                             )
                           const committed = {
@@ -400,7 +400,7 @@ export const layerWith = (options?: LayerOptions) =>
         Effect.suspend(() => observer(event)).pipe(
           Effect.catchCauseIf(
             (cause) => !Cause.hasInterrupts(cause),
-            (cause) => Effect.logError("Event listener failed", { eventID: event.id, eventType: event.type, cause }),
+            (cause) => Effect.logError(t("core.event.event-listener-failed"), { eventID: event.id, eventType: event.type, cause }),
           ),
         )
 
@@ -447,7 +447,7 @@ export const layerWith = (options?: LayerOptions) =>
           const definition = Durable.get(event.type)
           if (!definition?.durable) {
             yield* Effect.die(
-              new InvalidDurableEventError({ type: event.type, message: `Unknown durable event type ${event.type}` }),
+              new InvalidDurableEventError({ type: event.type, message: t("core.event.unknown-durable-event-type", { type: event.type }) }),
             )
           } else {
             const payload = {
@@ -500,7 +500,7 @@ export const layerWith = (options?: LayerOptions) =>
               yield* Effect.die(
                 new InvalidDurableEventError({
                   type: event.type,
-                  message: `Replay sequence mismatch at index ${index}: expected ${seq}, got ${event.seq}`,
+                  message: t("core.event.replay-sequence-mismatch-at-index-expected-got", { index: index, seq: seq, seq0: event.seq }),
                 }),
               )
             }

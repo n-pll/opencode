@@ -114,7 +114,7 @@ const webSocketUrl = (value: string) =>
         url.protocol = "ws:"
         return url.toString()
       }
-      throw new Error(`Unsupported WebSocket URL protocol ${url.protocol}`)
+      throw new Error(t("llm.websocket.unsupported-websocket-url-protocol", { protocol: url.protocol }))
     },
     catch: (error) =>
       transportError("prepare", error instanceof Error ? error.message : t("llm.error.invalid_ws_url"), {

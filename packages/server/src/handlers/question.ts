@@ -1,3 +1,4 @@
+import { t } from "../i18n"
 import { QuestionV2 } from "@opencode-ai/core/question"
 import { Effect } from "effect"
 import { HttpApiBuilder, HttpApiSchema } from "effect/unstable/httpapi"
@@ -6,7 +7,7 @@ import { QuestionNotFoundError } from "@opencode-ai/protocol/errors"
 import { response } from "../location"
 
 function missingRequest(id: QuestionV2.ID) {
-  return new QuestionNotFoundError({ requestID: id, message: `Question request not found: ${id}` })
+  return new QuestionNotFoundError({ requestID: id, message: t("server.question.question-request-not-found", { id: id }) })
 }
 
 export const QuestionHandler = HttpApiBuilder.group(Api, "server.question", (handlers) =>

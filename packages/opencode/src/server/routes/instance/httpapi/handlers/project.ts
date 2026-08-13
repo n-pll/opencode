@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import * as InstanceState from "@/effect/instance-state"
 import { Project } from "@/project/project"
 import { ProjectV2 } from "@opencode-ai/core/project"
@@ -42,7 +43,7 @@ export const projectHandlers = HttpApiBuilder.group(InstanceHttpApi, "project", 
           Effect.fail(
             new ProjectNotFoundError({
               projectID: error.projectID,
-              message: `Project not found: ${error.projectID}`,
+              message: t("cli.project.project-not-found", { projectID: error.projectID }),
             }),
           ),
         ),

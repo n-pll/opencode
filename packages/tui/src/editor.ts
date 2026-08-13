@@ -1,3 +1,4 @@
+import { useLanguage } from "./context/language"
 import type { CliRenderer } from "@opentui/core"
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs"
 import { readFile, rm, writeFile } from "node:fs/promises"
@@ -24,6 +25,7 @@ export function normalizePromptContent(content: string) {
 }
 
 export async function openEditor(input: { value: string; renderer: CliRenderer; cwd?: string; stdin?: EditorStdio }) {
+  const { t } = useLanguage()
   const editor = process.env.VISUAL || process.env.EDITOR
   if (!editor) return
   const file = path.join(os.tmpdir(), `${Date.now()}.md`)

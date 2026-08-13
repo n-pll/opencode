@@ -448,7 +448,7 @@ export const page = Effect.fn("MessageV2.page")(function* (input: {
       .where(eq(SessionTable.id, input.sessionID))
       .get()
       .pipe(Effect.orDie)
-    if (!row) return yield* new NotFoundError({ message: `Session not found: ${input.sessionID}` })
+    if (!row) return yield* new NotFoundError({ message: t("cli.export.fail.session-not-found", { sessionID: input.sessionID }) })
     return {
       items: [] as WithParts[],
       more: false,
@@ -512,7 +512,7 @@ export const get = Effect.fn("MessageV2.get")(function* (input: { sessionID: Ses
     .where(and(eq(MessageTable.id, input.messageID), eq(MessageTable.session_id, input.sessionID)))
     .get()
     .pipe(Effect.orDie)
-  if (!row) return yield* new NotFoundError({ message: `Message not found: ${input.messageID}` })
+  if (!row) return yield* new NotFoundError({ message: t("cli.message_v2.message-not-found", { messageID: input.messageID }) })
   return {
     info: info(row),
     parts: yield* parts(input.messageID),

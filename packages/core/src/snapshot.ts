@@ -181,7 +181,7 @@ const layer = Layer.effect(
       for (const [file, snapshot] of input.files) {
         const absolute = path.resolve(worktree, file)
         if (!FSUtil.contains(worktree, absolute))
-          return yield* new Error({ operation, message: `Path escapes the project: ${file}` })
+          return yield* new Error({ operation, message: t("core.snapshot.path-escapes-the-project", { file: file }) })
         files.set(file, Git.TreeID.make(snapshot))
       }
       return files

@@ -1,3 +1,4 @@
+import { t } from "../i18n"
 export * as AgentPlugin from "./agent"
 
 import path from "path"
@@ -119,7 +120,7 @@ export const Plugin = define({
 
     yield* ctx.agent.transform((draft) => {
       draft.update(AgentV2.defaultID, (item) => {
-        item.description = "The default agent. Executes tools based on configured permissions."
+        item.description = t("core.agent.the-default-agent-executes-tools-based-on-configured-permiss")
         item.system ??= BUILD_SYSTEM
         item.mode = "primary"
         item.permissions.push(
@@ -131,7 +132,7 @@ export const Plugin = define({
       })
 
       draft.update(AgentV2.ID.make("plan"), (item) => {
-        item.description = "Plan mode. Disallows all edit tools."
+        item.description = t("core.agent.plan-mode-disallows-all-edit-tools")
         item.mode = "primary"
         item.permissions.push(
           ...PermissionV2.merge(defaults, [

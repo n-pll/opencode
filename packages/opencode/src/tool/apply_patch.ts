@@ -42,7 +42,7 @@ export const ApplyPatchTool = Tool.define(
         const parseResult = Patch.parsePatch(params.patchText)
         hunks = parseResult.hunks
       } catch (error) {
-        return yield* Effect.fail(new Error(`apply_patch verification failed: ${error}`))
+        return yield* Effect.fail(new Error(t("cli.apply_patch.apply-patch-verification-failed", { error: error })))
       }
 
       if (hunks.length === 0) {
@@ -109,7 +109,7 @@ export const ApplyPatchTool = Tool.define(
             const stats = yield* afs.stat(filePath).pipe(Effect.catch(() => Effect.succeed(undefined)))
             if (!stats || stats.type === "Directory") {
               return yield* Effect.fail(
-                new Error(`apply_patch verification failed: Failed to read file to update: ${filePath}`),
+                new Error(t("cli.apply_patch.apply-patch-verification-failed-failed-to-read-file-to-updat", { filePath: filePath })),
               )
             }
 
@@ -128,7 +128,7 @@ export const ApplyPatchTool = Tool.define(
               newContent = fileUpdate.content
               bom = fileUpdate.bom
             } catch (error) {
-              return yield* Effect.fail(new Error(`apply_patch verification failed: ${error}`))
+              return yield* Effect.fail(new Error(t("cli.apply_patch.apply-patch-verification-failed", { error: error })))
             }
 
             const diff = trimDiff(createTwoFilesPatch(filePath, filePath, oldContent, newContent))

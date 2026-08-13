@@ -115,7 +115,7 @@ const layer = Layer.effectDiscard(
                       ? new ToolFailure({
                           message: t("core.config.file_changed_after_permission_approval_read_it_again_before_"),
                         })
-                      : new ToolFailure({ message: `Unable to edit ${input.path}` }),
+                      : new ToolFailure({ message: t("core.edit.unable-to-edit", { path: input.path }) }),
                   ),
                 )
 

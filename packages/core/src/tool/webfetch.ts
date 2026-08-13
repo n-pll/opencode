@@ -19,9 +19,7 @@ export const MAX_RESPONSE_BYTES = 5 * 1024 * 1024
 export const DEFAULT_TIMEOUT_SECONDS = 30
 export const MAX_TIMEOUT_SECONDS = 120
 
-export const description = `Fetch content from an HTTP or HTTPS URL and return it as text, markdown, or HTML. Markdown is the default.
-
-Use a more targeted tool when one is available. This tool is read-only. Large text results may be replaced with a preview while the complete output is retained in managed storage.`
+export const description = t("core.webfetch.fetch-content-from-an-http-or-https-url-and-return-it-as-tex")
 
 const Timeout = Schema.Number.check(Schema.isGreaterThan(0), Schema.isLessThanOrEqualTo(MAX_TIMEOUT_SECONDS))
 
@@ -31,7 +29,7 @@ export const Input = Schema.Struct({
     .annotate({ description: t("core.config.the_format_to_return_the_content_in_defaults_to_markdown") })
     .pipe(Schema.withDecodingDefault(Effect.succeed("markdown" as const))),
   timeout: Timeout.pipe(Schema.optional).annotate({
-    description: `Optional timeout in seconds (maximum: ${MAX_TIMEOUT_SECONDS})`,
+    description: t("core.webfetch.optional-timeout-in-seconds-maximum", { MAX_TIMEOUT_SECONDS: MAX_TIMEOUT_SECONDS }),
   }),
 })
 
@@ -94,7 +92,7 @@ const collectBody = (response: HttpClientResponse.HttpClientResponse) =>
   collectBoundedResponseBody(
     response,
     MAX_RESPONSE_BYTES,
-    () => new Error(`Response too large (exceeds ${MAX_RESPONSE_BYTES} byte limit)`),
+    () => new Error(t("core.webfetch.response-too-large-exceeds-byte-limit", { MAX_RESPONSE_BYTES: MAX_RESPONSE_BYTES })),
   )
 
 const mimeFrom = (contentType: string) => contentType.split(";", 1)[0]?.trim().toLowerCase() ?? ""
@@ -153,9 +151,9 @@ const layer = Layer.effectDiscard(
                 const contentType = response.headers["content-type"] || ""
                 const mime = mimeFrom(contentType)
                 if (isImageAttachment(mime))
-                  return yield* Effect.fail(new Error(`Unsupported fetched image content type: ${mime}`))
+                  return yield* Effect.fail(new Error(t("core.webfetch.unsupported-fetched-image-content-type", { mime: mime })))
                 if (!isTextualMime(mime))
-                  return yield* Effect.fail(new Error(`Unsupported fetched file content type: ${mime}`))
+                  return yield* Effect.fail(new Error(t("core.webfetch.unsupported-fetched-file-content-type", { mime: mime })))
                 return { body: yield* collectBody(response), contentType }
               }).pipe(
                 Effect.timeoutOrElse({
@@ -174,7 +172,7 @@ const layer = Layer.effectDiscard(
                 format: input.format,
                 output,
               }
-            }).pipe(Effect.mapError(() => new ToolFailure({ message: `Unable to fetch ${input.url}` }))),
+            }).pipe(Effect.mapError(() => new ToolFailure({ message: t("core.webfetch.unable-to-fetch", { url: input.url }) }))),
         }),
       })
       .pipe(Effect.orDie)

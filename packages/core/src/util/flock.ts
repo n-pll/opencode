@@ -291,7 +291,7 @@ export namespace Flock {
       }
 
       if (mono() > stop) {
-        throw new Error(`Timed out waiting for lock: ${input.key}`)
+        throw new Error(t("core.flock.timed-out-waiting-for-lock", { key: input.key }))
       }
 
       attempt += 1

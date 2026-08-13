@@ -131,7 +131,7 @@ export function retryable(error: Err, provider: string) {
 
       const link = `https://opencode.ai/workspace/${workspace}/go`
       return {
-        message: `${message} - ${link}`,
+        message: t("cli.retry.", { message: message, link: link }),
         action: {
           reason: "account_rate_limit",
           provider,

@@ -1,3 +1,4 @@
+import { t } from "../i18n"
 export * as SystemContext from "./index"
 
 import { Effect, Option, Schema } from "effect"
@@ -260,7 +261,7 @@ function reconcileObservation(
     }
     const compared = comparisons.get(entry.key)
     if (!compared || compared._tag === "Incompatible")
-      throw new Error(`Missing comparison for system context source ${entry.key}`)
+      throw new Error(t("core.index.missing-comparison-for-system-context-source", { key: entry.key }))
     if (compared._tag === "Unchanged") {
       snapshot[entry.key] = stored
       continue
@@ -272,7 +273,7 @@ function reconcileObservation(
   for (const key of Object.keys(previous).sort()) {
     if (keys.has(Key.make(key))) continue
     const removed = previous[key].removed
-    if (removed === undefined) throw new Error(`Missing removal rendering for system context source ${key}`)
+    if (removed === undefined) throw new Error(t("core.index.missing-removal-rendering-for-system-context-source", { key: key }))
     updates.push(removed)
   }
   if (updates.length === 0) return { _tag: "Unchanged" }
@@ -307,7 +308,7 @@ function isUnavailable(value: unknown): value is Unavailable {
 }
 
 function requireText(key: Key, kind: string, text: string) {
-  if (text.length === 0) throw new Error(`System context source ${key} rendered an empty ${kind}`)
+  if (text.length === 0) throw new Error(t("core.index.system-context-source-rendered-an-empty", { key: key, kind: kind }))
   return text
 }
 

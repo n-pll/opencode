@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 // Permission UI body for the direct-mode footer.
 //
 // Renders inside the footer when the reducer pushes a FooterView of type
@@ -100,7 +101,7 @@ export function RejectField(props: {
       minHeight={1}
       maxHeight={3}
       wrapMode="word"
-      placeholder="Tell OpenCode what to do differently"
+      placeholder={t("cli.footer_permission.tell-opencode-what-to-do-differently")}
       placeholderColor={props.theme.muted}
       textColor={props.theme.text}
       focusedTextColor={props.theme.text}

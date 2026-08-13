@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { LayerNode } from "@opencode-ai/core/effect/layer-node"
 import { httpClient } from "@opencode-ai/core/effect/app-node-platform"
 import { serviceUse } from "@opencode-ai/core/effect/service-use"
@@ -195,10 +196,10 @@ const layer = Layer.effect(
           HttpClientRequest.get(url).pipe(HttpClientRequest.acceptJson, HttpClientRequest.setHeaders(headers ?? {})),
         )
         .pipe(
-          Effect.catch((error) => Effect.die(new Error(`failed to fetch remote config from ${url}: ${String(error)}`))),
+          Effect.catch((error) => Effect.die(new Error(t("cli.config.failed-to-fetch-remote-config-from", { url: url, p0: String(error) })))),
         )
       const body = yield* response.text.pipe(
-        Effect.catch((error) => Effect.die(new Error(`failed to read remote config from ${url}: ${String(error)}`))),
+        Effect.catch((error) => Effect.die(new Error(t("cli.config.failed-to-read-remote-config-from", { url: url, p0: String(error) })))),
       )
       // An auth proxy can answer with an HTML login page at HTTP 200 (passes filterStatusOk); treat it as a re-auth error, not a decode failure.
       const contentType = (response.headers["content-type"] ?? "").toLowerCase()
@@ -206,7 +207,7 @@ const layer = Layer.effect(
         return yield* Effect.die(new RemoteAuthError({ url: loginOrigin, remote: url }))
       }
       return yield* Schema.decodeEffect(Schema.fromJsonString(schema))(body).pipe(
-        Effect.catch((error) => Effect.die(new Error(`failed to decode remote config from ${url}: ${String(error)}`))),
+        Effect.catch((error) => Effect.die(new Error(t("cli.config.failed-to-decode-remote-config-from", { url: url, p0: String(error) })))),
       )
     })
 
@@ -379,7 +380,7 @@ const layer = Layer.effect(
                   if (isRecord(data) && isRecord(data.config)) return data.config
                   if (isRecord(data)) return data
                   return yield* Effect.die(
-                    new Error(`failed to decode remote config from ${remote.url}: expected object`),
+                    new Error(t("cli.config.failed-to-decode-remote-config-from-expected-object", { url: remote.url })),
                   )
                 })
               : {}

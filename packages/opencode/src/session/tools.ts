@@ -166,7 +166,7 @@ export const resolve = Effect.fn("SessionTools.resolve")(function* (input: {
             if (parsed.server && !resourceServers.includes(parsed.server)) {
               throw new Error(
                 resourceServers.length === 0
-                  ? `MCP server "${parsed.server}" does not support resources`
+                  ? t("cli.tools.mcp-server-does-not-support-resources", { server: parsed.server })
                   : `MCP server "${parsed.server}" does not support resources. Available resource servers: ${resourceServers.join(", ")}`,
               )
             }
@@ -249,7 +249,7 @@ export const resolve = Effect.fn("SessionTools.resolve")(function* (input: {
             if (parsed.server && !resourceServers.includes(parsed.server)) {
               throw new Error(
                 resourceServers.length === 0
-                  ? `MCP server "${parsed.server}" does not support resources`
+                  ? t("cli.tools.mcp-server-does-not-support-resources", { server: parsed.server })
                   : `MCP server "${parsed.server}" does not support resources. Available resource servers: ${resourceServers.join(", ")}`,
               )
             }
@@ -331,10 +331,10 @@ export const resolve = Effect.fn("SessionTools.resolve")(function* (input: {
             const clients = yield* mcp.clients()
             const client = clients[parsed.server]
             if (!client) {
-              throw new Error(`MCP server "${parsed.server}" is not connected`)
+              throw new Error(t("cli.tools.mcp-server-is-not-connected", { server: parsed.server }))
             }
             if (!client.getServerCapabilities()?.resources) {
-              throw new Error(`MCP server "${parsed.server}" does not support resources`)
+              throw new Error(t("cli.tools.mcp-server-does-not-support-resources", { server: parsed.server }))
             }
             yield* plugin.trigger(
               "tool.execute.before",
@@ -349,12 +349,12 @@ export const resolve = Effect.fn("SessionTools.resolve")(function* (input: {
             })
 
             const content = yield* mcp.readResource(parsed.server, parsed.uri)
-            if (!content) throw new Error(`Failed to read MCP resource: ${parsed.server}/${parsed.uri}`)
+            if (!content) throw new Error(t("cli.tools.failed-to-read-mcp-resource", { server: parsed.server, uri: parsed.uri }))
 
             const formatted = formatMcpResourceContent(parsed.server, parsed.uri, content)
             const truncated = yield* truncate.output(formatted.text, {}, input.agent)
             const output = {
-              title: `MCP resource: ${parsed.uri}`,
+              title: t("cli.tools.mcp-resource", { uri: parsed.uri }),
               metadata: {
                 server: parsed.server,
                 uri: parsed.uri,
@@ -511,14 +511,14 @@ function parseReadMcpResourceArgs(value: unknown) {
 function optionalString(args: Record<string, unknown>, key: string) {
   const value = args[key]
   if (value === undefined || value === null || value === "") return undefined
-  if (typeof value !== "string") throw new Error(`${key} must be a string`)
+  if (typeof value !== "string") throw new Error(t("cli.tools.must-be-a-string", { key: key }))
   return value
 }
 
 function requiredString(args: Record<string, unknown>, key: string) {
   const value = optionalString(args, key)
   if (value) return value
-  throw new Error(`${key} is required`)
+  throw new Error(t("cli.tools.is-required", { key: key }))
 }
 
 function formatMcpResource(resource: MCP.Resource) {

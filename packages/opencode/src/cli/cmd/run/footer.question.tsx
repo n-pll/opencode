@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 // Question UI body for the direct-mode footer.
 //
 // Renders inside the footer when the reducer pushes a FooterView of type
@@ -479,7 +480,7 @@ export function RunQuestionBody(props: {
                             minHeight={1}
                             maxHeight={4}
                             wrapMode="word"
-                            placeholder="Type your own answer"
+                            placeholder={t("cli.footer_question.type-your-own-answer")}
                             placeholderColor={props.theme.muted}
                             textColor={props.theme.text}
                             focusedTextColor={props.theme.text}

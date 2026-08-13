@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { Client } from "@modelcontextprotocol/sdk/client/index.js"
 import {
   CallToolResultSchema,
@@ -27,12 +28,12 @@ export async function paginate<T, R extends { nextCursor?: string }>(
     const page = await list(cursor)
     result.push(...items(page))
     if (page.nextCursor === undefined) return result
-    if (cursors.has(page.nextCursor)) throw new Error(`MCP list returned duplicate cursor: ${page.nextCursor}`)
+    if (cursors.has(page.nextCursor)) throw new Error(t("cli.catalog.mcp-list-returned-duplicate-cursor", { nextCursor: page.nextCursor }))
     cursors.add(page.nextCursor)
     cursor = page.nextCursor
   }
 
-  throw new Error(`MCP list exceeded ${MAX_LIST_PAGES} pages`)
+  throw new Error(t("cli.catalog.mcp-list-exceeded-pages", { MAX_LIST_PAGES: MAX_LIST_PAGES }))
 }
 
 export function defs(client: Client, timeout?: number) {

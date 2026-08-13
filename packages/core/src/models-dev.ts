@@ -1,3 +1,4 @@
+import { t } from "./i18n"
 import path from "path"
 import { Context, Duration, Effect, Layer, Option, Schedule, Schema } from "effect"
 import { FetchHttpClient, HttpClient, HttpClientRequest } from "effect/unstable/http"
@@ -247,7 +248,7 @@ const layer = Layer.effect(
           yield* events.publish(Event.Refreshed, {})
         }),
       ).pipe(
-        Effect.tapCause((cause) => Effect.logError("Failed to fetch models.dev", { cause: cause })),
+        Effect.tapCause((cause) => Effect.logError(t("core.models_dev.failed-to-fetch-models-dev"), { cause: cause })),
         Effect.ignore,
       )
     })

@@ -143,7 +143,7 @@ const isTokenFresh = (tokenExpiry: number | null, now: number) =>
   tokenExpiry != null && tokenExpiry > now + eagerRefreshThresholdMs
 
 const mapAccountServiceError =
-  (message = "Account service operation failed") =>
+  (message = t("cli.account.account-service-operation-failed")) =>
   <A, E, R>(effect: Effect.Effect<A, E, R>): Effect.Effect<A, AccountError, R> =>
     effect.pipe(Effect.mapError((cause) => accountErrorFromCause(cause, message)))
 

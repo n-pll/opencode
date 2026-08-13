@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/language"
 import type { Event } from "@opencode-ai/sdk/v2"
 import type { TuiAttentionSoundName, TuiPlugin, TuiPluginApi } from "@opencode-ai/plugin/tui"
 import type { BuiltinTuiPlugin } from "../builtins"
@@ -18,9 +19,10 @@ function notify(api: TuiPluginApi, sessionID: string | undefined, message: strin
 }
 
 function sessionErrorMessage(error: SessionError) {
+  const { t } = useLanguage()
   if (error?.name === "MessageAbortedError") return "Session aborted"
   const data = error?.data
-  if (data && typeof data === "object" && "message" in data && data.message === "SSE read timed out") {
+  if (data && typeof data === "object" && "message" in data && data.message === t("tui.notifications.sse-read-timed-out")) {
     return "Model stopped responding"
   }
   return "Session error"

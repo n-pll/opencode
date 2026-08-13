@@ -92,11 +92,11 @@ export const ReadTool = Tool.define<
 
       if (items.length > 0) {
         return yield* Effect.fail(
-          new Error(`File not found: ${filepath}\n\nDid you mean one of these?\n${items.join("\n")}`),
+          new Error(t("cli.read.file-not-found-n-ndid-you-mean-one-of-these-n", { filepath: filepath, p0: items.join("\n") })),
         )
       }
 
-      return yield* Effect.fail(new Error(`File not found: ${filepath}`))
+      return yield* Effect.fail(new Error(t("cli.read.file-not-found", { filepath: filepath })))
     })
 
     const list = Effect.fn("ReadTool.list")(function* (filepath: string) {
@@ -326,13 +326,13 @@ export const ReadTool = Tool.define<
       }
 
       if (isBinaryFile(filepath, sample)) {
-        return yield* Effect.fail(new Error(`Cannot read binary file: ${filepath}`))
+        return yield* Effect.fail(new Error(t("cli.read.cannot-read-binary-file", { filepath: filepath })))
       }
 
       const file = yield* lines(filepath, { limit: params.limit ?? DEFAULT_READ_LIMIT, offset: params.offset || 1 })
       if (file.count < file.offset && !(file.count === 0 && file.offset === 1)) {
         return yield* Effect.fail(
-          new Error(`Offset ${file.offset} is out of range for this file (${file.count} lines)`),
+          new Error(t("cli.read.offset-is-out-of-range-for-this-file-lines", { offset: file.offset, count: file.count })),
         )
       }
 

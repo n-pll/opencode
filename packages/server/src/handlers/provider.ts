@@ -1,3 +1,4 @@
+import { t } from "../i18n"
 import { Catalog } from "@opencode-ai/core/catalog"
 import { Effect } from "effect"
 import { HttpApiBuilder } from "effect/unstable/httpapi"
@@ -23,7 +24,7 @@ export const ProviderHandler = HttpApiBuilder.group(Api, "server.provider", (han
           if (!provider)
             return yield* new ProviderNotFoundError({
               providerID: ctx.params.providerID,
-              message: `Provider not found: ${ctx.params.providerID}`,
+              message: t("server.provider.provider-not-found", { providerID: ctx.params.providerID }),
             })
           return yield* response(Effect.succeed(provider))
         }),

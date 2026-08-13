@@ -293,7 +293,7 @@ export function Session() {
       const result = await sdk.client.session.get({ sessionID }, { throwOnError: true })
       if (!result.data) {
         toast.show({
-          message: `Session not found: ${sessionID}`,
+          message: t("tui.index.session-not-found", { sessionID: sessionID }),
           variant: "error",
           duration: 5000,
         })
@@ -1013,7 +1013,7 @@ export function Session() {
               await writeExport(filepath, result)
             }
 
-            toast.show({ message: `Session exported to ${filename}`, variant: "success" })
+            toast.show({ message: t("tui.index.session-exported-to", { filename: filename }), variant: "success" })
           }
         } catch {
           toast.show({ message: t("tui.index.failed-to-export-session"), variant: "error" })
@@ -1806,6 +1806,7 @@ type ToolProps = {
   part: ToolPart
 }
 function GenericTool(props: ToolProps) {
+  const { t } = useLanguage()
   const { theme } = useTheme()
   const ctx = use()
   const output = createMemo(() => props.output?.trim() ?? "")
@@ -1822,7 +1823,7 @@ function GenericTool(props: ToolProps) {
     <Show
       when={props.output && ctx.showGenericToolOutput()}
       fallback={
-        <InlineTool icon="⚙" pending="Writing command..." complete={true} part={props.part}>
+        <InlineTool icon="⚙" pending={t("tui.index.writing-command")} complete={true} part={props.part}>
           {props.tool} {input(props.input)}
         </InlineTool>
       }
@@ -2054,6 +2055,7 @@ function BlockTool(props: {
 }
 
 function Shell(props: ToolProps) {
+  const { t } = useLanguage()
   const { theme } = useTheme()
   const pathFormatter = usePathFormatter()
   const ctx = use()
@@ -2104,7 +2106,7 @@ function Shell(props: ToolProps) {
         </BlockTool>
       </Match>
       <Match when={true}>
-        <InlineTool icon="$" pending="Writing command..." complete={stringValue(props.input.command)} part={props.part}>
+        <InlineTool icon="$" pending={t("tui.index.writing-command")} complete={stringValue(props.input.command)} part={props.part}>
           {stringValue(props.input.command)}
         </InlineTool>
       </Match>
@@ -2113,6 +2115,7 @@ function Shell(props: ToolProps) {
 }
 
 function Write(props: ToolProps) {
+  const { t } = useLanguage()
   const { theme, syntax } = useTheme()
   const pathFormatter = usePathFormatter()
   const code = createMemo(() => {
@@ -2138,7 +2141,7 @@ function Write(props: ToolProps) {
       <Match when={true}>
         <InlineTool
           icon="←"
-          pending="Preparing write..."
+          pending={t("tui.index.preparing-write")}
           complete={stringValue(props.input.filePath)}
           part={props.part}
         >
@@ -2150,9 +2153,10 @@ function Write(props: ToolProps) {
 }
 
 function Glob(props: ToolProps) {
+    const { t } = useLanguage()
   const pathFormatter = usePathFormatter()
   return (
-    <InlineTool icon="✱" pending="Finding files..." complete={stringValue(props.input.pattern)} part={props.part}>
+    <InlineTool icon="✱" pending={t("tui.index.finding-files")} complete={stringValue(props.input.pattern)} part={props.part}>
       Glob "{stringValue(props.input.pattern)}"{" "}
       <Show when={stringValue(props.input.path)}>in {pathFormatter.format(stringValue(props.input.path))} </Show>
       <Show when={numberValue(props.metadata.count)}>
@@ -2163,6 +2167,7 @@ function Glob(props: ToolProps) {
 }
 
 function Read(props: ToolProps) {
+      const { t } = useLanguage()
   const { theme } = useTheme()
   const pathFormatter = usePathFormatter()
   const isRunning = createMemo(() => props.part.state.status === "running")
@@ -2177,7 +2182,7 @@ function Read(props: ToolProps) {
     <>
       <InlineTool
         icon="→"
-        pending="Reading file..."
+        pending={t("tui.index.reading-file")}
         complete={stringValue(props.input.filePath)}
         spinner={isRunning()}
         part={props.part}
@@ -2198,9 +2203,10 @@ function Read(props: ToolProps) {
 }
 
 function Grep(props: ToolProps) {
+        const { t } = useLanguage()
   const pathFormatter = usePathFormatter()
   return (
-    <InlineTool icon="✱" pending="Searching content..." complete={stringValue(props.input.pattern)} part={props.part}>
+    <InlineTool icon="✱" pending={t("tui.index.searching-content")} complete={stringValue(props.input.pattern)} part={props.part}>
       Grep "{stringValue(props.input.pattern)}"{" "}
       <Show when={stringValue(props.input.path)}>in {pathFormatter.format(stringValue(props.input.path))} </Show>
       <Show when={numberValue(props.metadata.matches)}>
@@ -2211,16 +2217,18 @@ function Grep(props: ToolProps) {
 }
 
 function WebFetch(props: ToolProps) {
+          const { t } = useLanguage()
   return (
-    <InlineTool icon="%" pending="Fetching from the web..." complete={stringValue(props.input.url)} part={props.part}>
+    <InlineTool icon="%" pending={t("tui.index.fetching-from-the-web")} complete={stringValue(props.input.url)} part={props.part}>
       WebFetch {stringValue(props.input.url)}
     </InlineTool>
   )
 }
 
 function WebSearch(props: ToolProps) {
+    const { t } = useLanguage()
   return (
-    <InlineTool icon="◈" pending="Searching web..." complete={stringValue(props.input.query)} part={props.part}>
+    <InlineTool icon="◈" pending={t("tui.index.searching-web")} complete={stringValue(props.input.query)} part={props.part}>
       {webSearchProviderLabel(props.metadata.provider)} "{stringValue(props.input.query)}"{" "}
       <Show when={numberValue(props.metadata.numResults)}>({numberValue(props.metadata.numResults)} results)</Show>
     </InlineTool>
@@ -2228,6 +2236,7 @@ function WebSearch(props: ToolProps) {
 }
 
 function Task(props: ToolProps) {
+    const { t } = useLanguage()
   const { theme } = useTheme()
   const { navigate } = useRoute()
   const sync = useSync()
@@ -2310,7 +2319,7 @@ function Task(props: ToolProps) {
       color={retry() ? theme.error : undefined}
       spinner={isRunning()}
       complete={stringValue(props.input.description)}
-      pending="Delegating..."
+      pending={t("tui.index.delegating")}
       part={props.part}
       onClick={() => {
         if (sessionID()) {
@@ -2403,6 +2412,7 @@ function Execute(props: ToolProps) {
 }
 
 function Edit(props: ToolProps) {
+                const { t } = useLanguage()
   const ctx = use()
   const { theme, syntax } = useTheme()
   const pathFormatter = usePathFormatter()
@@ -2447,7 +2457,7 @@ function Edit(props: ToolProps) {
         </BlockTool>
       </Match>
       <Match when={true}>
-        <InlineTool icon="←" pending="Preparing edit..." complete={stringValue(props.input.filePath)} part={props.part}>
+        <InlineTool icon="←" pending={t("tui.index.preparing-edit")} complete={stringValue(props.input.filePath)} part={props.part}>
           Edit {pathFormatter.format(stringValue(props.input.filePath))} {input({ replaceAll: props.input.replaceAll })}
         </InlineTool>
       </Match>
@@ -2456,6 +2466,7 @@ function Edit(props: ToolProps) {
 }
 
 function ApplyPatch(props: ToolProps) {
+        const { t } = useLanguage()
   const ctx = use()
   const { theme, syntax } = useTheme()
   const pathFormatter = usePathFormatter()
@@ -2523,7 +2534,7 @@ function ApplyPatch(props: ToolProps) {
         </For>
       </Match>
       <Match when={true}>
-        <InlineTool icon="%" pending="Preparing patch..." failure="Patch failed" complete={false} part={props.part}>
+        <InlineTool icon="%" pending={t("tui.index.preparing-patch")} failure="Patch failed" complete={false} part={props.part}>
           Patch
         </InlineTool>
       </Match>
@@ -2532,6 +2543,7 @@ function ApplyPatch(props: ToolProps) {
 }
 
 function TodoWrite(props: ToolProps) {
+          const { t } = useLanguage()
   const todos = createMemo(() => parseTodos(props.input.todos))
   return (
     <Switch>
@@ -2545,8 +2557,8 @@ function TodoWrite(props: ToolProps) {
       <Match when={true}>
         <InlineTool
           icon="⚙"
-          pending="Updating todos..."
-          failure="Todo update failed"
+          pending={t("tui.index.updating-todos")}
+          failure={t("tui.index.todo-update-failed")}
           complete={false}
           part={props.part}
         >
@@ -2558,6 +2570,7 @@ function TodoWrite(props: ToolProps) {
 }
 
 function Question(props: ToolProps) {
+            const { t } = useLanguage()
   const { theme } = useTheme()
   const questions = createMemo(() => parseQuestions(props.input.questions))
   const answers = createMemo(() => parseQuestionAnswers(props.metadata.answers))
@@ -2585,7 +2598,7 @@ function Question(props: ToolProps) {
         </BlockTool>
       </Match>
       <Match when={true}>
-        <InlineTool icon="→" pending="Asking questions..." complete={count()} part={props.part}>
+        <InlineTool icon="→" pending={t("tui.index.asking-questions")} complete={count()} part={props.part}>
           Asked {count()} question{count() !== 1 ? "s" : ""}
         </InlineTool>
       </Match>
@@ -2594,8 +2607,9 @@ function Question(props: ToolProps) {
 }
 
 function Skill(props: ToolProps) {
+              const { t } = useLanguage()
   return (
-    <InlineTool icon="→" pending="Loading skill..." complete={stringValue(props.input.name)} part={props.part}>
+    <InlineTool icon="→" pending={t("tui.index.loading-skill")} complete={stringValue(props.input.name)} part={props.part}>
       Skill "{stringValue(props.input.name)}"
     </InlineTool>
   )

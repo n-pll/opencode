@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { randomBytes } from "crypto"
 
 const prefixes = {
@@ -33,7 +34,7 @@ function generateID(prefix: keyof typeof prefixes, direction: "descending" | "as
   }
 
   if (!given.startsWith(prefixes[prefix])) {
-    throw new Error(`ID ${given} does not start with ${prefixes[prefix]}`)
+    throw new Error(t("cli.id.id-does-not-start-with", { given: given, prefixes: prefixes[prefix] }))
   }
   return given
 }

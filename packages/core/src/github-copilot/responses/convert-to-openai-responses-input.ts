@@ -1,3 +1,4 @@
+import { t } from "../../i18n"
 import {
   type LanguageModelV3Prompt,
   type LanguageModelV3ToolCallPart,
@@ -59,7 +60,7 @@ export async function convertToOpenAIResponsesInput({
           }
           default: {
             const _exhaustiveCheck: never = systemMessageMode
-            throw new Error(`Unsupported system message mode: ${_exhaustiveCheck}`)
+            throw new Error(t("core.convert_to_openai_responses_input.unsupported-system-message-mode", { _exhaustiveCheck: _exhaustiveCheck }))
           }
         }
         break
@@ -175,7 +176,7 @@ export async function convertToOpenAIResponsesInput({
               } else {
                 warnings.push({
                   type: "other",
-                  message: `Results for OpenAI tool ${part.toolName} are not sent to the API when store is false`,
+                  message: t("core.convert_to_openai_responses_input.results-for-openai-tool-are-not-sent-to-the-api-when-store-i", { toolName: part.toolName }),
                 })
               }
 
@@ -220,7 +221,7 @@ export async function convertToOpenAIResponsesInput({
                   } else if (reasoningMessage !== undefined) {
                     warnings.push({
                       type: "other",
-                      message: `Cannot append empty reasoning part to existing reasoning sequence. Skipping reasoning part: ${JSON.stringify(part)}.`,
+                      message: t("core.convert_to_openai_responses_input.cannot-append-empty-reasoning-part-to-existing-reasoning-seq", { p0: JSON.stringify(part) }),
                     })
                   }
 
@@ -239,7 +240,7 @@ export async function convertToOpenAIResponsesInput({
               } else {
                 warnings.push({
                   type: "other",
-                  message: `Non-OpenAI reasoning parts are not supported. Skipping reasoning part: ${JSON.stringify(part)}.`,
+                  message: t("core.convert_to_openai_responses_input.non-openai-reasoning-parts-are-not-supported-skipping-reason", { p0: JSON.stringify(part) }),
                 })
               }
               break
@@ -319,7 +320,7 @@ export async function convertToOpenAIResponsesInput({
 
       default: {
         const _exhaustiveCheck: never = role
-        throw new Error(`Unsupported role: ${_exhaustiveCheck}`)
+        throw new Error(t("core.convert_to_openai_responses_input.unsupported-role", { _exhaustiveCheck: _exhaustiveCheck }))
       }
     }
   }

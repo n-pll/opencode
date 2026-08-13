@@ -233,7 +233,7 @@ export default new Hono<{ Bindings: Env }>()
     if (!message) return c.json({ ok: true })
 
     const threadId = body.event?.message?.root_id || body.event?.message?.message_id
-    if (threadId) message = `${message} [${threadId}]`
+    if (threadId) message = t("function.api.", { message: message, threadId: threadId })
 
     const response = await fetch(
       `https://discord.com/api/v10/channels/${Resource.DISCORD_SUPPORT_CHANNEL_ID.value}/messages`,

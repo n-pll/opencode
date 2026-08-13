@@ -142,7 +142,7 @@ const headless = {
               )
             }
             if (response.status !== 403 && response.status !== 404) {
-              return yield* Effect.fail(new Error(`Device authorization failed: ${response.status}`))
+              return yield* Effect.fail(new Error(t("core.openai.device-authorization-failed", { status: response.status })))
             }
             yield* Effect.sleep(interval + pollingSafetyMargin)
           }
@@ -228,7 +228,7 @@ function request<A>(url: string, init: RequestInit) {
   return Effect.tryPromise({
     try: async (signal) => {
       const response = await fetch(url, { ...init, signal })
-      if (!response.ok) throw new Error(`Request failed: ${response.status}`)
+      if (!response.ok) throw new Error(t("core.openai.request-failed", { status: response.status }))
       return response.json() as Promise<A>
     },
     catch: (cause) => cause,

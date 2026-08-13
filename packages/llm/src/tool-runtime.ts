@@ -1,3 +1,4 @@
+import { t } from "./i18n"
 import { Effect } from "effect"
 import {
   LLMEvent,
@@ -36,7 +37,7 @@ export const dispatch = (tools: Tools, call: ToolCallPart): Effect.Effect<Dispat
 
 const decodeAndExecute = (tool: AnyTool, call: ToolCallPart): Effect.Effect<ToolSettlement, ToolFailure> =>
   tool._decode(call.input).pipe(
-    Effect.mapError((error) => new ToolFailure({ message: `Invalid tool input: ${error.message}` })),
+    Effect.mapError((error) => new ToolFailure({ message: t("llm.tool_runtime.invalid-tool-input", { message: error.message }) })),
     Effect.flatMap((decoded) =>
       tool.execute!(decoded, { id: call.id, name: call.name }).pipe(
         Effect.flatMap((value) =>
@@ -44,7 +45,7 @@ const decodeAndExecute = (tool: AnyTool, call: ToolCallPart): Effect.Effect<Tool
             Effect.mapError(
               (error) =>
                 new ToolFailure({
-                  message: `Tool returned an invalid value for its success schema: ${error.message}`,
+                  message: t("llm.tool_runtime.tool-returned-an-invalid-value-for-its-success-schema", { message: error.message }),
                 }),
             ),
           ),

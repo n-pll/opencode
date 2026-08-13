@@ -1,3 +1,4 @@
+import { t } from "../i18n"
 import { Location } from "@opencode-ai/core/location"
 import { PermissionV2 } from "@opencode-ai/core/permission"
 import { PermissionSaved } from "@opencode-ai/core/permission/saved"
@@ -8,7 +9,7 @@ import { PermissionNotFoundError, SessionNotFoundError } from "@opencode-ai/prot
 import { response } from "../location"
 
 function missingRequest(id: PermissionV2.ID) {
-  return new PermissionNotFoundError({ requestID: id, message: `Permission request not found: ${id}` })
+  return new PermissionNotFoundError({ requestID: id, message: t("server.permission.permission-request-not-found", { id: id }) })
 }
 
 export const PermissionHandler = HttpApiBuilder.group(Api, "server.permission", (handlers) =>
@@ -42,7 +43,7 @@ export const PermissionHandler = HttpApiBuilder.group(Api, "server.permission", 
                   (error) =>
                     new SessionNotFoundError({
                       sessionID: error.sessionID,
-                      message: `Session not found: ${error.sessionID}`,
+                      message: t("server.permission.session-not-found", { sessionID: error.sessionID }),
                     }),
                 ),
               ),

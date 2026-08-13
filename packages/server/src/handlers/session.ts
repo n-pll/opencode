@@ -98,7 +98,7 @@ export const SessionHandler = HttpApiBuilder.group(Api, "server.session", (handl
                 (error) =>
                   new SessionNotFoundError({
                     sessionID: error.sessionID,
-                    message: `Session not found: ${error.sessionID}`,
+                    message: t("server.session.session-not-found", { sessionID: error.sessionID }),
                   }),
               ),
             ),
@@ -113,7 +113,7 @@ export const SessionHandler = HttpApiBuilder.group(Api, "server.session", (handl
               Effect.fail(
                 new SessionNotFoundError({
                   sessionID: error.sessionID,
-                  message: `Session not found: ${error.sessionID}`,
+                  message: t("server.session.session-not-found", { sessionID: error.sessionID }),
                 }),
               ),
             ),
@@ -129,7 +129,7 @@ export const SessionHandler = HttpApiBuilder.group(Api, "server.session", (handl
               Effect.fail(
                 new SessionNotFoundError({
                   sessionID: error.sessionID,
-                  message: `Session not found: ${error.sessionID}`,
+                  message: t("server.session.session-not-found", { sessionID: error.sessionID }),
                 }),
               ),
             ),
@@ -154,14 +154,14 @@ export const SessionHandler = HttpApiBuilder.group(Api, "server.session", (handl
                   Effect.fail(
                     new SessionNotFoundError({
                       sessionID: error.sessionID,
-                      message: `Session not found: ${error.sessionID}`,
+                      message: t("server.session.session-not-found", { sessionID: error.sessionID }),
                     }),
                   ),
                 ),
                 Effect.catchTag("Session.PromptConflictError", (error) =>
                   Effect.fail(
                     new ConflictError({
-                      message: `Prompt message ID conflicts with an existing durable record: ${error.messageID}`,
+                      message: t("server.session.prompt-message-id-conflicts-with-an-existing-durable-record", { messageID: error.messageID }),
                       resource: error.messageID,
                     }),
                   ),
@@ -178,14 +178,14 @@ export const SessionHandler = HttpApiBuilder.group(Api, "server.session", (handl
               Effect.fail(
                 new SessionNotFoundError({
                   sessionID: error.sessionID,
-                  message: `Session not found: ${error.sessionID}`,
+                  message: t("server.session.session-not-found", { sessionID: error.sessionID }),
                 }),
               ),
             ),
             Effect.catchTag("Session.OperationUnavailableError", (error) =>
               Effect.fail(
                 new ServiceUnavailableError({
-                  message: `Session ${error.operation} is not available yet`,
+                  message: t("server.session.session-is-not-available-yet", { operation: error.operation }),
                   service: `session.${error.operation}`,
                 }),
               ),
@@ -202,14 +202,14 @@ export const SessionHandler = HttpApiBuilder.group(Api, "server.session", (handl
               Effect.fail(
                 new SessionNotFoundError({
                   sessionID: error.sessionID,
-                  message: `Session not found: ${error.sessionID}`,
+                  message: t("server.session.session-not-found", { sessionID: error.sessionID }),
                 }),
               ),
             ),
             Effect.catchTag("Session.OperationUnavailableError", (error) =>
               Effect.fail(
                 new ServiceUnavailableError({
-                  message: `Session ${error.operation} is not available yet`,
+                  message: t("server.session.session-is-not-available-yet", { operation: error.operation }),
                   service: `session.${error.operation}`,
                 }),
               ),
@@ -228,7 +228,7 @@ export const SessionHandler = HttpApiBuilder.group(Api, "server.session", (handl
                 (error) =>
                   new SessionNotFoundError({
                     sessionID: error.sessionID,
-                    message: `Session not found: ${error.sessionID}`,
+                    message: t("server.session.session-not-found", { sessionID: error.sessionID }),
                   }),
               ),
               Effect.catchTag(
@@ -237,7 +237,7 @@ export const SessionHandler = HttpApiBuilder.group(Api, "server.session", (handl
                   new MessageNotFoundError({
                     sessionID: error.sessionID,
                     messageID: error.messageID,
-                    message: `Message not found: ${error.messageID}`,
+                    message: t("server.session.message-not-found", { messageID: error.messageID }),
                   }),
               ),
               Effect.catchTag("Snapshot.Error", (error) => {
@@ -266,7 +266,7 @@ export const SessionHandler = HttpApiBuilder.group(Api, "server.session", (handl
               (error) =>
                 new SessionNotFoundError({
                   sessionID: error.sessionID,
-                  message: `Session not found: ${error.sessionID}`,
+                  message: t("server.session.session-not-found", { sessionID: error.sessionID }),
                 }),
             ),
             Effect.catchTag("Snapshot.Error", (error) => {
@@ -295,7 +295,7 @@ export const SessionHandler = HttpApiBuilder.group(Api, "server.session", (handl
               (error) =>
                 new SessionNotFoundError({
                   sessionID: error.sessionID,
-                  message: `Session not found: ${error.sessionID}`,
+                  message: t("server.session.session-not-found", { sessionID: error.sessionID }),
                 }),
             ),
           )
@@ -311,7 +311,7 @@ export const SessionHandler = HttpApiBuilder.group(Api, "server.session", (handl
                 Effect.fail(
                   new SessionNotFoundError({
                     sessionID: error.sessionID,
-                    message: `Session not found: ${error.sessionID}`,
+                    message: t("server.session.session-not-found", { sessionID: error.sessionID }),
                   }),
                 ),
               ),
@@ -349,7 +349,7 @@ export const SessionHandler = HttpApiBuilder.group(Api, "server.session", (handl
                 (error) =>
                   new SessionNotFoundError({
                     sessionID: error.sessionID,
-                    message: `Session not found: ${error.sessionID}`,
+                    message: t("server.session.session-not-found", { sessionID: error.sessionID }),
                   }),
               ),
             )
@@ -378,7 +378,7 @@ export const SessionHandler = HttpApiBuilder.group(Api, "server.session", (handl
           return yield* new MessageNotFoundError({
             sessionID: ctx.params.sessionID,
             messageID: ctx.params.messageID,
-            message: `Message not found: ${ctx.params.messageID}`,
+            message: t("server.session.message-not-found", { messageID: ctx.params.messageID }),
           })
         }),
       )

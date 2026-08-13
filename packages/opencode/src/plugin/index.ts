@@ -198,21 +198,21 @@ const layer = Layer.effect(
 
                 if (stage === "install") {
                   const parsed = parsePluginSpecifier(spec)
-                  publishPluginError(`Failed to install plugin ${parsed.pkg}@${parsed.version}: ${message}`)
+                  publishPluginError(t("cli.index.failed-to-install-plugin", { pkg: parsed.pkg, version: parsed.version, message: message }))
                   return
                 }
 
                 if (stage === "compatibility") {
-                  publishPluginError(`Plugin ${spec} skipped: ${message}`)
+                  publishPluginError(t("cli.index.plugin-skipped", { spec: spec, message: message }))
                   return
                 }
 
                 if (stage === "entry") {
-                  publishPluginError(`Failed to load plugin ${spec}: ${message}`)
+                  publishPluginError(t("cli.index.failed-to-load-plugin", { spec: spec, message: message }))
                   return
                 }
 
-                publishPluginError(`Failed to load plugin ${spec}: ${message}`)
+                publishPluginError(t("cli.index.failed-to-load-plugin", { spec: spec, message: message }))
               },
             },
           }),

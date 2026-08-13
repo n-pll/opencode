@@ -66,7 +66,7 @@ export const PtyHandler = HttpApiBuilder.group(Api, "server.pty", (handlers) =>
                 () =>
                   new PtyNotFoundError({
                     ptyID: ctx.params.ptyID,
-                    message: `PTY session not found: ${ctx.params.ptyID}`,
+                    message: t("server.pty.pty-session-not-found", { ptyID: ctx.params.ptyID }),
                   }),
               ),
             ),
@@ -89,7 +89,7 @@ export const PtyHandler = HttpApiBuilder.group(Api, "server.pty", (handlers) =>
                   () =>
                     new PtyNotFoundError({
                       ptyID: ctx.params.ptyID,
-                      message: `PTY session not found: ${ctx.params.ptyID}`,
+                      message: t("server.pty.pty-session-not-found", { ptyID: ctx.params.ptyID }),
                     }),
                 ),
               ),
@@ -106,7 +106,7 @@ export const PtyHandler = HttpApiBuilder.group(Api, "server.pty", (handlers) =>
               () =>
                 new PtyNotFoundError({
                   ptyID: ctx.params.ptyID,
-                  message: `PTY session not found: ${ctx.params.ptyID}`,
+                  message: t("server.pty.pty-session-not-found", { ptyID: ctx.params.ptyID }),
                 }),
             ),
           )
@@ -131,7 +131,7 @@ export const PtyHandler = HttpApiBuilder.group(Api, "server.pty", (handlers) =>
               () =>
                 new PtyNotFoundError({
                   ptyID: ctx.params.ptyID,
-                  message: `PTY session not found: ${ctx.params.ptyID}`,
+                  message: t("server.pty.pty-session-not-found", { ptyID: ctx.params.ptyID }),
                 }),
             ),
           )

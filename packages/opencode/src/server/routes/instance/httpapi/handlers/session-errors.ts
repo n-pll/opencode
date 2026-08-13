@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import type { NotFoundError as StorageNotFoundError } from "@/storage/storage"
 import type { Session } from "@/session/session"
 import { Effect } from "effect"
@@ -13,7 +14,7 @@ export function mapBusy<A, R>(self: Effect.Effect<A, Session.BusyError, R>) {
       Effect.fail(
         new ApiError.SessionBusyError({
           sessionID: error.sessionID,
-          message: `Session is busy: ${error.sessionID}`,
+          message: t("cli.session_errors.session-is-busy", { sessionID: error.sessionID }),
         }),
       ),
     ),

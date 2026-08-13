@@ -315,7 +315,7 @@ const layer = Layer.effect(
 
           case "tool-input-start":
             if (ctx.assistantMessage.summary) {
-              throw new Error(`Tool call not allowed while generating summary: ${value.name}`)
+              throw new Error(t("cli.processor.tool-call-not-allowed-while-generating-summary", { name: value.name }))
             }
             yield* ensureToolCall(value)
             return
@@ -331,7 +331,7 @@ const layer = Layer.effect(
 
           case "tool-call": {
             if (ctx.assistantMessage.summary) {
-              throw new Error(`Tool call not allowed while generating summary: ${value.name}`)
+              throw new Error(t("cli.processor.tool-call-not-allowed-while-generating-summary", { name: value.name }))
             }
             yield* ensureToolCall(value)
             const input = isRecord(value.input) ? value.input : { value: value.input }

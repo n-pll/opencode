@@ -1,3 +1,4 @@
+import { t } from "./i18n"
 export * as SessionV2 from "./session"
 export * from "./session/schema"
 

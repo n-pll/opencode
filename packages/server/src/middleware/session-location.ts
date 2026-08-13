@@ -49,7 +49,7 @@ export const sessionLocationLayer = Layer.effect(
         if (!row)
           return yield* new SessionNotFoundError({
             sessionID,
-            message: `Session not found: ${sessionID}`,
+            message: t("server.session_location.session-not-found", { sessionID: sessionID }),
           })
 
         return yield* effect.pipe(

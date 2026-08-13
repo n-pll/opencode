@@ -11,4 +11,8 @@ export const dict: Record<string, string> = {
   "enterprise.api.share_removed": "Share removed",
   "enterprise.error.session_data_missing_schema": "SessionDataMissingError does not expose a schema",
   "enterprise.error.missing_shareID": "Missing shareID",
+  "enterprise.storage.failed-to-read": "Failed to read {{path}}: {{status}}",
+  "enterprise.storage.failed-to-write": "Failed to write {{path}}: {{status}}",
+  "enterprise.storage.failed-to-remove": "Failed to remove {{path}}: {{status}}",
+  "enterprise.storage.failed-to-list": "Failed to list {{prefix}}: {{status}}",
 }

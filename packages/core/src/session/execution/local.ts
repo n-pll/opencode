@@ -1,3 +1,4 @@
+import { t } from "../../i18n"
 import { Cause, Effect, Layer } from "effect"
 import { LocationServiceMap } from "../../location-service-map"
 import { makeGlobalNode } from "../../effect/app-node"
@@ -22,7 +23,7 @@ const layer = Layer.effect(
           Effect.tapCause((cause) =>
             Cause.hasInterruptsOnly(cause)
               ? Effect.void
-              : Effect.logError("Failed to drain Session", cause).pipe(Effect.annotateLogs({ sessionID })),
+              : Effect.logError(t("core.local.failed-to-drain-session"), cause).pipe(Effect.annotateLogs({ sessionID })),
           ),
         )
       }),

@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { Duration, Effect, Schema } from "effect"
 import { HttpClient, HttpClientRequest } from "effect/unstable/http"
 
@@ -89,7 +90,7 @@ export const call = <F extends Schema.Struct.Fields>(
     const response = yield* HttpClient.filterStatusOk(http)
       .execute(request)
       .pipe(
-        Effect.timeoutOrElse({ duration: timeout, orElse: () => Effect.die(new Error(`${tool} request timed out`)) }),
+        Effect.timeoutOrElse({ duration: timeout, orElse: () => Effect.die(new Error(t("cli.mcp_websearch.request-timed-out", { tool: tool }))) }),
       )
     const body = yield* response.text
     return yield* parseResponse(body)

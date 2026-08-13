@@ -257,7 +257,7 @@ function poll(http: HttpClient.HttpClient, server: string, deviceCode: string, i
       if (result.error === "slow_down") {
         return yield* loop(Duration.sum(wait, Duration.seconds(5)))
       }
-      return yield* Effect.fail(new Error(`Device authorization failed: ${result.error}`))
+      return yield* Effect.fail(new Error(t("core.opencode.device-authorization-failed", { error: result.error })))
     })
   return loop(interval)
 }

@@ -41,7 +41,7 @@ The current year is ${new Date().getFullYear()}. Use this year when searching fo
 export const Input = Schema.Struct({
   query: Schema.String.annotate({ description: t("core.config.websearch_query") }),
   numResults: Schema.optional(PositiveInt.check(Schema.isLessThanOrEqualTo(MAX_NUM_RESULTS))).annotate({
-    description: `Number of search results to return (default: 8, maximum: ${MAX_NUM_RESULTS})`,
+    description: t("core.websearch.number-of-search-results-to-return-default-8-maximum", { MAX_NUM_RESULTS: MAX_NUM_RESULTS }),
   }),
   livecrawl: Schema.optional(Schema.Literals(["fallback", "preferred"])).annotate({
     description:
@@ -52,7 +52,7 @@ export const Input = Schema.Struct({
   }),
   contextMaxCharacters: Schema.optional(PositiveInt.check(Schema.isLessThanOrEqualTo(MAX_CONTEXT_CHARACTERS))).annotate(
     {
-      description: `Maximum characters for context string optimized for models (default: 10000, maximum: ${MAX_CONTEXT_CHARACTERS})`,
+      description: t("core.websearch.maximum-characters-for-context-string-optimized-for-models-d", { MAX_CONTEXT_CHARACTERS: MAX_CONTEXT_CHARACTERS }),
     },
   ),
 })
@@ -174,13 +174,13 @@ const callMcp = <F extends Schema.Struct.Fields>(
       const body = yield* collectBoundedResponseBody(
         response,
         MAX_RESPONSE_BYTES,
-        () => new Error(`${tool} response exceeded ${MAX_RESPONSE_BYTES} bytes`),
+        () => new Error(t("core.websearch.response-exceeded-bytes", { tool: tool, MAX_RESPONSE_BYTES: MAX_RESPONSE_BYTES })),
       )
       return yield* parseResponse(body.toString("utf8"))
     }).pipe(
       Effect.timeoutOrElse({
         duration: Duration.seconds(25),
-        orElse: () => Effect.fail(new Error(`${tool} request timed out`)),
+        orElse: () => Effect.fail(new Error(t("core.websearch.request-timed-out", { tool: tool }))),
       }),
     )
   })
@@ -246,7 +246,7 @@ const layer = Layer.effectDiscard(
                 provider,
                 text: text ?? NO_RESULTS,
               }
-            }).pipe(Effect.mapError(() => new ToolFailure({ message: `Unable to search the web for ${input.query}` })))
+            }).pipe(Effect.mapError(() => new ToolFailure({ message: t("core.websearch.unable-to-search-the-web-for", { query: input.query }) })))
           },
         }),
       })

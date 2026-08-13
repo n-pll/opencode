@@ -73,7 +73,7 @@ export const LspTool = Tool.define(
           const title = detail ? `${args.operation} ${detail}` : args.operation
 
           const exists = yield* fs.existsSafe(file)
-          if (!exists) throw new Error(`File not found: ${file}`)
+          if (!exists) throw new Error(t("cli.run.message.file-not-found", { file: file }))
 
           const available = yield* lsp.hasClients(file)
           if (!available) throw new Error(t("cli.lsp.no-lsp-server-available-for-this-file-type"))

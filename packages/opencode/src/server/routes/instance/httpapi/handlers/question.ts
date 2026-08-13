@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { Question } from "@/question"
 import { QuestionID } from "@/question/schema"
 import { Effect } from "effect"
@@ -27,7 +28,7 @@ export const questionHandlers = HttpApiBuilder.group(InstanceHttpApi, "question"
             Effect.fail(
               new QuestionNotFoundError({
                 requestID: String(error.requestID),
-                message: `Question request not found: ${error.requestID}`,
+                message: t("cli.question.question-request-not-found", { requestID: error.requestID }),
               }),
             ),
           ),
@@ -41,7 +42,7 @@ export const questionHandlers = HttpApiBuilder.group(InstanceHttpApi, "question"
           Effect.fail(
             new QuestionNotFoundError({
               requestID: String(error.requestID),
-              message: `Question request not found: ${error.requestID}`,
+              message: t("cli.question.question-request-not-found", { requestID: error.requestID }),
             }),
           ),
         ),

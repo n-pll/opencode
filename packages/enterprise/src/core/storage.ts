@@ -16,7 +16,7 @@ export namespace Storage {
       async read(path: string): Promise<string | undefined> {
         const response = await client.fetch(`${base}/${path}`)
         if (response.status === 404) return undefined
-        if (!response.ok) throw new Error(`Failed to read ${path}: ${response.status}`)
+        if (!response.ok) throw new Error(t("enterprise.storage.failed-to-read", { path: path, status: response.status }))
         return response.text()
       },
 
@@ -28,14 +28,14 @@ export namespace Storage {
             "Content-Type": "application/json",
           },
         })
-        if (!response.ok) throw new Error(`Failed to write ${path}: ${response.status}`)
+        if (!response.ok) throw new Error(t("enterprise.storage.failed-to-write", { path: path, status: response.status }))
       },
 
       async remove(path: string): Promise<void> {
         const response = await client.fetch(`${base}/${path}`, {
           method: "DELETE",
         })
-        if (!response.ok) throw new Error(`Failed to remove ${path}: ${response.status}`)
+        if (!response.ok) throw new Error(t("enterprise.storage.failed-to-remove", { path: path, status: response.status }))
       },
 
       async list(options?: { prefix?: string; limit?: number; after?: string; before?: string }): Promise<string[]> {
@@ -47,7 +47,7 @@ export namespace Storage {
           params.set("start-after", afterPath)
         }
         const response = await client.fetch(`${base}?${params}`)
-        if (!response.ok) throw new Error(`Failed to list ${prefix}: ${response.status}`)
+        if (!response.ok) throw new Error(t("enterprise.storage.failed-to-list", { prefix: prefix, status: response.status }))
         const xml = await response.text()
         const keys: string[] = []
         const regex = /<Key>([^<]+)<\/Key>/g

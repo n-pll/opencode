@@ -156,7 +156,7 @@ const normalizeError = (error: unknown): Diagnostic => {
   if (error instanceof InterpreterRuntimeError) {
     return {
       kind: error.kind,
-      message: `${error.message}${formatLocation(error.node)}`,
+      message: t("codemode.runtime.", { message: error.message, p0: formatLocation(error.node) }),
       ...(error.node?.loc ? { location: sourceLocation(error.node) } : {}),
       ...(error.suggestions ? { suggestions: error.suggestions } : {}),
     }
@@ -195,7 +195,7 @@ const normalizeError = (error: unknown): Diagnostic => {
         message = String(value)
       }
     }
-    return { kind: "ExecutionFailure", message: `Uncaught: ${message}` }
+    return { kind: "ExecutionFailure", message: t("codemode.runtime.uncaught", { message: message }) }
   }
 
   if (error instanceof RangeError && /call stack|recursion/i.test(error.message)) {
@@ -3384,7 +3384,7 @@ export const executeWithLimits = <const Tools extends Record<string, unknown>>(
         orElse: () =>
           Effect.succeed({
             ok: false,
-            error: { kind: "TimeoutExceeded", message: `Execution timed out after ${timeoutMs}ms.` },
+            error: { kind: "TimeoutExceeded", message: t("codemode.runtime.execution-timed-out-after-ms", { timeoutMs: timeoutMs }) },
             ...logged(),
             toolCalls: tools.calls,
           } satisfies Result),

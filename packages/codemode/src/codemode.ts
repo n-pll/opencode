@@ -123,7 +123,7 @@ const validateLimit = <Value extends number | undefined>(
   minimum: number,
 ): Value => {
   if (value !== undefined && (!Number.isSafeInteger(value) || value < minimum)) {
-    throw new RangeError(`${name} must be a safe integer greater than or equal to ${minimum}.`)
+    throw new RangeError(t("codemode.codemode.must-be-a-safe-integer-greater-than-or-equal-to", { name: name, minimum: minimum }))
   }
   return value
 }

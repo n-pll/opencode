@@ -330,9 +330,9 @@ const layer = Layer.effect(
           const c = yield* config.get()
           if (c.default_agent) {
             const agent = agents[c.default_agent]
-            if (!agent) throw new Error(`default agent "${c.default_agent}" not found`)
-            if (agent.mode === "subagent") throw new Error(`default agent "${c.default_agent}" is a subagent`)
-            if (agent.hidden === true) throw new Error(`default agent "${c.default_agent}" is hidden`)
+            if (!agent) throw new Error(t("cli.agent.default-agent-not-found", { default_agent: c.default_agent }))
+            if (agent.mode === "subagent") throw new Error(t("cli.agent.default-agent-is-a-subagent", { default_agent: c.default_agent }))
+            if (agent.hidden === true) throw new Error(t("cli.agent.default-agent-is-hidden", { default_agent: c.default_agent }))
             return agent
           }
           const visible = Object.values(agents).find((a) => a.mode !== "subagent" && a.hidden !== true)

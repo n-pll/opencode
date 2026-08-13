@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { MCP } from "@/mcp"
 import { Effect, Schema } from "effect"
 import { HttpApiBuilder, HttpApiError } from "effect/unstable/httpapi"
@@ -23,12 +24,12 @@ export const mcpHandlers = HttpApiBuilder.group(InstanceHttpApi, "mcp", (handler
     const authStart = Effect.fn("McpHttpApi.authStart")(function* (ctx: { params: { name: string } }) {
       return yield* Effect.gen(function* () {
         if (!(yield* mcp.supportsOAuth(ctx.params.name))) {
-          return yield* new UnsupportedOAuthError({ error: `MCP server ${ctx.params.name} does not support OAuth` })
+          return yield* new UnsupportedOAuthError({ error: t("cli.mcp.mcp-server-does-not-support-oauth", { name: ctx.params.name }) })
         }
         return yield* mcp.startAuth(ctx.params.name)
       }).pipe(
         Effect.catchTag("MCP.NotFoundError", (error) =>
-          Effect.fail(new McpServerNotFoundError({ name: error.name, message: `MCP server not found: ${error.name}` })),
+          Effect.fail(new McpServerNotFoundError({ name: error.name, message: t("cli.mcp.mcp-server-not-found", { name: error.name }) })),
         ),
       )
     })
@@ -42,7 +43,7 @@ export const mcpHandlers = HttpApiBuilder.group(InstanceHttpApi, "mcp", (handler
         .pipe(
           Effect.catchTag("MCP.NotFoundError", (error) =>
             Effect.fail(
-              new McpServerNotFoundError({ name: error.name, message: `MCP server not found: ${error.name}` }),
+              new McpServerNotFoundError({ name: error.name, message: t("cli.mcp.mcp-server-not-found", { name: error.name }) }),
             ),
           ),
         )
@@ -51,12 +52,12 @@ export const mcpHandlers = HttpApiBuilder.group(InstanceHttpApi, "mcp", (handler
     const authAuthenticate = Effect.fn("McpHttpApi.authAuthenticate")(function* (ctx: { params: { name: string } }) {
       return yield* Effect.gen(function* () {
         if (!(yield* mcp.supportsOAuth(ctx.params.name))) {
-          return yield* new UnsupportedOAuthError({ error: `MCP server ${ctx.params.name} does not support OAuth` })
+          return yield* new UnsupportedOAuthError({ error: t("cli.mcp.mcp-server-does-not-support-oauth", { name: ctx.params.name }) })
         }
         return yield* mcp.authenticate(ctx.params.name)
       }).pipe(
         Effect.catchTag("MCP.NotFoundError", (error) =>
-          Effect.fail(new McpServerNotFoundError({ name: error.name, message: `MCP server not found: ${error.name}` })),
+          Effect.fail(new McpServerNotFoundError({ name: error.name, message: t("cli.mcp.mcp-server-not-found", { name: error.name }) })),
         ),
       )
     })
@@ -66,7 +67,7 @@ export const mcpHandlers = HttpApiBuilder.group(InstanceHttpApi, "mcp", (handler
       if (!(ctx.params.name in status))
         return yield* new McpServerNotFoundError({
           name: ctx.params.name,
-          message: `MCP server not found: ${ctx.params.name}`,
+          message: t("cli.mcp.mcp-server-not-found", { name: ctx.params.name }),
         })
       yield* mcp.removeAuth(ctx.params.name)
       return { success: true as const }
@@ -78,7 +79,7 @@ export const mcpHandlers = HttpApiBuilder.group(InstanceHttpApi, "mcp", (handler
         .pipe(
           Effect.catchTag("MCP.NotFoundError", (error) =>
             Effect.fail(
-              new McpServerNotFoundError({ name: error.name, message: `MCP server not found: ${error.name}` }),
+              new McpServerNotFoundError({ name: error.name, message: t("cli.mcp.mcp-server-not-found", { name: error.name }) }),
             ),
           ),
         )
@@ -91,7 +92,7 @@ export const mcpHandlers = HttpApiBuilder.group(InstanceHttpApi, "mcp", (handler
         .pipe(
           Effect.catchTag("MCP.NotFoundError", (error) =>
             Effect.fail(
-              new McpServerNotFoundError({ name: error.name, message: `MCP server not found: ${error.name}` }),
+              new McpServerNotFoundError({ name: error.name, message: t("cli.mcp.mcp-server-not-found", { name: error.name }) }),
             ),
           ),
         )

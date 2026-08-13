@@ -478,7 +478,7 @@ export const searchIndex = <R>(tools: HostTools<R>): ReadonlyArray<SearchEntry> 
 
 export const assertValidTools = <R>(tools: HostTools<R>): void => {
   if (Object.hasOwn(tools, reservedNamespace)) {
-    throw new Error(`Tool namespace '${reservedNamespace}' is reserved for CodeMode discovery tools.`)
+    throw new Error(t("codemode.tool_runtime.tool-namespace-is-reserved-for-codemode-discovery-tools", { reservedNamespace: reservedNamespace }))
   }
 }
 

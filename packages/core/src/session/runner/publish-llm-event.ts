@@ -1,3 +1,4 @@
+import { t } from "../../i18n"
 import { ToolOutput, type LLMEvent, type ProviderMetadata, type ToolResultValue, type Usage } from "@opencode-ai/llm"
 import { DateTime, Effect } from "effect"
 import { EventV2 } from "../../event"
@@ -46,7 +47,7 @@ type SettledOutput =
 const settledOutput = (value: ToolOutput | undefined, result: ToolResultValue): SettledOutput => {
   if (result.type === "error") return { error: { type: "unknown", message: message(result.value) } }
   const settled = value ?? ToolOutput.fromResultValue(result)
-  if (!settled) throw new Error(`Unsupported tool result: ${message(result)}`)
+  if (!settled) throw new Error(t("core.publish_llm_event.unsupported-tool-result", { p0: message(result) }))
   return { structured: record(settled.structured), content: settled.content }
 }
 

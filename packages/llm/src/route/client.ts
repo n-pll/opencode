@@ -1,3 +1,4 @@
+import { t } from "../i18n"
 import { Cause, Context, Effect, Layer, Schema, Stream } from "effect"
 import * as Option from "effect/Option"
 import { Auth, type Auth as AuthDef } from "./auth"
@@ -92,9 +93,9 @@ type RouteMappedModelInput = RouteModelInput | RouteRoutedModelInput
 
 const makeRouteModel = (route: AnyRoute, mapped: RouteMappedModelInput) => {
   const provider = route.provider ?? ("provider" in mapped ? mapped.provider : undefined)
-  if (!provider) throw new Error(`Route.model(${route.id}) requires a provider`)
+  if (!provider) throw new Error(t("llm.client.route-model-requires-a-provider", { id: route.id }))
   if (!endpointBaseURL(route.endpoint))
-    throw new Error(`Route.model(${route.id}) requires an endpoint baseURL — configure it on the route first`)
+    throw new Error(t("llm.client.route-model-requires-an-endpoint-baseurl-configure-it-on-the", { id: route.id }))
   return Model.make({
     ...mapped,
     provider,

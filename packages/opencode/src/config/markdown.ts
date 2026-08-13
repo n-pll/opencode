@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { Filesystem } from "@/util/filesystem"
 import { FrontmatterError } from "@opencode-ai/core/v1/config/error"
 import { ConfigMarkdown as ConfigMarkdownCore } from "@opencode-ai/core/config/markdown"
@@ -26,7 +27,7 @@ export async function parse(filePath: string) {
     throw new FrontmatterError(
       {
         path: filePath,
-        message: `${filePath}: Failed to parse YAML frontmatter: ${err instanceof Error ? err.message : String(err)}`,
+        message: t("cli.markdown.failed-to-parse-yaml-frontmatter", { filePath: filePath, p0: err instanceof Error ? err.message : String(err) }),
       },
       { cause: err },
     )

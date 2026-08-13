@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { Schema } from "effect"
 import { NamedError } from "@opencode-ai/core/util/error"
 import { Process } from "@/util/process"
@@ -35,7 +36,7 @@ export function alreadyInstalled() {
 
 export async function install(ide: (typeof SUPPORTED_IDES)[number]["name"]) {
   const cmd = SUPPORTED_IDES.find((i) => i.name === ide)?.cmd
-  if (!cmd) throw new Error(`Unknown IDE: ${ide}`)
+  if (!cmd) throw new Error(t("cli.index.unknown-ide", { ide: ide }))
 
   const p = await Process.run([cmd, "--install-extension", "sst-dev.opencode"], {
     nothrow: true,

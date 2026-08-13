@@ -1,3 +1,4 @@
+import { useLanguage } from "../context/language"
 import { createComponent, createContext, type JSX, useContext } from "solid-js"
 
 export type TuiPaths = Readonly<{
@@ -44,8 +45,9 @@ export function TuiStartupProvider(props: { value: TuiStartup; children: JSX.Ele
 }
 
 function required<T>(context: ReturnType<typeof createContext<T>>, name: string) {
+  const { t } = useLanguage()
   const value = useContext(context)
-  if (!value) throw new Error(`${name} is missing`)
+  if (!value) throw new Error(t("tui.runtime.is-missing", { name: name }))
   return value
 }
 

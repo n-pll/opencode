@@ -203,7 +203,7 @@ export const locationLayer = Layer.effect(
         if (model.api.type !== "aisdk")
           return yield* new InitError({
             providerID: model.providerID,
-            cause: new Error(`Unsupported api ${model.api.type}`),
+            cause: new Error(t("core.aisdk.unsupported-api", { type: model.api.type })),
           })
 
         const options = prepareOptions(model, model.api.package)

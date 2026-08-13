@@ -1,3 +1,4 @@
+import { useLanguage } from "../context/language"
 import { t } from "../i18n/t"
 export * as TuiKeybind from "./keybind"
 
@@ -484,6 +485,7 @@ export function toBindingConfig(keybinds: Keybinds): BindingConfig<Renderable, K
 const decodeBindingValue = Schema.decodeUnknownSync(BindingValueSchema)
 
 export function defaultValue(name: KeybindName) {
+  const { t } = useLanguage()
   return Definitions[name].default
 }
 

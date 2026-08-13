@@ -51,7 +51,7 @@ export const MessageHandler = HttpApiBuilder.group(Api, "server.message", (handl
               Effect.fail(
                 new SessionNotFoundError({
                   sessionID: error.sessionID,
-                  message: `Session not found: ${error.sessionID}`,
+                  message: t("server.message.session-not-found", { sessionID: error.sessionID }),
                 }),
               ),
             ),

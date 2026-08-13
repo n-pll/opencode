@@ -26,7 +26,7 @@ export const invoke = (plan: Plan, input: unknown): Effect.Effect<unknown, unkno
       .execute(request)
       .pipe(
         Effect.catch((cause) =>
-          Effect.fail(toolError(`${plan.operation.method} ${plan.operation.path} failed: transport error`, cause)),
+          Effect.fail(toolError(t("codemode.runtime.failed-transport-error", { method: plan.operation.method, path: plan.operation.path }), cause)),
         ),
       )
     const text = yield* readResponseBody(response, plan)
@@ -43,11 +43,11 @@ export const invoke = (plan: Plan, input: unknown): Effect.Effect<unknown, unkno
             ? `${rendered.slice(0, maxErrorBodyChars)}...`
             : rendered
       return yield* Effect.fail(
-        toolError(`${plan.operation.method} ${plan.operation.path} failed with HTTP ${response.status}: ${summary}`),
+        toolError(t("codemode.runtime.failed-with-http", { method: plan.operation.method, path: plan.operation.path, status: response.status, summary: summary })),
       )
     }
     if (json && Option.isNone(decoded)) {
-      return yield* Effect.fail(toolError(`${plan.operation.method} ${plan.operation.path} returned malformed JSON.`))
+      return yield* Effect.fail(toolError(t("codemode.runtime.returned-malformed-json", { method: plan.operation.method, path: plan.operation.path })))
     }
     return parsed
   })
@@ -65,7 +65,7 @@ const buildRequest = (
     )
     if (missing !== undefined) {
       const label = missing.location === "body" ? "body field" : `${missing.location} parameter`
-      return yield* Effect.fail(toolError(`Missing required ${label} '${missing.inputName}'.`))
+      return yield* Effect.fail(toolError(t("codemode.runtime.missing-required", { label: label, inputName: missing.inputName })))
     }
 
     let request = HttpClientRequest.make(plan.operation.method as HttpMethod.HttpMethod)(url)
@@ -93,7 +93,7 @@ const buildRequest = (
       HttpClientRequest.bodyJson(request, value).pipe(
         Effect.map((next) => HttpClientRequest.setHeader(next, "content-type", mediaType)),
         Effect.mapError((cause) =>
-          toolError(`Invalid JSON body for ${plan.operation.method} ${plan.operation.path}.`, cause),
+          toolError(t("codemode.runtime.invalid-json-body-for", { method: plan.operation.method, path: plan.operation.path }), cause),
         ),
       )
     if (plan.body?.mode === "value") {
@@ -160,7 +160,7 @@ const applyCredentials = (
   const query = new Map<string, string>()
   const add = (carrier: "header" | "query", name: string, value: string): ToolError | undefined => {
     const target = carrier === "header" ? headers : query
-    if (target.has(name)) return toolError(`Authentication resolves multiple credentials for ${carrier} '${name}'.`)
+    if (target.has(name)) return toolError(t("codemode.runtime.authentication-resolves-multiple-credentials-for", { carrier: carrier, name: name }))
     target.set(name, value)
   }
   for (const [name, definition, credential] of credentials) {
@@ -190,7 +190,7 @@ const applyCredentials = (
         `Security scheme '${name}' is not an apiKey scheme; resolve a bearer, basic, or header credential for it.`,
       )
     }
-    if (definition.in === "cookie") return toolError(`Cookie authentication '${name}' is not supported.`)
+    if (definition.in === "cookie") return toolError(t("codemode.runtime.cookie-authentication-is-not-supported", { name: name }))
     const parameter = definition.in === "header" ? definition.name.toLowerCase() : definition.name
     const duplicate = add(definition.in, parameter, credential.value)
     if (duplicate !== undefined) return duplicate
@@ -204,7 +204,7 @@ const buildUrl = (plan: Plan, input: Readonly<Record<string, unknown>>): string 
     if (field.location !== "path") continue
     const item = own(input, field.inputName)
     if (item === undefined) {
-      return toolError(`Missing required path parameter '${field.inputName}'.`)
+      return toolError(t("codemode.runtime.missing-required-path-parameter", { inputName: field.inputName }))
     }
     const fieldValue = serializeSimple(field, item, (value) =>
       encodeURIComponent(value).replace(
@@ -216,12 +216,12 @@ const buildUrl = (plan: Plan, input: Readonly<Record<string, unknown>>): string 
     // '.'/'..' survive encoding and URL normalization collapses them, letting a
     // model-supplied value retarget the request to a different endpoint.
     if (fieldValue === "" || fieldValue === "." || fieldValue === "..") {
-      return toolError(`Invalid path parameter '${field.inputName}'.`)
+      return toolError(t("codemode.runtime.invalid-path-parameter", { inputName: field.inputName }))
     }
     url = url.replaceAll(`{${field.name}}`, fieldValue)
   }
   const unresolved = url.match(/\{[^{}]+\}/)
-  if (unresolved !== null) return toolError(`Unresolved path parameter ${unresolved[0]}.`)
+  if (unresolved !== null) return toolError(t("codemode.runtime.unresolved-path-parameter", { unresolved: unresolved[0] }))
   return url
 }
 
@@ -232,7 +232,7 @@ const serializeSimple = (
 ): string | ToolError => {
   const scalar = (item: unknown): string | ToolError =>
     item !== null && typeof item !== "string" && typeof item !== "number" && typeof item !== "boolean"
-      ? toolError(`Parameter '${field.inputName}' contains an unsupported nested value.`)
+      ? toolError(t("codemode.runtime.parameter-contains-an-unsupported-nested-value", { inputName: field.inputName }))
       : encode(String(item))
   if (Array.isArray(value)) {
     const items = value.map(scalar)
@@ -255,11 +255,11 @@ const serializeQuery = (
   value: unknown,
 ): HttpClientRequest.HttpClientRequest | ToolError => {
   if (field.style === "deepObject") {
-    if (!isRecord(value)) return toolError(`Deep-object parameter '${field.inputName}' must be an object.`)
+    if (!isRecord(value)) return toolError(t("codemode.runtime.deep-object-parameter-must-be-an-object", { inputName: field.inputName }))
     return Object.entries(value).reduce<HttpClientRequest.HttpClientRequest | ToolError>((current, [name, item]) => {
       if (current instanceof ToolError) return current
       if (item === undefined || (item !== null && typeof item === "object")) {
-        return toolError(`Deep-object parameter '${field.inputName}' contains an unsupported nested value.`)
+        return toolError(t("codemode.runtime.deep-object-parameter-contains-an-unsupported-nested-value", { inputName: field.inputName }))
       }
       return HttpClientRequest.appendUrlParam(current, `${field.name}[${name}]`, String(item))
     }, request)
@@ -269,7 +269,7 @@ const serializeQuery = (
     if (rendered instanceof ToolError) return rendered
     if (!field.explode) return HttpClientRequest.appendUrlParam(request, field.name, rendered)
     if (value.some((item) => item === undefined || (item !== null && typeof item === "object"))) {
-      return toolError(`Query parameter '${field.inputName}' contains an unsupported nested value.`)
+      return toolError(t("codemode.runtime.query-parameter-contains-an-unsupported-nested-value", { inputName: field.inputName }))
     }
     return value.reduce((current, item) => HttpClientRequest.appendUrlParam(current, field.name, String(item)), request)
   }
@@ -277,7 +277,7 @@ const serializeQuery = (
     return Object.entries(value).reduce<HttpClientRequest.HttpClientRequest | ToolError>((current, [name, item]) => {
       if (current instanceof ToolError) return current
       if (item === undefined || (item !== null && typeof item === "object")) {
-        return toolError(`Query parameter '${field.inputName}' contains an unsupported nested value.`)
+        return toolError(t("codemode.runtime.query-parameter-contains-an-unsupported-nested-value", { inputName: field.inputName }))
       }
       return HttpClientRequest.appendUrlParam(current, name, String(item))
     }, request)
@@ -296,13 +296,13 @@ const readResponseBody = (
     const declaredSize =
       parsedSize !== undefined && Number.isSafeInteger(parsedSize) && parsedSize >= 0 ? parsedSize : undefined
     if (declaredSize !== undefined && declaredSize > maxResponseBodyBytes) {
-      return yield* Effect.fail(toolError(`${plan.operation.method} ${plan.operation.path} response exceeds 50 MiB.`))
+      return yield* Effect.fail(toolError(t("codemode.runtime.response-exceeds-50-mib", { method: plan.operation.method, path: plan.operation.path })))
     }
     let body = Buffer.allocUnsafe(Math.min(maxResponseBodyBytes, declaredSize ?? 64 * 1024))
     let size = 0
     yield* Stream.runForEach(response.stream, (chunk) => {
       if (size + chunk.byteLength > maxResponseBodyBytes) {
-        return Effect.fail(toolError(`${plan.operation.method} ${plan.operation.path} response exceeds 50 MiB.`))
+        return Effect.fail(toolError(t("codemode.runtime.response-exceeds-50-mib", { method: plan.operation.method, path: plan.operation.path })))
       }
       if (size + chunk.byteLength > body.byteLength) {
         const grown = Buffer.allocUnsafe(
@@ -319,7 +319,7 @@ const readResponseBody = (
         if (cause instanceof ToolError) return Effect.fail(cause)
         if (cause.reason._tag === "EmptyBodyError") return Effect.void
         return Effect.fail(
-          toolError(`${plan.operation.method} ${plan.operation.path} failed while reading the response body.`, cause),
+          toolError(t("codemode.runtime.failed-while-reading-the-response-body", { method: plan.operation.method, path: plan.operation.path }), cause),
         )
       }),
     )

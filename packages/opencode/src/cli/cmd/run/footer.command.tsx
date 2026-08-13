@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 /** @jsxImportSource @opentui/solid */
 import { TextAttributes, type InputRenderable, type KeyEvent } from "@opentui/core"
 import { useKeyboard, type JSX } from "@opentui/solid"
@@ -561,7 +562,7 @@ export function RunCommandMenuBody(props: {
         offset={menu.offset}
         rows={() => PANEL_LIST_ROWS}
         limit={PANEL_LIST_ROWS}
-        empty="No results found"
+        empty={t("cli.footer_command.no-results-found")}
         border={false}
         paddingLeft={PANEL_PAD}
         paddingRight={PANEL_PAD}
@@ -644,7 +645,7 @@ export function RunSubagentSelectBody(props: {
 
   return (
     <PanelShell
-      title="Select subagent"
+      title={t("cli.footer_command.select-subagent")}
       query={query()}
       count={items().length}
       total={entries().length}
@@ -664,7 +665,7 @@ export function RunSubagentSelectBody(props: {
         offset={menu.offset}
         rows={menu.rows}
         limit={SUBAGENT_LIST_ROWS}
-        empty="No subagents found"
+        empty={t("cli.footer_command.no-subagents-found")}
         border={false}
         paddingLeft={PANEL_PAD}
         paddingRight={PANEL_PAD}
@@ -741,7 +742,7 @@ export function RunQueuedPromptSelectBody(props: {
 
   return (
     <PanelShell
-      title="Queued prompts"
+      title={t("cli.footer_command.queued-prompts")}
       query={query()}
       count={items().length}
       total={entries().length}
@@ -761,7 +762,7 @@ export function RunQueuedPromptSelectBody(props: {
         offset={menu.offset}
         rows={menu.rows}
         limit={SUBAGENT_LIST_ROWS}
-        empty="No queued prompts"
+        empty={t("cli.footer_command.no-queued-prompts")}
         border={false}
         paddingLeft={PANEL_PAD}
         paddingRight={PANEL_PAD}
@@ -916,7 +917,7 @@ export function RunVariantSelectBody(props: {
 
   return (
     <PanelShell
-      title="Select variant"
+      title={t("cli.footer_command.select-variant")}
       query={query()}
       count={items().length}
       total={entries().length}
@@ -936,7 +937,7 @@ export function RunVariantSelectBody(props: {
         offset={menu.offset}
         rows={() => PANEL_LIST_ROWS}
         limit={PANEL_LIST_ROWS}
-        empty="No results found"
+        empty={t("cli.footer_command.no-results-found")}
         border={false}
         paddingLeft={PANEL_PAD}
         paddingRight={PANEL_PAD}

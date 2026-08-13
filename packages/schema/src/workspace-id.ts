@@ -1,3 +1,4 @@
+import { t } from "./i18n"
 import { Schema } from "effect"
 import { ascending } from "./identifier"
 import { statics } from "./schema"
@@ -9,7 +10,7 @@ export const WorkspaceID = Schema.String.check(Schema.isStartsWith("wrk")).pipe(
     return {
       ascending: (id?: string) => {
         if (!id) return create()
-        if (!id.startsWith("wrk")) throw new Error(`ID ${id} does not start with wrk`)
+        if (!id.startsWith("wrk")) throw new Error(t("schema.workspace_id.id-does-not-start-with-wrk", { id: id }))
         return schema.make(id)
       },
       create,

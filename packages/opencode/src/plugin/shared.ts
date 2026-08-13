@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import path from "path"
 import { fileURLToPath, pathToFileURL } from "url"
 import npa from "npm-package-arg"
@@ -91,7 +92,7 @@ function resolvePackageFile(spec: string, raw: string, kind: string, pkg: Plugin
   const root = Filesystem.resolve(pkg.dir)
   const next = Filesystem.resolve(resolved)
   if (!Filesystem.contains(root, next)) {
-    throw new Error(`Plugin ${spec} resolved ${kind} entry outside plugin directory`)
+    throw new Error(t("cli.shared.plugin-resolved-entry-outside-plugin-directory", { spec: spec, kind: kind }))
   }
   return next
 }
@@ -188,7 +189,7 @@ export async function resolvePathPluginTarget(spec: string) {
   const index = await resolveDirectoryIndex(file)
   if (index) return pathToFileURL(index).href
 
-  throw new Error(`Plugin directory ${file} is missing package.json or index file`)
+  throw new Error(t("cli.shared.plugin-directory-is-missing-package-json-or-index-file", { file: file }))
 }
 
 export async function checkPluginCompatibility(target: string, opencodeVersion: string, pkg?: PluginPackage) {
@@ -200,7 +201,7 @@ export async function checkPluginCompatibility(target: string, opencodeVersion: 
   const range = engines.opencode
   if (typeof range !== "string") return
   if (!semver.satisfies(opencodeVersion, range)) {
-    throw new Error(`Plugin requires opencode ${range} but running ${opencodeVersion}`)
+    throw new Error(t("cli.shared.plugin-requires-opencode-but-running", { range: range, opencodeVersion: opencodeVersion }))
   }
 }
 
@@ -239,20 +240,20 @@ export function readPackageThemes(spec: string, pkg: PluginPackage) {
   const field = pkg.json["oc-themes"]
   if (field === undefined) return []
   if (!Array.isArray(field)) {
-    throw new TypeError(`Plugin ${spec} has invalid oc-themes field`)
+    throw new TypeError(t("cli.shared.plugin-has-invalid-oc-themes-field", { spec: spec }))
   }
 
   const list = field.map((item) => {
     if (typeof item !== "string") {
-      throw new TypeError(`Plugin ${spec} has invalid oc-themes entry`)
+      throw new TypeError(t("cli.shared.plugin-has-invalid-oc-themes-entry", { spec: spec }))
     }
 
     const raw = item.trim()
     if (!raw) {
-      throw new TypeError(`Plugin ${spec} has empty oc-themes entry`)
+      throw new TypeError(t("cli.shared.plugin-has-empty-oc-themes-entry", { spec: spec }))
     }
     if (raw.startsWith("file://") || isAbsolutePath(raw)) {
-      throw new TypeError(`Plugin ${spec} oc-themes entry must be relative: ${item}`)
+      throw new TypeError(t("cli.shared.plugin-oc-themes-entry-must-be-relative", { spec: spec, item: item }))
     }
 
     return resolvePackageFile(spec, raw, "oc-themes", pkg)
@@ -265,7 +266,7 @@ export function readPluginId(id: unknown, spec: string) {
   if (id === undefined) return
   if (typeof id !== "string") throw new TypeError(`Plugin ${spec} has invalid id type ${typeof id}`)
   const value = id.trim()
-  if (!value) throw new TypeError(`Plugin ${spec} has an empty id`)
+  if (!value) throw new TypeError(t("cli.shared.plugin-has-an-empty-id", { spec: spec }))
   return value
 }
 
@@ -278,26 +279,26 @@ export function readV1Plugin(
   const value = mod.default
   if (!isRecord(value)) {
     if (mode === "detect") return
-    throw new TypeError(`Plugin ${spec} must default export an object with ${kind}()`)
+    throw new TypeError(t("cli.shared.plugin-must-default-export-an-object-with", { spec: spec, kind: kind }))
   }
   if (mode === "detect" && !("id" in value) && !("server" in value) && !("tui" in value)) return
 
   const server = "server" in value ? value.server : undefined
   const tui = "tui" in value ? value.tui : undefined
   if (server !== undefined && typeof server !== "function") {
-    throw new TypeError(`Plugin ${spec} has invalid server export`)
+    throw new TypeError(t("cli.shared.plugin-has-invalid-server-export", { spec: spec }))
   }
   if (tui !== undefined && typeof tui !== "function") {
-    throw new TypeError(`Plugin ${spec} has invalid tui export`)
+    throw new TypeError(t("cli.shared.plugin-has-invalid-tui-export", { spec: spec }))
   }
   if (server !== undefined && tui !== undefined) {
-    throw new TypeError(`Plugin ${spec} must default export either server() or tui(), not both`)
+    throw new TypeError(t("cli.shared.plugin-must-default-export-either-server-or-tui-not-both", { spec: spec }))
   }
   if (kind === "server" && server === undefined) {
-    throw new TypeError(`Plugin ${spec} must default export an object with server()`)
+    throw new TypeError(t("cli.shared.plugin-must-default-export-an-object-with-server", { spec: spec }))
   }
   if (kind === "tui" && tui === undefined) {
-    throw new TypeError(`Plugin ${spec} must default export an object with tui()`)
+    throw new TypeError(t("cli.shared.plugin-must-default-export-an-object-with-tui", { spec: spec }))
   }
 
   return value
@@ -312,12 +313,12 @@ export async function resolvePluginId(
 ) {
   if (source === "file") {
     if (id) return id
-    throw new TypeError(`Path plugin ${spec} must export id`)
+    throw new TypeError(t("cli.shared.path-plugin-must-export-id", { spec: spec }))
   }
   if (id) return id
   const hit = pkg ?? (await readPluginPackage(target))
   if (typeof hit.json.name !== "string" || !hit.json.name.trim()) {
-    throw new TypeError(`Plugin package ${hit.pkg} is missing name`)
+    throw new TypeError(t("cli.shared.plugin-package-is-missing-name", { pkg: hit.pkg }))
   }
   return hit.json.name.trim()
 }

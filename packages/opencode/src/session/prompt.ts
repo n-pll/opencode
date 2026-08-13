@@ -315,7 +315,7 @@ const layer = Layer.effect(
       if (!taskAgent) {
         const available = (yield* agents.list()).filter((a) => !a.hidden).map((a) => a.name)
         const hint = available.length ? ` Available agents: ${available.join(", ")}` : ""
-        const error = new NamedError.Unknown({ message: `Agent not found: "${task.agent}".${hint}` })
+        const error = new NamedError.Unknown({ message: t("cli.prompt.agent-not-found", { agent: task.agent, hint: hint }) })
         yield* events.publish(Session.Event.Error, { sessionID, error: error.toObject() })
         throw error
       }
@@ -463,7 +463,7 @@ const layer = Layer.effect(
             if (!agent) {
               const available = (yield* agents.list()).filter((a) => !a.hidden).map((a) => a.name)
               const hint = available.length ? ` Available agents: ${available.join(", ")}` : ""
-              const error = new NamedError.Unknown({ message: `Agent not found: "${input.agent}".${hint}` })
+              const error = new NamedError.Unknown({ message: t("cli.prompt.agent-not-found", { agent: input.agent, hint: hint }) })
               yield* events.publish(Session.Event.Error, { sessionID: input.sessionID, error: error.toObject() })
               throw error
             }
@@ -605,7 +605,7 @@ const layer = Layer.effect(
         yield* events.publish(Session.Event.Error, {
           sessionID,
           error: new NamedError.Unknown({
-            message: `Model not found: ${err.providerID}/${err.modelID}.${hint}`,
+            message: t("cli.prompt.model-not-found", { providerID: err.providerID, modelID: err.modelID, hint: hint }),
           }).toObject(),
         })
       }
@@ -639,7 +639,7 @@ const layer = Layer.effect(
       if (!ag) {
         const available = (yield* agents.list()).filter((a) => !a.hidden).map((a) => a.name)
         const hint = available.length ? ` Available agents: ${available.join(", ")}` : ""
-        const error = new NamedError.Unknown({ message: `Agent not found: "${agentName}".${hint}` })
+        const error = new NamedError.Unknown({ message: t("cli.prompt.agent-not-found.2", { agentName: agentName, hint: hint }) })
         yield* events.publish(Session.Event.Error, { sessionID: input.sessionID, error: error.toObject() })
         throw error
       }
@@ -716,7 +716,7 @@ const layer = Layer.effect(
             const exit = yield* mcp.readResource(clientName, uri).pipe(Effect.exit)
             if (Exit.isSuccess(exit)) {
               const content = exit.value
-              if (!content) throw new Error(`Resource not found: ${clientName}/${uri}`)
+              if (!content) throw new Error(t("cli.prompt.resource-not-found", { clientName: clientName, uri: uri }))
               const items = Array.isArray(content.contents) ? content.contents : [content.contents]
               for (const c of items) {
                 if (!c || typeof c !== "object") continue
@@ -1172,7 +1172,7 @@ const layer = Layer.effect(
           if (!agent) {
             const available = (yield* agents.list()).filter((a) => !a.hidden).map((a) => a.name)
             const hint = available.length ? ` Available agents: ${available.join(", ")}` : ""
-            const error = new NamedError.Unknown({ message: `Agent not found: "${lastUser.agent}".${hint}` })
+            const error = new NamedError.Unknown({ message: t("cli.prompt.agent-not-found", { agent: lastUser.agent, hint: hint }) })
             yield* events.publish(Session.Event.Error, { sessionID, error: error.toObject() })
             throw error
           }
@@ -1364,7 +1364,7 @@ const layer = Layer.effect(
       if (!cmd) {
         const available = (yield* commands.list()).map((c) => c.name)
         const hint = available.length ? ` Available commands: ${available.join(", ")}` : ""
-        const error = new NamedError.Unknown({ message: `Command not found: "${input.command}".${hint}` })
+        const error = new NamedError.Unknown({ message: t("cli.prompt.command-not-found", { command: input.command, hint: hint }) })
         yield* events.publish(Session.Event.Error, { sessionID: input.sessionID, error: error.toObject() })
         throw error
       }
@@ -1425,7 +1425,7 @@ const layer = Layer.effect(
       if (!agent) {
         const available = (yield* agents.list()).filter((a) => !a.hidden).map((a) => a.name)
         const hint = available.length ? ` Available agents: ${available.join(", ")}` : ""
-        const error = new NamedError.Unknown({ message: `Agent not found: "${agentName}".${hint}` })
+        const error = new NamedError.Unknown({ message: t("cli.prompt.agent-not-found.2", { agentName: agentName, hint: hint }) })
         yield* events.publish(Session.Event.Error, { sessionID: input.sessionID, error: error.toObject() })
         throw error
       }

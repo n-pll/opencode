@@ -117,8 +117,8 @@ function bootstrapScript(options: BootstrapOptions) {
 var TOKEN_URL=new URL(${scriptString(options.tokenPath)},window.location.origin).href;
 (function(){
   var card=document.getElementById("oc-card"),headline=document.getElementById("oc-headline"),message=document.getElementById("oc-message"),detail=document.getElementById("oc-detail"),footnote=document.getElementById("oc-footnote");
-  function fail(text){card.dataset.status="error";headline.textContent="Authorization failed";message.textContent=PROVIDER?("OpenCode couldn't finish connecting to "+PROVIDER+"."):"OpenCode couldn't complete authorization.";if(text){detail.textContent=text;detail.hidden=false}footnote.textContent="Close this window and try again from OpenCode."}
-  function ok(){card.dataset.status="success";headline.textContent="Authorization successful";message.textContent=PROVIDER?("OpenCode is now connected to "+PROVIDER+"."):"OpenCode is now authorized.";detail.hidden=true;footnote.textContent="You can close this window.";setTimeout(function(){try{window.close()}catch(e){}},2500)}
+  function fail(text){card.dataset.status="error";headline.textContent="Authorization failed";message.textContent=PROVIDER?("OpenCode couldn't finish connecting to "+PROVIDER+"."):"OpenCode couldn't complete authorization.";if(text){detail.textContent=text;detail.hidden=false}footnote.textContent={t("core.page.close-this-window-and-try-again-from-opencode")}}
+  function ok(){card.dataset.status="success";headline.textContent="Authorization successful";message.textContent=PROVIDER?("OpenCode is now connected to "+PROVIDER+"."):"OpenCode is now authorized.";detail.hidden=true;footnote.textContent={t("core.page.you-can-close-this-window")};setTimeout(function(){try{window.close()}catch(e){}},2500)}
   try{
     var hash=new URLSearchParams((window.location.hash||"").slice(1));
     var search=new URLSearchParams(window.location.search||"");
@@ -252,26 +252,26 @@ const STYLES = `
 
 // OpenCode wordmark — same path geometry as packages/ui/src/components/logo.tsx (Logo).
 const WORDMARK = `<svg class="wordmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 234 42" fill="none" aria-label="OpenCode" role="img">
-        <path d="M18 30H6V18H18V30Z" fill="var(--oc-icon-weak)" />
-        <path d="M18 12H6V30H18V12ZM24 36H0V6H24V36Z" fill="var(--oc-icon-base)" />
-        <path d="M48 30H36V18H48V30Z" fill="var(--oc-icon-weak)" />
-        <path d="M36 30H48V12H36V30ZM54 36H36V42H30V6H54V36Z" fill="var(--oc-icon-base)" />
-        <path d="M84 24V30H66V24H84Z" fill="var(--oc-icon-weak)" />
-        <path d="M84 24H66V30H84V36H60V6H84V24ZM66 18H78V12H66V18Z" fill="var(--oc-icon-base)" />
-        <path d="M108 36H96V18H108V36Z" fill="var(--oc-icon-weak)" />
-        <path d="M108 12H96V36H90V6H108V12ZM114 36H108V12H114V36Z" fill="var(--oc-icon-base)" />
-        <path d="M144 30H126V18H144V30Z" fill="var(--oc-icon-weak)" />
-        <path d="M144 12H126V30H144V36H120V6H144V12Z" fill="var(--oc-icon-strong)" />
-        <path d="M168 30H156V18H168V30Z" fill="var(--oc-icon-weak)" />
-        <path d="M168 12H156V30H168V12ZM174 36H150V6H174V36Z" fill="var(--oc-icon-strong)" />
-        <path d="M198 30H186V18H198V30Z" fill="var(--oc-icon-weak)" />
-        <path d="M198 12H186V30H198V12ZM204 36H180V6H198V0H204V36Z" fill="var(--oc-icon-strong)" />
-        <path d="M234 24V30H216V24H234Z" fill="var(--oc-icon-weak)" />
-        <path d="M216 12V18H228V12H216ZM234 24H216V30H234V36H210V6H234V24Z" fill="var(--oc-icon-strong)" />
+        <path d={t("core.page.m18-30h6v18h18v30z")} fill="var(--oc-icon-weak)" />
+        <path d={t("core.page.m18-12h6v30h18v12zm24-36h0v6h24v36z")} fill="var(--oc-icon-base)" />
+        <path d={t("core.page.m48-30h36v18h48v30z")} fill="var(--oc-icon-weak)" />
+        <path d={t("core.page.m36-30h48v12h36v30zm54-36h36v42h30v6h54v36z")} fill="var(--oc-icon-base)" />
+        <path d={t("core.page.m84-24v30h66v24h84z")} fill="var(--oc-icon-weak)" />
+        <path d={t("core.page.m84-24h66v30h84v36h60v6h84v24zm66-18h78v12h66v18z")} fill="var(--oc-icon-base)" />
+        <path d={t("core.page.m108-36h96v18h108v36z")} fill="var(--oc-icon-weak)" />
+        <path d={t("core.page.m108-12h96v36h90v6h108v12zm114-36h108v12h114v36z")} fill="var(--oc-icon-base)" />
+        <path d={t("core.page.m144-30h126v18h144v30z")} fill="var(--oc-icon-weak)" />
+        <path d={t("core.page.m144-12h126v30h144v36h120v6h144v12z")} fill="var(--oc-icon-strong)" />
+        <path d={t("core.page.m168-30h156v18h168v30z")} fill="var(--oc-icon-weak)" />
+        <path d={t("core.page.m168-12h156v30h168v12zm174-36h150v6h174v36z")} fill="var(--oc-icon-strong)" />
+        <path d={t("core.page.m198-30h186v18h198v30z")} fill="var(--oc-icon-weak)" />
+        <path d={t("core.page.m198-12h186v30h198v12zm204-36h180v6h198v0h204v36z")} fill="var(--oc-icon-strong)" />
+        <path d={t("core.page.m234-24v30h216v24h234z")} fill="var(--oc-icon-weak)" />
+        <path d={t("core.page.m216-12v18h228v12h216zm234-24h216v30h234v36h210v6h234v24z")} fill="var(--oc-icon-strong)" />
       </svg>`
 
 const ICON_CHECK = `<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><path d="m8.5 12.5 2.4 2.4 4.6-5.4" /></svg>`
 
 const ICON_CROSS = `<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><path d="m9 9 6 6m0-6-6 6" /></svg>`
 
-const ICON_SPINNER = `<svg class="spinner" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9" opacity="0.2" /><path d="M21 12a9 9 0 0 0-9-9" /></svg>`
+const ICON_SPINNER = `<svg class="spinner" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9" opacity="0.2" /><path d={t("core.page.m21-12a9-9-0-0-0-9-9")} /></svg>`

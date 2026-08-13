@@ -1,3 +1,4 @@
+import { t } from "./i18n"
 export * as Event from "./event"
 
 import { Schema } from "effect"
@@ -85,7 +86,7 @@ export function latest(definitions: ReadonlyArray<Definition>) {
         if (definition.durable.version > existing.durable.version) result.set(definition.type, definition)
         return result
       }
-      if (definition !== existing) throw new Error(`Duplicate latest event definition for ${definition.type}`)
+      if (definition !== existing) throw new Error(t("schema.event.duplicate-latest-event-definition-for", { type: definition.type }))
       return result
     }, new Map<string, Definition>()),
   )
@@ -100,7 +101,7 @@ export function durable<const Definitions extends ReadonlyArray<Definition>>(def
     definitions.reduce((result, definition) => {
       if (!definition.durable) return result
       const key = versionedType(definition.type, definition.durable.version)
-      if (result.has(key)) throw new Error(`Duplicate durable event definition for ${key}`)
+      if (result.has(key)) throw new Error(t("schema.event.duplicate-durable-event-definition-for", { key: key }))
       result.set(key, definition)
       return result
     }, new Map<string, Definitions[number]>()),

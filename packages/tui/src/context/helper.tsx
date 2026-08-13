@@ -1,3 +1,4 @@
+import { t } from "../i18n/t"
 import { createContext, Show, useContext, type ParentProps } from "solid-js"
 
 export function createSimpleContext<T, Props extends Record<string, any>>(input: {
@@ -19,7 +20,7 @@ export function createSimpleContext<T, Props extends Record<string, any>>(input:
     },
     use() {
       const value = useContext(ctx)
-      if (!value) throw new Error(`${input.name} context must be used within a context provider`)
+      if (!value) throw new Error(t("tui.helper.context-must-be-used-within-a-context-provider", { name: input.name }))
       return value
     },
   }

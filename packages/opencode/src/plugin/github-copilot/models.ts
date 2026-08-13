@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import type { Model } from "@opencode-ai/sdk/v2"
 import { Option, Schema } from "effect"
 
@@ -223,7 +224,7 @@ export async function get(
     signal: AbortSignal.timeout(5_000),
   }).then(async (res) => {
     if (!res.ok) {
-      throw new Error(`Failed to fetch models: ${res.status}`)
+      throw new Error(t("cli.models.failed-to-fetch-models", { status: res.status }))
     }
     return decodeModels(await res.json())
   })

@@ -118,7 +118,7 @@ async function exchangeCodeForTokens(code: string, redirectUri: string, pkce: Pk
     }).toString(),
   })
   if (!response.ok) {
-    throw new Error(`Token exchange failed: ${response.status}`)
+    throw new Error(t("cli.codex.token-exchange-failed", { status: response.status }))
   }
   return response.json()
 }
@@ -134,7 +134,7 @@ async function refreshAccessToken(refreshToken: string, issuer = ISSUER): Promis
     }).toString(),
   })
   if (!response.ok) {
-    throw new Error(`Token refresh failed: ${response.status}`)
+    throw new Error(t("cli.codex.token-refresh-failed", { status: response.status }))
   }
   return response.json()
 }
@@ -517,7 +517,7 @@ export async function CodexAuthPlugin(input: PluginInput, options: CodexAuthPlug
                     })
 
                     if (!tokenResponse.ok) {
-                      throw new Error(`Token exchange failed: ${tokenResponse.status}`)
+                      throw new Error(t("cli.codex.token-exchange-failed", { status: tokenResponse.status }))
                     }
 
                     const tokens: TokenResponse = await tokenResponse.json()

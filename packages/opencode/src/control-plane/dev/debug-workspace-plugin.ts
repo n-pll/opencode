@@ -22,7 +22,7 @@ async function waitForHealth(port: number) {
     await sleep(250)
   }
 
-  throw new Error(`Timed out waiting for debug server health check at ${url}`)
+  throw new Error(t("cli.debug_workspace_plugin.timed-out-waiting-for-debug-server-health-check-at", { url: url }))
 }
 
 let PORT: number | undefined

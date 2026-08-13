@@ -97,7 +97,7 @@ const contentPart = (part: unknown) => {
       providerMetadata: partProviderMetadata(part),
     })
   if (part.type === "tool-result") return toolResult(part)
-  throw new Error(`Native LLM request adapter does not support ${String(part.type)} content parts`)
+  throw new Error(t("cli.native_request.native-llm-request-adapter-does-not-support-content-parts", { p0: String(part.type) }))
 }
 
 const content = (value: ModelMessage["content"]) =>
@@ -148,7 +148,7 @@ const baseURL = (input: Provider.Model | RequestInput) =>
 
 const requireBaseURL = (model: Provider.Model, url: string | undefined) => {
   if (url) return url
-  throw new Error(`Native LLM request adapter requires a base URL for ${model.providerID}/${model.id}`)
+  throw new Error(t("cli.native_request.native-llm-request-adapter-requires-a-base-url-for", { providerID: model.providerID, id: model.id }))
 }
 
 export const model = (input: Provider.Model | RequestInput, headers?: Record<string, string>) => {
@@ -176,7 +176,7 @@ export const model = (input: Provider.Model | RequestInput, headers?: Record<str
       baseURL: requireBaseURL(model, url),
     }).model(model.api.id)
   if (model.api.npm === "@openrouter/ai-sdk-provider") return OpenRouter.configure(options).model(model.api.id)
-  throw new Error(`Native LLM request adapter does not support provider package ${model.api.npm}`)
+  throw new Error(t("cli.native_request.native-llm-request-adapter-does-not-support-provider-package", { npm: model.api.npm }))
 }
 
 export const request = (input: RequestInput) => {

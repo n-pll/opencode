@@ -194,7 +194,7 @@ const layer = Layer.effect(
       )
       if (response.status < 200 || response.status >= 300) {
         return yield* new SyncHttpError({
-          message: `Workspace sync HTTP failure: ${response.status}`,
+          message: t("cli.workspace.workspace-sync-http-failure", { status: response.status }),
           status: response.status,
         })
       }
@@ -337,7 +337,7 @@ const layer = Layer.effect(
       if (response.status < 200 || response.status >= 300) {
         const body = yield* response.text
         return yield* new SyncHttpError({
-          message: `Workspace history HTTP failure: ${response.status} ${body}`,
+          message: t("cli.workspace.workspace-history-http-failure", { status: response.status, body: body }),
           status: response.status,
           body,
         })
@@ -631,7 +631,7 @@ const layer = Layer.effect(
         const space = yield* get(workspaceID)
         if (!space)
           return yield* new WorkspaceNotFoundError({
-            message: `Workspace not found: ${workspaceID}`,
+            message: t("cli.workspace.workspace-not-found", { workspaceID: workspaceID }),
             workspaceID,
           })
 
@@ -658,7 +658,7 @@ const layer = Layer.effect(
           .pipe(Effect.orDie)
         if (rows.length === 0)
           return yield* new SessionEventsNotFoundError({
-            message: `No events found for session: ${input.sessionID}`,
+            message: t("cli.workspace.no-events-found-for-session", { sessionID: input.sessionID }),
             sessionID: input.sessionID,
           })
 
@@ -682,7 +682,7 @@ const layer = Layer.effect(
               if (response.status < 200 || response.status >= 300) {
                 const body = yield* response.text
                 return yield* new SessionWarpHttpError({
-                  message: `Failed to warp session ${input.sessionID} into workspace ${workspaceID}: HTTP ${response.status} ${body}`,
+                  message: t("cli.workspace.failed-to-warp-session-into-workspace-http", { sessionID: input.sessionID, workspaceID: workspaceID, status: response.status, body: body }),
                   workspaceID,
                   sessionID: input.sessionID,
                   status: response.status,
@@ -702,7 +702,7 @@ const layer = Layer.effect(
         if (response.status < 200 || response.status >= 300) {
           const body = yield* response.text
           return yield* new SessionWarpHttpError({
-            message: `Failed to steal session ${input.sessionID} into workspace ${workspaceID}: HTTP ${response.status} ${body}`,
+            message: t("cli.workspace.failed-to-steal-session-into-workspace-http", { sessionID: input.sessionID, workspaceID: workspaceID, status: response.status, body: body }),
             workspaceID,
             sessionID: input.sessionID,
             status: response.status,
@@ -844,7 +844,7 @@ const layer = Layer.effect(
               )
             : Effect.fail(
                 new SyncTimeoutError({
-                  message: `Timed out waiting for sync fence: ${JSON.stringify(state)}`,
+                  message: t("cli.workspace.timed-out-waiting-for-sync-fence", { p0: JSON.stringify(state) }),
                   state,
                 }),
               ),

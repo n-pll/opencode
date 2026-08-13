@@ -209,7 +209,7 @@ export const McpAuthCommand = effectCmd({
         const statusText = getAuthStatusText(authStatus)
         const url = cfg.url
         return {
-          label: `${icon} ${name} (${statusText})`,
+          label: t("cli.mcp.", { icon: icon, name: name, statusText: statusText }),
           value: name,
           hint: url,
         }

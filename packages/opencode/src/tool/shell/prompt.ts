@@ -29,7 +29,7 @@ export type Parameters = Schema.Schema.Type<typeof Parameters>
 function renderPrompt(template: string, values: Record<string, string>) {
   return template.replace(/\$\{(\w+)\}/g, (_, key: string) => {
     const value = values[key]
-    if (value === undefined) throw new Error(`Missing shell prompt value: ${key}`)
+    if (value === undefined) throw new Error(t("cli.prompt.missing-shell-prompt-value", { key: key }))
     return value
   })
 }

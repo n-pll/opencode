@@ -106,7 +106,7 @@ export const WebFetchTool = Tool.define(
 
           const contentType = response.headers["content-type"] || ""
           const mime = contentType.split(";")[0]?.trim().toLowerCase() || ""
-          const title = `${params.url} (${contentType})`
+          const title = t("cli.webfetch.", { url: params.url, contentType: contentType })
 
           if (isImageAttachment(mime)) {
             const base64Content = Buffer.from(arrayBuffer).toString("base64")

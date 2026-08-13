@@ -91,7 +91,7 @@ export function make<
     },
     settle: (call, context) =>
       Schema.decodeUnknownEffect(config.input)(call.input).pipe(
-        Effect.mapError((error) => new ToolFailure({ message: `Invalid tool input: ${error.message}` })),
+        Effect.mapError((error) => new ToolFailure({ message: t("core.tool.invalid-tool-input", { message: error.message }) })),
         Effect.flatMap((input) =>
           config.execute(input, context).pipe(
             Effect.flatMap((output) =>
@@ -106,7 +106,7 @@ export function make<
                 Effect.mapError(
                   (error) =>
                     new ToolFailure({
-                      message: `Tool returned an invalid value for its output schema: ${error.message}`,
+                      message: t("core.tool.tool-returned-an-invalid-value-for-its-output-schema", { message: error.message }),
                     }),
                 ),
               ),
@@ -135,7 +135,7 @@ export function make<
 export const validateName = (name: string) =>
   /^[A-Za-z][A-Za-z0-9_-]{0,63}$/.test(name)
     ? Effect.void
-    : Effect.fail(new RegistrationError({ name, message: `Invalid tool name: ${name}` }))
+    : Effect.fail(new RegistrationError({ name, message: t("core.tool.invalid-tool-name", { name: name }) }))
 
 export const withPermission = <Input extends SchemaType<any>, Output extends SchemaType<any>>(
   tool: Definition<Input, Output>,

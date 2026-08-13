@@ -356,7 +356,7 @@ function parseWrappedError(event: Record<string, unknown> | undefined, body: str
         )
       : undefined,
     body,
-    message: isRecord(event.error) && typeof event.error.message === "string" ? event.error.message : `${status}`,
+    message: isRecord(event.error) && typeof event.error.message === "string" ? event.error.message : t("cli.ws.", { status: status }),
   }
 }
 

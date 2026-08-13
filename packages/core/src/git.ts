@@ -631,7 +631,7 @@ const layer = Layer.effect(
         return yield* new OperationError({
           operation: "restore",
           directory: repository.worktree,
-          message: `Invalid tree entry for ${file}`,
+          message: t("core.git.invalid-tree-entry-for", { file: file }),
         })
       return { mode: match[1], object: match[2] }
     })
@@ -706,7 +706,7 @@ const layer = Layer.effect(
                       new OperationError({
                         operation: "restore",
                         directory: input.repository.worktree,
-                        message: `Failed to remove ${file}`,
+                        message: t("core.git.failed-to-remove", { file: file }),
                         cause,
                       }),
                   ),

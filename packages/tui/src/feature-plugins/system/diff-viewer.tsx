@@ -712,7 +712,7 @@ function DiffViewer(props: { api: TuiPluginApi }) {
   const openSwitchDiffDialog = () => {
     props.api.ui.dialog.replace(() => (
       <DialogSelect
-        title="Switch source"
+        title={t("tui.diff_viewer.switch-source")}
         skipFilter={true}
         renderFilter={false}
         current={mode()}

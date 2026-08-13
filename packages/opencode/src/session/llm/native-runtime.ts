@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import type { Auth } from "@/auth"
 import type { Provider } from "@/provider/provider"
 import { ProviderTransform } from "@/provider/transform"
@@ -178,7 +179,7 @@ export function nativeTools(tools: Record<string, Tool>, input: Pick<StreamInput
         execute: (args: unknown, ctx) =>
           Effect.tryPromise({
             try: () => {
-              if (!item.execute) throw new Error(`Tool has no execute handler: ${name}`)
+              if (!item.execute) throw new Error(t("cli.native_runtime.tool-has-no-execute-handler", { name: name }))
               return item.execute(args, {
                 toolCallId: ctx?.id ?? name,
                 messages: input.messages,

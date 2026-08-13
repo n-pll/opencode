@@ -1,3 +1,4 @@
+import { t } from "../i18n"
 export * as ApplyPatchTool from "./apply-patch"
 
 import { ToolFailure } from "@opencode-ai/llm"
@@ -91,7 +92,7 @@ const layer = Layer.effectDiscard(
                 if (!input.patchText.trim()) return yield* new ToolFailure({ message: "patchText is required" })
                 const hunks = yield* Effect.try({
                   try: () => Patch.parse(input.patchText),
-                  catch: (cause) => new ToolFailure({ message: `apply_patch verification failed: ${String(cause)}` }),
+                  catch: (cause) => new ToolFailure({ message: t("core.apply_patch.apply-patch-verification-failed", { p0: String(cause) }) }),
                 })
                 if (hunks.length === 0) return yield* new ToolFailure({ message: "patch rejected: empty patch" })
                 const move = hunks.find((hunk) => hunk.type === "update" && hunk.movePath !== undefined)

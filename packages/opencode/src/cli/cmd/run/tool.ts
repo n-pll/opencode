@@ -278,7 +278,7 @@ function fallbackInline(ctx: ToolFrame): ToolInline {
 
   return {
     icon: "⚙",
-    title: `${ctx.name} ${title}`,
+    title: t("cli.tool.", { name: ctx.name, title: title }),
   }
 }
 
@@ -325,7 +325,7 @@ function runRead(p: ToolProps<typeof ReadTool>): ToolInline {
   const description = info(p.frame.input, ["filePath"]) || undefined
   return {
     icon: "→",
-    title: `Read ${file}`,
+    title: t("cli.tool.read", { file: file }),
     ...(description && { description }),
   }
 }
@@ -333,7 +333,7 @@ function runRead(p: ToolProps<typeof ReadTool>): ToolInline {
 function runWrite(p: ToolProps<typeof WriteTool>): ToolInline {
   return {
     icon: "←",
-    title: `Write ${toolPath(p.input.filePath)}`,
+    title: t("cli.tool.write", { p0: toolPath(p.input.filePath) }),
     mode: "block",
     body: p.frame.status === "completed" ? text(p.frame.state.output) : undefined,
   }
@@ -343,14 +343,14 @@ function runWebfetch(p: ToolProps<typeof WebFetchTool>): ToolInline {
   const url = p.input.url ?? ""
   return {
     icon: "%",
-    title: url ? `WebFetch ${url}` : "WebFetch",
+    title: url ? t("cli.tool.webfetch", { url: url }) : "WebFetch",
   }
 }
 
 function runEdit(p: ToolProps<typeof EditTool>): ToolInline {
   return {
     icon: "←",
-    title: `Edit ${toolPath(p.input.filePath)}`,
+    title: t("cli.tool.edit", { p0: toolPath(p.input.filePath) }),
     mode: "block",
     body: p.metadata.diff,
   }
@@ -507,7 +507,7 @@ function snapWrite(p: ToolProps<typeof WriteTool>): ToolSnapshot | undefined {
 
   return {
     kind: "code",
-    title: `# Wrote ${toolPath(file)}`,
+    title: t("cli.tool.wrote", { p0: toolPath(file) }),
     content,
     file,
   }
@@ -524,7 +524,7 @@ function snapEdit(p: ToolProps<typeof EditTool>): ToolSnapshot | undefined {
     kind: "diff",
     items: [
       {
-        title: `# Edited ${toolPath(file)}`,
+        title: t("cli.tool.edited", { p0: toolPath(file) }),
         diff,
         file,
       },
@@ -577,7 +577,7 @@ function snapTask(p: ToolProps<typeof TaskTool>): ToolSnapshot {
 
   return {
     kind: "task",
-    title: `# ${kind} Task`,
+    title: t("cli.tool.task", { kind: kind }),
     rows,
     tail: "",
   }
@@ -783,7 +783,7 @@ function scrollTaskFinal(p: ToolProps<typeof TaskTool>): string {
   const kind = Locale.titlecase(p.input.subagent_type || "general")
   const row = p.input.description || text(p.frame.state.title)
   if (!row) {
-    return `# ${kind} Task`
+    return t("cli.tool.task", { kind: kind })
   }
 
   return `# ${kind} Task\n${row}`
@@ -943,7 +943,7 @@ function permGlob(p: ToolPermissionProps<typeof GlobTool>): ToolPermissionInfo {
   const pattern = p.input.pattern || p.patterns[0] || ""
   return {
     icon: "✱",
-    title: `Glob "${pattern}"`,
+    title: t("cli.tool.glob", { pattern: pattern }),
     lines: pattern ? [`Pattern: ${pattern}`] : [],
   }
 }
@@ -952,7 +952,7 @@ function permGrep(p: ToolPermissionProps<typeof GrepTool>): ToolPermissionInfo {
   const pattern = p.input.pattern || p.patterns[0] || ""
   return {
     icon: "✱",
-    title: `Grep "${pattern}"`,
+    title: t("cli.tool.grep", { pattern: pattern }),
     lines: pattern ? [`Pattern: ${pattern}`] : [],
   }
 }
@@ -980,7 +980,7 @@ function permTask(p: ToolPermissionProps<typeof TaskTool>): ToolPermissionInfo {
   const desc = p.input.description
   return {
     icon: "#",
-    title: `${Locale.titlecase(type)} Task`,
+    title: t("cli.tool.task.2", { p0: Locale.titlecase(type) }),
     lines: desc ? [`◉ ${desc}`] : [],
   }
 }
@@ -989,7 +989,7 @@ function permWebfetch(p: ToolPermissionProps<typeof WebFetchTool>): ToolPermissi
   const url = p.input.url || ""
   return {
     icon: "%",
-    title: `WebFetch ${url}`,
+    title: t("cli.tool.webfetch", { url: url }),
     lines: url ? [`URL: ${url}`] : [],
   }
 }

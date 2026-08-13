@@ -130,7 +130,7 @@ const createToolContext = Effect.fn("Cli.debug.agent.createToolContext")(functio
   ctx: InstanceContext,
 ) {
   const sessionSvc = yield* Session.Service
-  const session = yield* sessionSvc.create({ title: `Debug tool run (${agent.name})` })
+  const session = yield* sessionSvc.create({ title: t("cli.agent_handler.debug-tool-run", { name: agent.name }) })
   const messageID = MessageID.ascending()
   const model = agent.model
     ? agent.model

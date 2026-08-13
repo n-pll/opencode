@@ -933,13 +933,13 @@ async function installPluginBySpec(
     if (manifest.code === "manifest_no_targets") {
       return {
         ok: false,
-        message: `"${spec}" does not expose plugin entrypoints or oc-themes in package.json`,
+        message: t("cli.runtime.does-not-expose-plugin-entrypoints-or-oc-themes-in-package-j", { spec: spec }),
       }
     }
 
     return {
       ok: false,
-      message: `Installed "${spec}" but failed to read ${manifest.file}`,
+      message: t("cli.runtime.installed-but-failed-to-read", { spec: spec, file: manifest.file }),
     }
   }
 
@@ -955,7 +955,7 @@ async function installPluginBySpec(
     if (patch.code === "invalid_json") {
       return {
         ok: false,
-        message: `Invalid JSON in ${patch.file} (${patch.parse} at line ${patch.line}, column ${patch.col})`,
+        message: t("cli.plugin.error.invalid-json", { file: patch.file, parse: patch.parse, line: patch.line, col: patch.col }),
       }
     }
 
@@ -997,7 +997,7 @@ export async function init(input: {
   const cwd = process.cwd()
   if (loaded) {
     if (dir !== cwd) {
-      throw new Error(`TuiPluginRuntime.init() called with a different working directory. expected=${dir} got=${cwd}`)
+      throw new Error(t("cli.runtime.tuipluginruntime-init-called-with-a-different-working-direct", { dir: dir, cwd: cwd }))
     }
     return loaded
   }

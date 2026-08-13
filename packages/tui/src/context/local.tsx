@@ -101,7 +101,7 @@ export const { use: useLocal, provider: LocalProvider } = createSimpleContext({
           if (!agents().some((x) => x.name === name))
             return toast.show({
               variant: "warning",
-              message: `Agent not found: ${name}`,
+              message: t("tui.local.agent-not-found", { name: name }),
               duration: 3000,
             })
           setAgentStore("current", name)
@@ -322,7 +322,7 @@ export const { use: useLocal, provider: LocalProvider } = createSimpleContext({
           batch(() => {
             if (!isModelValid(model)) {
               toast.show({
-                message: `Model ${model.providerID}/${model.modelID} is not valid`,
+                message: t("tui.local.model-is-not-valid", { providerID: model.providerID, modelID: model.modelID }),
                 variant: "warning",
                 duration: 3000,
               })
@@ -341,7 +341,7 @@ export const { use: useLocal, provider: LocalProvider } = createSimpleContext({
           batch(() => {
             if (!isModelValid(model)) {
               toast.show({
-                message: `Model ${model.providerID}/${model.modelID} is not valid`,
+                message: t("tui.local.model-is-not-valid", { providerID: model.providerID, modelID: model.modelID }),
                 variant: "warning",
                 duration: 3000,
               })
@@ -526,7 +526,7 @@ export const { use: useLocal, provider: LocalProvider } = createSimpleContext({
       if (isModelValid(value.model)) return
       toast.show({
         variant: "warning",
-        message: `Agent ${value.name}'s configured model ${value.model.providerID}/${value.model.modelID} is not valid`,
+        message: t("tui.local.agent-s-configured-model-is-not-valid", { name: value.name, providerID: value.model.providerID, modelID: value.model.modelID }),
         duration: 3000,
       })
     })

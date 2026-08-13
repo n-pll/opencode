@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import { LayerNode } from "@opencode-ai/core/effect/layer-node"
 import { PermissionV1 } from "@opencode-ai/core/v1/permission"
 import { Slug } from "@opencode-ai/core/util/slug"
@@ -541,7 +542,7 @@ const layer: Layer.Layer<
 
     const get = Effect.fn("Session.get")(function* (id: SessionID) {
       const row = yield* db.select().from(SessionTable).where(eq(SessionTable.id, id)).get().pipe(Effect.orDie)
-      if (!row) return yield* Effect.fail(new NotFoundError({ message: `Session not found: ${id}` }))
+      if (!row) return yield* Effect.fail(new NotFoundError({ message: t("cli.session.session-not-found", { id: id }) }))
       return fromRow(row)
     })
 

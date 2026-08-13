@@ -29,7 +29,7 @@ export const Input = Schema.Struct({
   timeout: PositiveInt.check(Schema.isLessThanOrEqualTo(MAX_TIMEOUT_MS))
     .pipe(Schema.optional)
     .annotate({
-      description: `Timeout in milliseconds. Defaults to ${DEFAULT_TIMEOUT_MS} and may not exceed ${MAX_TIMEOUT_MS}.`,
+      description: t("core.bash.timeout-in-milliseconds-defaults-to-and-may-not-exceed", { DEFAULT_TIMEOUT_MS: DEFAULT_TIMEOUT_MS, MAX_TIMEOUT_MS: MAX_TIMEOUT_MS }),
     }),
 })
 
@@ -107,7 +107,7 @@ const layer = Layer.effectDiscard(
     yield* tools
       .register({
         [name]: Tool.make({
-          description: `Execute one shell command string with the host user's filesystem, process, and network authority. The active Location is the default working directory. Relative workdir values resolve from that Location. External workdir values require external_directory approval; best-effort command-argument path warnings are advisory only. Timeout values are milliseconds (default: ${DEFAULT_TIMEOUT_MS}; maximum: ${MAX_TIMEOUT_MS}). Uses the configured shell when set; otherwise uses /bin/sh on POSIX and COMSPEC or cmd.exe on Windows.`,
+          description: t("core.bash.execute-one-shell-command-string-with-the-host-user-s-filesy", { DEFAULT_TIMEOUT_MS: DEFAULT_TIMEOUT_MS, MAX_TIMEOUT_MS: MAX_TIMEOUT_MS }),
           input: Input,
           output: Output,
           structured: StructuredOutput,
@@ -150,7 +150,7 @@ const layer = Layer.effectDiscard(
               })
 
               if ((yield* fs.stat(target.canonical)).type !== "Directory")
-                return yield* Effect.fail(new Error(`Working directory is not a directory: ${target.canonical}`))
+                return yield* Effect.fail(new Error(t("core.bash.working-directory-is-not-a-directory", { canonical: target.canonical })))
 
               const entries = yield* config.entries()
               const shell =
@@ -194,7 +194,7 @@ const layer = Layer.effectDiscard(
                 truncated: result.outputTruncated === true,
                 ...(warnings.length ? { warnings } : {}),
               }
-            }).pipe(Effect.mapError(() => new ToolFailure({ message: `Unable to execute command: ${input.command}` }))),
+            }).pipe(Effect.mapError(() => new ToolFailure({ message: t("core.bash.unable-to-execute-command", { command: input.command }) }))),
         }),
       })
       .pipe(Effect.orDie)

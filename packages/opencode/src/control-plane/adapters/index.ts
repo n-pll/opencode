@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import type { ProjectV2 } from "@opencode-ai/core/project"
 import type { WorkspaceAdapter, WorkspaceAdapterEntry } from "../types"
 import { WorktreeAdapter } from "./worktree"
@@ -15,7 +16,7 @@ export function getAdapter(projectID: ProjectV2.ID, type: string): WorkspaceAdap
   const builtin = BUILTIN[type]
   if (builtin) return builtin
 
-  throw new Error(`Unknown workspace adapter: ${type}`)
+  throw new Error(t("cli.index.unknown-workspace-adapter", { type: type }))
 }
 
 export function listAdapters(projectID: ProjectV2.ID): WorkspaceAdapterEntry[] {

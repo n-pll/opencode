@@ -91,7 +91,7 @@ const layer = Layer.effectDiscard(
                   ),
                 )
             }).pipe(
-              Effect.mapError(() => new ToolFailure({ message: `Unable to find files matching ${input.pattern}` })),
+              Effect.mapError(() => new ToolFailure({ message: t("core.glob.unable-to-find-files-matching", { pattern: input.pattern }) })),
             ),
         }),
       })

@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 export * as ConfigParse from "./parse"
 
 import { type ParseError as JsoncParseError, parse as parseJsoncImpl, printParseErrorCode } from "jsonc-parser"
@@ -25,7 +26,7 @@ export function jsonc(text: string, filepath: string): unknown {
       .join("\n")
     throw new JsonError({
       path: filepath,
-      message: `\n--- JSONC Input ---\n${text}\n--- Errors ---\n${issues}\n--- End ---`,
+      message: t("cli.parse.n-jsonc-input-n-n-errors-n-n-end", { text: text, issues: issues }),
     })
   }
 

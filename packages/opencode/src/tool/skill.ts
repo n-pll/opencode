@@ -1,3 +1,4 @@
+import { t } from "@/i18n"
 import path from "path"
 import { Effect, Schema } from "effect"
 import { Ripgrep } from "@opencode-ai/core/ripgrep"
@@ -43,7 +44,7 @@ export const SkillTool = Tool.define(
           })
 
           return {
-            title: `Loaded skill: ${info.name}`,
+            title: t("cli.skill.loaded-skill", { name: info.name }),
             output: [
               `<skill_content name="${info.name}">`,
               `# Skill: ${info.name}`,

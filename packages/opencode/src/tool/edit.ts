@@ -122,8 +122,8 @@ export const EditTool = Tool.define(
               }
 
               const info = yield* afs.stat(filePath).pipe(Effect.catch(() => Effect.succeed(undefined)))
-              if (!info) throw new Error(`File ${filePath} not found`)
-              if (info.type === "Directory") throw new Error(`Path is a directory, not a file: ${filePath}`)
+              if (!info) throw new Error(t("cli.edit.file-not-found", { filePath: filePath }))
+              if (info.type === "Directory") throw new Error(t("cli.edit.path-is-a-directory-not-a-file", { filePath: filePath }))
               const source = yield* Bom.readFile(afs, filePath)
               contentOld = source.text
 
@@ -207,7 +207,7 @@ export const EditTool = Tool.define(
               diff,
               filediff,
             },
-            title: `${path.relative(instance.worktree, filePath)}`,
+            title: t("cli.edit.", { p0: path.relative(instance.worktree, filePath) }),
             output,
           }
         }),

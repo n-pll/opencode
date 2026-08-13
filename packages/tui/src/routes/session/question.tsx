@@ -436,7 +436,7 @@ export function QuestionPrompt(props: { request: QuestionRequest; directory?: st
                           })
                         }}
                         initialValue={input()}
-                        placeholder="Type your own answer"
+                        placeholder={t("tui.question.type-your-own-answer")}
                         placeholderColor={theme.textMuted}
                         minHeight={1}
                         maxHeight={6}

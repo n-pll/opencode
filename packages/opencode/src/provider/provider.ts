@@ -1784,7 +1784,7 @@ const layer = Layer.effect(
             return model.api.npm
           }
           const item = await Npm.add(model.api.npm)
-          if (!item.entrypoint) throw new Error(`Package ${model.api.npm} has no import entrypoint`)
+          if (!item.entrypoint) throw new Error(t("cli.provider.package-has-no-import-entrypoint", { npm: model.api.npm }))
           return item.entrypoint
         })()
 

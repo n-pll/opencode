@@ -304,7 +304,7 @@ const layer = Layer.effect(
                 return events
                   .publish(TuiEvent.ToastShow, {
                     title: t("cli.index.mcp-authentication-required"),
-                    message: `Server "${key}" requires a pre-registered client ID. Add clientId to your config.`,
+                    message: t("cli.index.server-requires-a-pre-registered-client-id-add-clientid-to-y", { key: key }),
                     variant: "warning",
                     duration: 8000,
                   })
@@ -315,7 +315,7 @@ const layer = Layer.effect(
                 return events
                   .publish(TuiEvent.ToastShow, {
                     title: t("cli.index.mcp-authentication-required"),
-                    message: `Server "${key}" requires authentication. Run: opencode mcp auth ${key}`,
+                    message: t("cli.index.server-requires-authentication-run-opencode-mcp-auth", { key: key, key0: key }),
                     variant: "warning",
                     duration: 8000,
                   })
@@ -476,17 +476,17 @@ const layer = Layer.effect(
       const fields = { server: name, logger: params.logger, level: params.level, data: params.data }
       switch (params.level) {
         case "debug":
-          return Effect.logDebug("MCP server log", fields)
+          return Effect.logDebug(t("cli.index.mcp-server-log"), fields)
         case "info":
         case "notice":
-          return Effect.logInfo("MCP server log", fields)
+          return Effect.logInfo(t("cli.index.mcp-server-log"), fields)
         case "warning":
-          return Effect.logWarning("MCP server log", fields)
+          return Effect.logWarning(t("cli.index.mcp-server-log"), fields)
         case "error":
         case "critical":
         case "alert":
         case "emergency":
-          return Effect.logError("MCP server log", fields)
+          return Effect.logError(t("cli.index.mcp-server-log"), fields)
       }
     }
 
@@ -508,7 +508,7 @@ const layer = Layer.effect(
           ([key, mcp]) =>
             Effect.gen(function* () {
               if (!isMcpConfigured(mcp)) {
-                yield* Effect.logError("Ignoring MCP config entry without type", { key })
+                yield* Effect.logError(t("cli.index.ignoring-mcp-config-entry-without-type"), { key })
                 return
               }
 
@@ -756,7 +756,7 @@ const layer = Layer.effect(
         catch: (error) => error,
       }).pipe(
         Effect.tapError((error) =>
-          Effect.logError(`failed to ${label}`, {
+          Effect.logError(t("cli.index.failed-to", { label: label }), {
             clientName,
             ...meta,
             error: error instanceof Error ? error.message : String(error),
@@ -806,8 +806,8 @@ const layer = Layer.effect(
 
     const startAuth = Effect.fn("MCP.startAuth")(function* (mcpName: string) {
       const mcpConfig = yield* requireMcpConfig(mcpName)
-      if (mcpConfig.type !== "remote") throw new Error(`MCP server ${mcpName} is not a remote server`)
-      if (mcpConfig.oauth === false) throw new Error(`MCP server ${mcpName} has OAuth explicitly disabled`)
+      if (mcpConfig.type !== "remote") throw new Error(t("cli.index.mcp-server-is-not-a-remote-server", { mcpName: mcpName }))
+      if (mcpConfig.oauth === false) throw new Error(t("cli.index.mcp-server-has-oauth-explicitly-disabled", { mcpName: mcpName }))
       const url = remoteURL(mcpConfig.url)
       if (!url) throw new Error(t("cli.mcp.invalid_mcp_url", { key: mcpName }))
 
@@ -919,7 +919,7 @@ const layer = Layer.effect(
     const finishAuth = Effect.fn("MCP.finishAuth")(function* (mcpName: string, authorizationCode: string) {
       yield* requireMcpConfig(mcpName)
       const pending = pendingOAuthTransports.get(mcpName)
-      if (!pending) throw new Error(`No pending OAuth flow for MCP server: ${mcpName}`)
+      if (!pending) throw new Error(t("cli.index.no-pending-oauth-flow-for-mcp-server", { mcpName: mcpName }))
 
       const error = yield* Effect.tryPromise({
         try: () => pending.transport.finishAuth(authorizationCode),
@@ -931,7 +931,7 @@ const layer = Layer.effect(
         }),
       )
 
-      if (error) return { status: "failed", error: `OAuth completion failed: ${error}` } satisfies Status
+      if (error) return { status: "failed", error: t("cli.index.oauth-completion-failed", { error: error }) } satisfies Status
 
       yield* Effect.promise(() => pending.provider?.commit() ?? Promise.resolve())
       yield* auth.clearCodeVerifier(mcpName)

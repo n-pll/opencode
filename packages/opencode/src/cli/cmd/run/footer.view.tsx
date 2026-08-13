@@ -465,7 +465,7 @@ export function RunFooterView(props: RunFooterViewProps) {
       items.push({ kind: "background", key: backgroundShortcut(), label: "background" })
     }
     if (queuedPrompts().length > 0 && queuedShortcut()) {
-      items.push({ kind: "queued", key: queuedShortcut(), label: `${queue()} queued` })
+      items.push({ kind: "queued", key: queuedShortcut(), label: t("cli.footer_view.queued", { p0: queue() }) })
     }
     if (activeTabs().length > 0 && subagentShortcut()) {
       items.push({ kind: "subagents", key: subagentShortcut(), label: "subagents" })

@@ -21,4 +21,7 @@ export const dict: Record<string, string> = {
   // tui-event.ts
   "schema.tui_event.duration": "Duration in milliseconds",
   "schema.tui_event.session_select.sessionID": "Session ID to navigate to",
+  "schema.event.duplicate-latest-event-definition-for": "Duplicate latest event definition for {{type}}",
+  "schema.event.duplicate-durable-event-definition-for": "Duplicate durable event definition for {{key}}",
+  "schema.workspace_id.id-does-not-start-with-wrk": "ID {{id}} does not start with wrk",
 }
